@@ -144,14 +144,58 @@
   }
   .detail .v { font-size: 18px; font-weight: 700; margin-top: 3px; }
 
-  .assume {
-    margin-top: 16px; padding: 16px 18px; border-left: 3px solid var(--flipdish-blue);
+  .breakdown {
+    margin-top: 16px; padding: 18px 20px;
+    border-left: 3px solid var(--flipdish-blue);
     background: #F5FAFE; font-size: 13px; color: #0A2A47;
     border-radius: 0 8px 8px 0;
   }
-  .assume strong { color: var(--flipdish-dark); display: block; margin-bottom: 4px; }
-  .assume ul { margin: 4px 0 0; padding-left: 18px; }
-  .assume li { margin-bottom: 2px; }
+  .breakdown > strong {
+    display: block; font-size: 13px; margin-bottom: 14px;
+    color: var(--flipdish-dark);
+  }
+  .breakdown-section { margin-bottom: 16px; }
+  .breakdown-section:last-child { margin-bottom: 0; }
+  .breakdown-title {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 6px; padding-bottom: 5px;
+    border-bottom: 1px solid #D7E5F0;
+  }
+  .breakdown-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 4px 0; gap: 12px;
+  }
+  .breakdown-row > span:first-child { color: #334155; }
+  .breakdown-row > span:last-child {
+    font-weight: 600; font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .breakdown-row.indent {
+    padding-left: 16px;
+  }
+  .breakdown-row.indent > span:first-child {
+    color: var(--muted); font-size: 12px; position: relative;
+  }
+  .breakdown-row.indent > span:first-child::before {
+    content: "•"; margin-right: 6px; color: var(--flipdish-blue);
+  }
+  .breakdown-row.total {
+    font-weight: 700;
+    border-top: 1px solid #D7E5F0;
+    padding-top: 6px; margin-top: 2px;
+  }
+  .breakdown-row.total > span:last-child {
+    color: var(--flipdish-blue-dark);
+  }
+  .breakdown-section.result {
+    background: white; border: 1px solid var(--flipdish-blue-line);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .breakdown-row.total.headline {
+    border-top: none; padding-top: 3px; margin-top: 0;
+    font-size: 14px;
+  }
+  .breakdown-row.total.headline > span:last-child { font-size: 15px; }
 
   footer {
     margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center;
@@ -229,8 +273,8 @@
   <p class="lede" id="pageLede">See exactly how much a restaurant gets back when orders move from third-party marketplaces to Flipdish direct ordering. All Flipdish fees deducted — what's shown is real money the restaurant keeps.</p>
 
   <div class="segmented" role="tablist">
-    <button class="active" data-view="own">Restaurant has own drivers</button>
-    <button data-view="no">Uses delivery service</button>
+    <button class="active" data-view="own">Restaurant has drivers</button>
+    <button data-view="no">Restaurant needs delivery</button>
   </div>
 
   <div class="layout">
@@ -254,7 +298,7 @@
       </div>
 
       <div class="input-row">
-        <label>Average order value (AOV) <span class="hint">marketplace + online avg</span></label>
+        <label>Average order value (AOV) <span class="hint">used to work out order counts</span></label>
         <input id="aov" type="number" value="25">
       </div>
 
@@ -269,7 +313,7 @@
         <input id="mpRateOwn" type="number" value="12" step="0.5">
       </div>
       <div class="input-row own-drivers-only">
-        <label>% rerouted to Flipdish <span class="hint">orders that move from marketplaces</span></label>
+        <label>% captured by Flipdish <span class="hint">orders that move from marketplaces</span></label>
         <input id="convOwn" type="number" value="70" step="5">
       </div>
       <div class="input-row own-drivers-only">
@@ -283,7 +327,7 @@
         <input id="mpRateNo" type="number" value="30" step="0.5">
       </div>
       <div class="input-row no-drivers-only">
-        <label>% rerouted to Flipdish <span class="hint">lower when delivery still needed</span></label>
+        <label>% captured by Flipdish <span class="hint">lower when delivery still needed</span></label>
         <input id="convNo" type="number" value="40" step="5">
       </div>
       <div class="input-row no-drivers-only">
@@ -295,22 +339,22 @@
         <summary>Advanced &mdash; Flipdish fees, subscription &amp; delivery</summary>
 
         <div class="input-row own-drivers-only" style="margin-top:10px;">
-          <label>Flipdish processing fee % (own drivers) <span class="hint">on Flipdish-routed GMV</span></label>
+          <label>Flipdish processing fee % <span class="hint">on Flipdish-routed GMV</span></label>
           <input id="fdFeeOwn" type="number" value="3.5" step="0.1">
         </div>
 
         <div class="input-row no-drivers-only" style="margin-top:10px;">
-          <label>Flipdish processing fee % (delivery service) <span class="hint">on Flipdish-routed GMV</span></label>
+          <label>Flipdish processing fee % <span class="hint">on Flipdish-routed GMV</span></label>
           <input id="fdFeeNo" type="number" value="5.0" step="0.1">
         </div>
 
         <div class="input-row">
-          <label>Flipdish OO subscription <span class="hint">monthly, fixed</span></label>
+          <label>Flipdish Online Ordering subscription <span class="hint">monthly, fixed</span></label>
           <input id="fdSub" type="number" value="99">
         </div>
 
         <div class="input-row no-drivers-only">
-          <label>Avg Flipdish delivery cost per order <span class="hint">paid by restaurant, e.g. £5.31 / €5.31 / $5.50</span></label>
+          <label>Avg delivery cost per order <span class="hint">paid by restaurant, e.g. £5.31 / €5.31 / $5.50</span></label>
           <input id="fdDelivery" type="number" value="5.31" step="0.01">
         </div>
       </details>
@@ -320,29 +364,54 @@
     <!-- RESULTS -->
     <div>
       <div class="hero">
-        <div class="label" id="heroLabel">Monthly revenue increase</div>
+        <div class="label" id="heroLabel">Additional annual revenue</div>
         <div class="big" id="heroBig">—</div>
         <div class="sub" id="heroSub">Net of all Flipdish fees, subscription and delivery costs</div>
       </div>
 
       <div class="detail-grid">
         <div class="detail">
-          <div class="k">Annual increase</div>
+          <div class="k">Monthly uplift</div>
           <div class="v" id="k1">—</div>
         </div>
         <div class="detail">
-          <div class="k">Revenue today</div>
+          <div class="k">Kept today</div>
           <div class="v" id="k2">—</div>
         </div>
         <div class="detail">
-          <div class="k">Revenue with Flipdish</div>
+          <div class="k">Kept with Flipdish</div>
           <div class="v" id="k3">—</div>
         </div>
       </div>
 
-      <div class="assume">
+      <div class="breakdown">
         <strong>How we got there</strong>
-        <ul id="assumeList"></ul>
+
+        <div class="breakdown-section">
+          <div class="breakdown-title">Today — Marketplaces only</div>
+          <div class="breakdown-row"><span>Monthly GMV</span><span id="b-today-gmv">—</span></div>
+          <div class="breakdown-row"><span>Monthly orders</span><span id="b-today-orders">—</span></div>
+          <div class="breakdown-row"><span id="b-today-mpcost-label">Marketplace take</span><span id="b-today-mpcost">—</span></div>
+          <div class="breakdown-row total"><span>Restaurant keeps</span><span id="b-today-keep">—</span></div>
+        </div>
+
+        <div class="breakdown-section">
+          <div class="breakdown-title">With Flipdish Online Ordering</div>
+          <div class="breakdown-row"><span id="b-fd-gmv-label">Monthly GMV (with uplift)</span><span id="b-fd-gmv">—</span></div>
+          <div class="breakdown-row"><span>Total monthly orders</span><span id="b-fd-orders">—</span></div>
+          <div class="breakdown-row indent"><span>via Flipdish</span><span id="b-fd-fdorders">—</span></div>
+          <div class="breakdown-row indent"><span>still on marketplaces</span><span id="b-fd-mporders">—</span></div>
+          <div class="breakdown-row"><span>Marketplace take (remaining)</span><span id="b-fd-mpcost">—</span></div>
+          <div class="breakdown-row"><span id="b-fd-processing-label">Flipdish processing</span><span id="b-fd-processing">—</span></div>
+          <div class="breakdown-row"><span>Flipdish Online Ordering subscription</span><span id="b-fd-sub">—</span></div>
+          <div class="breakdown-row no-drivers-only"><span>Delivery cost</span><span id="b-fd-delivery">—</span></div>
+          <div class="breakdown-row total"><span>Restaurant keeps</span><span id="b-fd-keep">—</span></div>
+        </div>
+
+        <div class="breakdown-section result">
+          <div class="breakdown-row total headline"><span>Monthly uplift</span><span id="b-monthly">—</span></div>
+          <div class="breakdown-row total headline"><span>Annual uplift</span><span id="b-annual">—</span></div>
+        </div>
       </div>
     </div>
 
@@ -453,28 +522,43 @@
     const monthlyIncrease = revenueWithFD - revenueToday;
     const annualIncrease = monthlyIncrease * 12;
 
-    // ---- Render results ----
-    $('heroBig').textContent = fmtMoney(monthlyIncrease) + '/mo';
+    // ---- Update page title to reflect the actual marketplace cut ----
+    $('pageTitle').textContent = `Stop giving ${Math.round(mpRate)}% to the marketplaces`;
+
+    // ---- Render headline (annual) + detail cards ----
+    $('heroBig').textContent = fmtMoney(annualIncrease) + '/yr';
     $('heroSub').textContent = isOwn
       ? 'Net of Flipdish processing and subscription'
       : 'Net of Flipdish processing, subscription and delivery costs';
-    $('k1').textContent = fmtMoney(annualIncrease) + '/yr';
+    $('k1').textContent = fmtMoney(monthlyIncrease) + '/mo';
     $('k2').textContent = fmtMoney(revenueToday) + '/mo';
     $('k3').textContent = fmtMoney(revenueWithFD) + '/mo';
 
-    // ---- Assumptions ----
-    const lines = [];
-    lines.push(`Total orders: <strong>${fmtOrders(newOrders)}</strong>/month — <strong>${fmtOrders(fdOrders)}</strong> via Flipdish, <strong>${fmtOrders(remainingMpOrders)}</strong> remain on marketplaces.`);
-    lines.push(`Marketplace effective cost: <strong>${fmtPct(mpEffective * 100)}</strong> (${fmtPct(mpRate)} cut + ${fmtPct(vat)} VAT) — costs the restaurant <strong>${fmtMoney(remainingMpCost)}/mo</strong> on remaining marketplace orders.`);
-    if (isOwn) {
-      lines.push(`Flipdish costs: <strong>${fmtMoney(fdProcessing)}</strong> processing (${fmtPct(fdFee)} of ${fmtMoney(fdGmv)}) + <strong>${fmtMoney(fdSub)}</strong> subscription = <strong>${fmtMoney(fdTotal)}/mo</strong>.`);
-    } else {
-      lines.push(`Flipdish costs: <strong>${fmtMoney(fdProcessing)}</strong> processing + <strong>${fmtMoney(fdSub)}</strong> subscription + <strong>${fmtMoney(fdDeliveryTotal)}</strong> delivery (${fmtOrders(fdOrders)} orders × ${currency}${fdDelivery.toFixed(2)}) = <strong>${fmtMoney(fdTotal)}/mo</strong>.`);
-    }
-    lines.push(`Order volume uplift of <strong>${fmtPct(uplift)}</strong> from Flipdish marketing &amp; loyalty included.`);
-    lines.push(`Restaurant keeps <strong>${fmtMoney(revenueWithFD)}</strong> with Flipdish vs <strong>${fmtMoney(revenueToday)}</strong> on marketplaces only — <strong>${fmtMoney(monthlyIncrease)}/mo</strong> more in their pocket.`);
+    // ---- Breakdown: Today ----
+    $('b-today-gmv').textContent = fmtMoney(gmv) + '/mo';
+    $('b-today-orders').textContent = fmtOrders(mpOrdersToday);
+    $('b-today-mpcost-label').textContent = `Marketplace take (${fmtPct(mpRate)} + ${fmtPct(vat)} VAT = ${fmtPct(mpEffective * 100)})`;
+    $('b-today-mpcost').textContent = '-' + fmtMoney(mpCostToday);
+    $('b-today-keep').textContent = fmtMoney(revenueToday) + '/mo';
 
-    $('assumeList').innerHTML = lines.map(l => '<li>' + l + '</li>').join('');
+    // ---- Breakdown: With Flipdish ----
+    $('b-fd-gmv-label').textContent = uplift > 0
+      ? `Monthly GMV (with ${fmtPct(uplift)} uplift)`
+      : `Monthly GMV`;
+    $('b-fd-gmv').textContent = fmtMoney(newGmv) + '/mo';
+    $('b-fd-orders').textContent = fmtOrders(newOrders);
+    $('b-fd-fdorders').textContent = fmtOrders(fdOrders);
+    $('b-fd-mporders').textContent = fmtOrders(remainingMpOrders);
+    $('b-fd-mpcost').textContent = '-' + fmtMoney(remainingMpCost);
+    $('b-fd-processing-label').textContent = `Flipdish processing (${fmtPct(fdFee)})`;
+    $('b-fd-processing').textContent = '-' + fmtMoney(fdProcessing);
+    $('b-fd-sub').textContent = '-' + fmtMoney(fdSub);
+    $('b-fd-delivery').textContent = '-' + fmtMoney(fdDeliveryTotal) + ' (' + fmtOrders(fdOrders) + ' × ' + currency + fdDelivery.toFixed(2) + ')';
+    $('b-fd-keep').textContent = fmtMoney(revenueWithFD) + '/mo';
+
+    // ---- Breakdown: Result ----
+    $('b-monthly').textContent = fmtMoney(monthlyIncrease) + '/mo';
+    $('b-annual').textContent = fmtMoney(annualIncrease) + '/yr';
   }
 
   calc();
