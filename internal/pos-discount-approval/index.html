@@ -525,7 +525,6 @@
       <button class="country-btn" data-country="UK">🇬🇧 United Kingdom</button>
       <button class="country-btn" data-country="IE">🇮🇪 Ireland</button>
     </div>
-    <div class="country-meta" id="countryMeta">—</div>
   </div>
 
   <!-- ===================================================== -->
@@ -948,8 +947,6 @@
       btn.classList.toggle('active', btn.dataset.country === code);
     });
     const co = COUNTRIES[code];
-    $('countryMeta').innerHTML =
-      `Card cost: <strong>${(co.cardPct*100).toFixed(2)}% + ${co.currency}${co.cardFix.toFixed(3)}</strong> · ${co.subsidyName} typical: <strong>${co.currency}${co.typicalSubsidy}</strong> if approved · Typical processing fee <strong>${co.typicalCommission}%</strong>`;
     updateCurrencyPrefixes();
 
     // Update subsidy label everywhere

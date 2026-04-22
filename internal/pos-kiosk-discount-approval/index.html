@@ -446,7 +446,6 @@
       <button class="country-btn" data-country="UK">🇬🇧 United Kingdom</button>
       <button class="country-btn" data-country="IE">🇮🇪 Ireland</button>
     </div>
-    <div class="country-meta" id="countryMeta">—</div>
   </div>
 
   <!-- ===================================================== -->
@@ -516,7 +515,7 @@
         <div class="input-cell">
           <label for="posComm">POS processing fee <span style="text-transform:none;font-weight:400;color:var(--muted);">(% of POS GMV)</span></label>
           <div class="input-wrap">
-            <input id="posComm" class="has-suffix" type="number" value="1.0" step="0.05" min="0">
+            <input id="posComm" class="has-suffix" type="number" value="1.2" step="0.05" min="0">
             <span class="suffix">%</span>
           </div>
         </div>
@@ -524,7 +523,7 @@
           <label for="posMerchant">POS transaction fee <span style="text-transform:none;font-weight:400;color:var(--muted);">(per POS order)</span></label>
           <div class="input-wrap">
             <span class="prefix" id="posMerchantPrefix">£</span>
-            <input id="posMerchant" class="has-prefix" type="number" value="0.04" step="0.01" min="0">
+            <input id="posMerchant" class="has-prefix" type="number" value="0.10" step="0.01" min="0">
           </div>
         </div>
       </div>
@@ -536,7 +535,7 @@
         <div class="input-cell">
           <label for="kioskComm">Kiosk processing fee <span style="text-transform:none;font-weight:400;color:var(--muted);">(% of Kiosk GMV)</span></label>
           <div class="input-wrap">
-            <input id="kioskComm" class="has-suffix" type="number" value="1.4" step="0.05" min="0">
+            <input id="kioskComm" class="has-suffix" type="number" value="1.5" step="0.05" min="0">
             <span class="suffix">%</span>
           </div>
         </div>
@@ -941,8 +940,6 @@
       btn.classList.toggle('active', btn.dataset.country === code);
     });
     const co = COUNTRIES[code];
-    $('countryMeta').innerHTML =
-      `Card cost: <strong>${(co.cardPct*100).toFixed(2)}% + ${co.currency}${co.cardFix.toFixed(3)}</strong> · ${co.subsidyName} typical: <strong>${co.currency}${co.typicalSubsidy}</strong>/POS terminal if approved`;
     updateCurrencyPrefixes();
 
     setText($('subsidyLabel'),       co.subsidyName, false);

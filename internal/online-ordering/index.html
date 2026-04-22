@@ -444,7 +444,6 @@
       <button class="country-btn" data-country="US">🇺🇸 United States</button>
       <button class="country-btn" data-country="ES">🇪🇸 Spain</button>
     </div>
-    <div class="country-meta" id="countryMeta">—</div>
   </div>
 
   <!-- ===================================================== -->
@@ -818,8 +817,6 @@
       btn.classList.toggle('active', btn.dataset.country === code);
     });
     const co = COUNTRIES[code];
-    $('countryMeta').innerHTML =
-      `Card processing cost: <strong>${(co.cardPct*100).toFixed(2)}% + ${co.currency}${co.cardFix.toFixed(3)}</strong> per order · Typical commission for ${co.name} <strong>${co.defaultCommission}%</strong>`;
     updateCurrencyPrefixes();
     runAll();
   }
