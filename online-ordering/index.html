@@ -62,6 +62,40 @@
   h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; font-weight: 700; color: var(--flipdish-blue-dark); }
   .lede { color: var(--muted); margin: 0 0 20px; font-size: 15px; max-width: 680px; }
 
+  /* ---------- Country bar ---------- */
+  .country-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .country-bar-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .country-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .country-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--flipdish-dark);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .country-btn:hover { border-color: var(--flipdish-blue); color: var(--flipdish-blue); }
+  .country-btn.active {
+    background: var(--flipdish-blue-dark);
+    border-color: var(--flipdish-blue-dark);
+    color: white;
+  }
+
   .segmented {
     display: inline-flex; background: #F1F2F4; border-radius: 10px; padding: 4px;
     margin-bottom: 22px;
@@ -272,6 +306,16 @@
   <h1 id="pageTitle">Stop giving 30% to the marketplaces</h1>
   <p class="lede" id="pageLede">See exactly how much a restaurant gets back when orders move from third-party marketplaces to Flipdish direct ordering. All Flipdish fees deducted — what's shown is real money the restaurant keeps.</p>
 
+  <!-- COUNTRY SELECTOR -->
+  <div class="country-bar">
+    <span class="country-bar-label">Country</span>
+    <div class="country-buttons" id="countryButtons">
+      <button class="country-btn" data-country="UK">🇬🇧 United Kingdom</button>
+      <button class="country-btn" data-country="IE">🇮🇪 Ireland</button>
+      <button class="country-btn" data-country="US">🇺🇸 United States</button>
+    </div>
+  </div>
+
   <div class="segmented" role="tablist">
     <button class="active" data-view="own">Restaurant has drivers</button>
     <button data-view="no">Restaurant needs delivery</button>
@@ -282,15 +326,6 @@
     <!-- INPUTS -->
     <div class="card">
       <h2>Restaurant's numbers <span class="legend">editable</span></h2>
-
-      <div class="input-row">
-        <label>Market <span class="hint">sets currency &amp; VAT</span></label>
-        <select id="market">
-          <option value="UK">United Kingdom (£)</option>
-          <option value="IE">Ireland (€)</option>
-          <option value="US">United States ($)</option>
-        </select>
-      </div>
 
       <div class="input-row">
         <label>Monthly GMV from marketplaces <span class="hint">order value before fees</span></label>
@@ -464,22 +499,30 @@
     });
   });
 
-  // ---------- market change updates defaults ----------
-  $('market').addEventListener('change', () => {
-    const m = defaultsByMarket[$('market').value];
+  // ---------- country selector ----------
+  let activeCountry = 'UK';
+  function setCountry(code) {
+    activeCountry = code;
+    document.querySelectorAll('.country-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.country === code);
+    });
+    const m = defaultsByMarket[code];
     $('vat').value = m.vat;
     $('fdSub').value = m.sub;
     $('fdDelivery').value = m.delivery;
     currency = m.currency;
     calc();
+  }
+  document.querySelectorAll('.country-btn').forEach(btn => {
+    btn.addEventListener('click', () => setCountry(btn.dataset.country));
   });
 
   // ---------- live recalculation ----------
   document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
 
   function calc() {
-    // Set currency from market
-    currency = defaultsByMarket[$('market').value].currency;
+    // Set currency from active country
+    currency = defaultsByMarket[activeCountry].currency;
 
     // Shared
     const gmv = num('gmv');
@@ -561,7 +604,7 @@
     $('b-annual').textContent = fmtMoney(annualIncrease) + '/yr';
   }
 
-  calc();
+  setCountry('UK');
 </script>
 </body>
 </html>

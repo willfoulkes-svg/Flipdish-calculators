@@ -77,6 +77,38 @@
     color: var(--muted); margin: 0 0 16px; font-weight: 700;
   }
 
+  /* ---------- Country bar ---------- */
+  .country-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .country-bar-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .country-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .country-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--flipdish-dark);
+    border-radius: 999px;
+    cursor: default;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .country-btn.active {
+    background: var(--flipdish-blue-dark);
+    border-color: var(--flipdish-blue-dark);
+    color: white;
+  }
+
   /* ---------- Inputs ribbon ---------- */
   .inputs-bar {
     display: grid;
@@ -340,6 +372,14 @@
 
   <h1 id="pageTitle">Stop paying 33% to marketplaces for delivery</h1>
   <p class="lede">Compare a restaurant's take-home on marketplace delivery (Just Eat, Deliveroo) vs ordering via Flipdish with Fox Delivery handling delivery in Ireland. The Fox Delivery rate is fixed by distance band — adjust what the customer pays per band to find a healthy take rate. All figures are ex-VAT: Fox charges VAT separately and it's reclaimable on both sides.</p>
+
+  <!-- COUNTRY (Ireland only — Fox Delivery is IE-exclusive) -->
+  <div class="country-bar">
+    <span class="country-bar-label">Country</span>
+    <div class="country-buttons">
+      <button class="country-btn active" type="button" aria-pressed="true">🇮🇪 Ireland</button>
+    </div>
+  </div>
 
   <!-- INPUTS -->
   <div class="inputs-bar inputs-bar-fox">

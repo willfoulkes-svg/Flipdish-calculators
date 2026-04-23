@@ -77,10 +77,44 @@
     color: var(--muted); margin: 0 0 16px; font-weight: 700;
   }
 
+  /* ---------- Country bar ---------- */
+  .country-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .country-bar-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .country-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .country-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--flipdish-dark);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .country-btn:hover { border-color: var(--flipdish-blue); color: var(--flipdish-blue); }
+  .country-btn.active {
+    background: var(--flipdish-blue-dark);
+    border-color: var(--flipdish-blue-dark);
+    color: white;
+  }
+
   /* ---------- Inputs ribbon ---------- */
   .inputs-bar {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0,1fr));
+    grid-template-columns: repeat(4, minmax(0,1fr));
     gap: 12px;
     margin-bottom: 18px;
   }
@@ -369,16 +403,18 @@
   <h1 id="pageTitle">Stop paying 30% to marketplaces for delivery</h1>
   <p class="lede">Compare a restaurant's take-home on marketplace delivery (UberEats, Deliveroo, Just Eat) vs ordering via Flipdish with Uber Direct handling delivery. The Uber Direct rate is fixed by distance band — adjust what the customer pays per band to find a healthy take rate.</p>
 
+  <!-- COUNTRY SELECTOR -->
+  <div class="country-bar">
+    <span class="country-bar-label">Country</span>
+    <div class="country-buttons" id="countryButtons">
+      <button class="country-btn" data-country="UK">🇬🇧 United Kingdom</button>
+      <button class="country-btn" data-country="IE">🇮🇪 Ireland</button>
+      <button class="country-btn" data-country="US">🇺🇸 United States</button>
+    </div>
+  </div>
+
   <!-- INPUTS -->
   <div class="inputs-bar">
-    <div class="input-cell">
-      <label>Market</label>
-      <select id="market">
-        <option value="UK">United Kingdom (£)</option>
-        <option value="IE">Ireland (€)</option>
-        <option value="US">United States ($)</option>
-      </select>
-    </div>
     <div class="input-cell">
       <label>Average order value</label>
       <input id="aov" type="number" value="20" step="0.5" min="0">
@@ -572,7 +608,7 @@
 
   // ---------- Render the table header (changes per market) ----------
   function renderHeader() {
-    const market = markets[$('market').value];
+    const market = markets[activeCountry];
     const showVat = market.vat && vatOn;
     const head = $('theadRow');
     let html = `
@@ -597,7 +633,7 @@
 
   // ---------- Build the table body for the current market ----------
   function renderBody() {
-    const market = markets[$('market').value];
+    const market = markets[activeCountry];
     let bands;
     if (market.ca) {
       bands = $('caToggle').checked ? market.bandsWithinCA : market.bandsOutsideCA;
@@ -642,9 +678,14 @@
     });
   }
 
-  // ---------- Switch market: reset defaults, redraw ----------
-  $('market').addEventListener('change', () => {
-    const m = markets[$('market').value];
+  // ---------- Country selector: reset defaults, redraw ----------
+  let activeCountry = 'UK';
+  function setCountry(code) {
+    activeCountry = code;
+    document.querySelectorAll('.country-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.country === code);
+    });
+    const m = markets[code];
     currency = m.currency;
     $('aov').value        = m.defaults.aov;
     $('mpRate').value     = m.defaults.mpRate;
@@ -652,9 +693,9 @@
     $('deliveries').value = m.defaults.deliveries;
 
     document.body.classList.remove('uk-view','ie-view','us-view');
-    document.body.classList.add($('market').value.toLowerCase() + '-view');
+    document.body.classList.add(code.toLowerCase() + '-view');
 
-    // Reset toggles when switching markets
+    // Reset toggles when switching countries
     $('caToggle').checked = false;
     $('vatToggle').checked = false;
     vatOn = false;
@@ -662,6 +703,9 @@
     renderHeader();
     renderBody();
     calc();
+  }
+  document.querySelectorAll('.country-btn').forEach(btn => {
+    btn.addEventListener('click', () => setCountry(btn.dataset.country));
   });
 
   // Toggle listeners
@@ -683,7 +727,7 @@
 
   // ---------- The calculation ----------
   function calc() {
-    const market = markets[$('market').value];
+    const market = markets[activeCountry];
     const aov        = num('aov');
     const mpRate     = num('mpRate');
     const fdRate     = num('fdRate');
@@ -790,12 +834,8 @@
 
   // ---------- Initial render ----------
   function init() {
-    const m = markets[$('market').value];
-    currency = m.currency;
-    document.body.classList.add('uk-view');
-    renderHeader();
-    renderBody();
-    calc();
+    // setCountry handles currency, defaults, body class, render & calc
+    setCountry('UK');
     // After first paint, allow flash animations on future changes
     isInitializing = false;
   }

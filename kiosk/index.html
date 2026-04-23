@@ -62,6 +62,40 @@
   h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; font-weight: 700; color: var(--flipdish-blue-dark); }
   .lede { color: var(--muted); margin: 0 0 20px; font-size: 15px; max-width: 680px; }
 
+  /* ---------- Country bar ---------- */
+  .country-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .country-bar-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .country-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .country-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    padding: 8px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--flipdish-dark);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .country-btn:hover { border-color: var(--flipdish-blue); color: var(--flipdish-blue); }
+  .country-btn.active {
+    background: var(--flipdish-blue-dark);
+    border-color: var(--flipdish-blue-dark);
+    color: white;
+  }
+
   .segmented {
     display: inline-flex; background: #F1F2F4; border-radius: 10px; padding: 4px;
     margin-bottom: 22px;
@@ -247,6 +281,16 @@
   <h1 id="pageTitle">How much could a Flipdish Kiosk save you?</h1>
   <p class="lede" id="pageLede">Enter your restaurant's numbers on the left. The annual saving updates live. Nothing is saved — this is a live illustration.</p>
 
+  <!-- COUNTRY SELECTOR -->
+  <div class="country-bar">
+    <span class="country-bar-label">Country</span>
+    <div class="country-buttons" id="countryButtons">
+      <button class="country-btn" data-country="UK">🇬🇧 United Kingdom</button>
+      <button class="country-btn" data-country="IE">🇮🇪 Ireland</button>
+      <button class="country-btn" data-country="US">🇺🇸 United States</button>
+    </div>
+  </div>
+
   <div class="segmented" role="tablist">
     <button class="active" data-view="labour">Labour savings</button>
     <button data-view="revenue">Revenue growth</button>
@@ -257,15 +301,6 @@
     <!-- INPUTS -->
     <div class="card">
       <h2>Your numbers <span class="legend">editable</span></h2>
-
-      <div class="input-row">
-        <label>Market <span class="hint">sets currency & rates</span></label>
-        <select id="market">
-          <option value="UK">United Kingdom (£)</option>
-          <option value="IE">Ireland (€)</option>
-          <option value="US">United States ($)</option>
-        </select>
-      </div>
 
       <div class="input-row">
         <label>Monthly in-store card volume <span class="hint">e.g. typical QSR ~£10k</span></label>
@@ -412,6 +447,7 @@
   };
 
   let currentAssumptions = [];
+  let activeCountry = 'UK';
 
   let view = "labour";
 
@@ -450,9 +486,13 @@
     el.addEventListener('input', () => { $(id + 'Val').textContent = el.value; });
   });
 
-  // Market default switch
-  $('market').addEventListener('change', e => {
-    const d = defaultsByMarket[e.target.value];
+  // Country selector — sets active country & resets defaults
+  function setCountry(code) {
+    activeCountry = code;
+    document.querySelectorAll('.country-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.country === code);
+    });
+    const d = defaultsByMarket[code];
     $('posRate').value = d.posRate;
     $('posFixed').value = d.posFixed;
     $('fdRate').value = d.fdRate;
@@ -460,10 +500,13 @@
     $('wage').value = d.wage;
     $('hardware').value = d.hardware;
     calc();
+  }
+  document.querySelectorAll('.country-btn').forEach(btn => {
+    btn.addEventListener('click', () => setCountry(btn.dataset.country));
   });
 
   function calc() {
-    const ccy = ccyMap[$('market').value];
+    const ccy = ccyMap[activeCountry];
     const cardVol = num('cardVol');
     const aov = num('aov');
     const cashiers = num('cashiers');
@@ -620,7 +663,7 @@
   // Wire all inputs
   document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calc));
 
-  calc();
+  setCountry('UK');
 </script>
 </body>
 </html>
