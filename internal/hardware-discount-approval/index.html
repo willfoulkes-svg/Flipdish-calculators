@@ -817,7 +817,7 @@
       <div class="label">Minimum sales price</div>
       <div class="big" id="heroMinPrice">—</div>
       <div class="sub">Don't sell below this. Below this price the discount takes longer than 3 months to pay back at operating margin.</div>
-      <div class="hero-supporting" id="heroSupportLine">Leaves room for up to <strong id="heroSupportMaxDiscount">—</strong> of discount off the list.</div>
+      <div class="hero-supporting" id="heroSupportLine">Leaves room for up to <strong>—</strong> of discount off the list.</div>
     </div>
 
     <!-- RIGHT: Payback period (traffic light, with proposed sales price input nested) -->
@@ -1115,16 +1115,17 @@
     setText($('opMarginShown'),   fmtMoney(opMargin, 2) + '/mo', true);
 
     // HEADLINE HEROES
-    setText($('heroMinPrice'),           fmtMoney(minSalesPrice, 0), true);
-    setText($('heroSupportMaxDiscount'), fmtMoney(maxDiscount, 0),   true);
-    // Support line wording — "(after CCEP)" only on POS/Combined
+    setText($('heroMinPrice'), fmtMoney(minSalesPrice, 0), true);
+    // Support line: "Leaves room for up to £X of discount off the list (after CCEP)."
+    // The "(after CCEP/CCH)" suffix applies on POS and Combined modes only —
+    // Kiosk-only deals don't qualify for the Coca-Cola subsidy.
     const subsidyName = co.subsidyName || 'CCEP';
     const supportSuffix = (activeMode === 'kiosk')
       ? ''
       : ' (after ' + subsidyName + ')';
     const heroSupport = $('heroSupportLine');
     if (heroSupport) {
-      heroSupport.innerHTML = 'Leaves room for up to <strong id="heroSupportMaxDiscount">' +
+      heroSupport.innerHTML = 'Leaves room for up to <strong>' +
         fmtMoney(maxDiscount, 0) + '</strong> of discount off the list' + supportSuffix + '.';
     }
 

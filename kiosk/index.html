@@ -300,7 +300,7 @@
       </svg>
       <span class="tag">Business Value Assessment</span>
     </div>
-    <div class="meta">Kiosk · Rates verified April 2026 · v1.0 mockup</div>
+    <div class="meta">Kiosk · Rates verified April 2026 · v1.0</div>
   </header>
 
   <h1 id="pageTitle">How much could a Flipdish Kiosk save you?</h1>
@@ -313,6 +313,7 @@
       <button class="country-btn" data-country="UK">🇬🇧 United Kingdom</button>
       <button class="country-btn" data-country="IE">🇮🇪 Ireland</button>
       <button class="country-btn" data-country="US">🇺🇸 United States</button>
+      <button class="country-btn" data-country="ES">🇪🇸 Spain</button>
     </div>
   </div>
 
@@ -464,11 +465,12 @@
 </div>
 
 <script>
-  const ccyMap = { UK: "£", IE: "€", US: "$" };
+  const ccyMap = { UK: "£", IE: "€", US: "$", ES: "€" };
   const defaultsByMarket = {
     UK: { posRate: 1.20, posFixed: 0.10, fdRate: 1.50, fdFixed: 0.20, wage: 14, hardware: 1500 },
     IE: { posRate: 1.50, posFixed: 0.08, fdRate: 1.50, fdFixed: 0.20, wage: 15, hardware: 1500 },
-    US: { posRate: 2.60, posFixed: 0.10, fdRate: 1.50, fdFixed: 0.20, wage: 16, hardware: 1800 }
+    US: { posRate: 2.60, posFixed: 0.10, fdRate: 1.50, fdFixed: 0.20, wage: 16, hardware: 1800 },
+    ES: { posRate: 1.50, posFixed: 0.08, fdRate: 1.50, fdFixed: 0.20, wage: 12, hardware: 1500 }
   };
 
   let currentAssumptions = [];
