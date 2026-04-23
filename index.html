@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Domine:wght@500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
+    /* Base brand */
     --science-blue: #0074D9;
     --venice-blue: #064885;
     --ink: #0A1F33;
@@ -18,8 +19,17 @@
     --border: #E1E8EF;
     --soft-blue: #E8F1FB;
     --success: #1D9F5A;
+
+    /* Product family accents */
+    --fam-oo: #0074D9;        --fam-oo-soft: #E6F1FB;
+    --fam-pos: #0D9488;       --fam-pos-soft: #DCF5F3;
+    --fam-kiosk: #7C3AED;     --fam-kiosk-soft: #EDE7FE;
+    --fam-combined: #059669;  --fam-combined-soft: #DCF0E5;
+    --fam-cross: #D97706;     --fam-cross-soft: #FDECD3;
+    --fam-phone: #DB2777;     --fam-phone-soft: #FCE0EC;
+
     --shadow: 0 1px 2px rgba(10,31,51,0.04), 0 4px 16px rgba(10,31,51,0.06);
-    --shadow-hover: 0 2px 6px rgba(10,31,51,0.08), 0 12px 28px rgba(10,31,51,0.12);
+    --shadow-hover: 0 2px 6px rgba(10,31,51,0.08), 0 14px 32px rgba(10,31,51,0.14);
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -45,13 +55,6 @@
   }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand svg { display: block; }
-  .brand-name {
-    font-family: 'Domine', serif;
-    font-weight: 700;
-    color: var(--venice-blue);
-    font-size: 18px;
-    letter-spacing: -0.2px;
-  }
   .topbar-tag {
     font-size: 12px;
     color: var(--muted);
@@ -63,17 +66,18 @@
 
   /* ---------- Hero ---------- */
   .hero {
-    padding: 56px 28px 32px;
+    padding: 64px 28px 24px;
     max-width: 1120px;
     margin: 0 auto;
     width: 100%;
     text-align: center;
+    position: relative;
   }
   .eyebrow {
     display: inline-block;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 1.2px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
     color: var(--science-blue);
     background: var(--soft-blue);
@@ -83,91 +87,193 @@
   }
   h1 {
     font-family: 'Domine', serif;
-    font-size: 44px;
+    font-size: 48px;
     font-weight: 700;
     color: var(--venice-blue);
     margin: 0 0 14px;
     letter-spacing: -0.8px;
-    line-height: 1.15;
+    line-height: 1.12;
+    background: linear-gradient(90deg, var(--venice-blue) 0%, var(--science-blue) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   .lede {
     font-size: 18px;
     color: var(--muted);
-    max-width: 620px;
+    max-width: 640px;
     margin: 0 auto;
-    line-height: 1.5;
+    line-height: 1.55;
   }
+
+  /* ---------- Filter chips ---------- */
+  .filter-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(246,249,252,0.92);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 28px;
+    margin-top: 16px;
+  }
+  .filter-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+  .chip {
+    border: 1.5px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--muted);
+    display: inline-block;
+  }
+  .chip[data-family="all"] .dot { background: linear-gradient(135deg, #0074D9, #7C3AED); }
+  .chip[data-family="oo"] .dot { background: var(--fam-oo); }
+  .chip[data-family="pos"] .dot { background: var(--fam-pos); }
+  .chip[data-family="kiosk"] .dot { background: var(--fam-kiosk); }
+  .chip[data-family="combined"] .dot { background: var(--fam-combined); }
+  .chip[data-family="cross"] .dot { background: var(--fam-cross); }
+  .chip[data-family="phone"] .dot { background: var(--fam-phone); }
+  .chip:hover { border-color: var(--ink); }
+  .chip.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+  .chip.active .dot { box-shadow: 0 0 0 2px rgba(255,255,255,0.25); }
 
   /* ---------- Grid ---------- */
   .grid-wrap {
     max-width: 1120px;
     margin: 0 auto;
-    padding: 24px 28px 48px;
+    padding: 28px 28px 48px;
     width: 100%;
     flex: 1;
   }
   .section-label {
     font-family: 'Domine', serif;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--ink);
-    margin: 24px 0 16px;
+    margin: 28px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-count {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: 999px;
   }
   .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 18px;
   }
   @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 
+  /* ---------- Tile (generic) ---------- */
   .tile {
+    --fam: var(--muted);
+    --fam-soft: var(--soft-blue);
+    position: relative;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px;
+    border-radius: 16px;
+    padding: 20px 22px 22px;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     text-decoration: none;
     color: inherit;
     min-height: 200px;
+    overflow: hidden;
   }
-  .tile.live:hover {
-    transform: translateY(-2px);
+  .tile::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--fam);
+    opacity: 0.85;
+  }
+  .tile:hover {
+    transform: translateY(-3px);
     box-shadow: var(--shadow-hover);
-    border-color: var(--science-blue);
+    border-color: var(--fam);
   }
-  .tile.coming {
-    opacity: 0.7;
-    cursor: default;
-  }
+  .tile.coming { opacity: 0.7; cursor: default; pointer-events: none; }
+
+  /* Family accent mapping via data-family */
+  .tile[data-family="oo"]       { --fam: var(--fam-oo);       --fam-soft: var(--fam-oo-soft); }
+  .tile[data-family="pos"]      { --fam: var(--fam-pos);      --fam-soft: var(--fam-pos-soft); }
+  .tile[data-family="kiosk"]    { --fam: var(--fam-kiosk);    --fam-soft: var(--fam-kiosk-soft); }
+  .tile[data-family="combined"] { --fam: var(--fam-combined); --fam-soft: var(--fam-combined-soft); }
+  .tile[data-family="cross"]    { --fam: var(--fam-cross);    --fam-soft: var(--fam-cross-soft); }
+  .tile[data-family="phone"]    { --fam: var(--fam-phone);    --fam-soft: var(--fam-phone-soft); }
 
   .tile-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
   }
   .tile-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    background: var(--soft-blue);
-    color: var(--science-blue);
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    background: var(--fam-soft);
+    color: var(--fam);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
+  .tile-icon svg { width: 22px; height: 22px; }
+
   .badge {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     padding: 4px 10px;
     border-radius: 999px;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -175,95 +281,23 @@
     background: rgba(29,159,90,0.12);
     color: var(--success);
   }
-  .badge.soon {
-    background: #F0F2F5;
-    color: var(--muted);
-  }
   .badge.internal {
     background: rgba(6,72,133,0.10);
     color: var(--venice-blue);
-  }
-
-  /* Internal calculators section header */
-  .internal-section-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 48px;
-    padding-top: 28px;
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .internal-section-label .lock-icon {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: rgba(6,72,133,0.10);
-    color: var(--venice-blue);
+    gap: 5px;
   }
-  .section-sublabel {
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--muted);
-    margin-left: 4px;
-  }
-
-  /* Family sub-sections inside Internal */
-  .family-label {
-    font-family: 'Domine', serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--venice-blue);
-    margin: 28px 0 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-  }
-  .family-label::before {
-    content: '';
-    flex: 0 0 18px;
-    height: 2px;
-    background: var(--venice-blue);
-    border-radius: 1px;
-  }
-  .family-label .family-sub {
-    font-family: 'Roboto', sans-serif;
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--muted);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-  .family-label:first-of-type { margin-top: 8px; }
-  /* Internal tiles are clickable (open the gated page) even when "coming soon" */
-  .internal-tile {
-    border-style: dashed;
-    border-color: var(--border);
-    opacity: 1;
-    cursor: pointer;
-  }
-  .internal-tile:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--venice-blue);
-    border-style: solid;
-  }
-  .internal-tile .tile-cta { color: var(--venice-blue); }
-  .internal-tile:hover .tile-cta svg { transform: translateX(3px); }
+  .badge.internal svg { width: 11px; height: 11px; }
 
   .tile-title {
     font-family: 'Domine', serif;
     font-size: 18px;
     font-weight: 600;
     color: var(--ink);
-    margin: 0;
+    margin: 2px 0 0;
     letter-spacing: -0.2px;
+    line-height: 1.25;
   }
   .tile-desc {
     font-size: 14px;
@@ -277,13 +311,101 @@
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    font-weight: 500;
-    color: var(--science-blue);
+    font-weight: 600;
+    color: var(--fam);
     margin-top: 4px;
   }
-  .tile.coming .tile-cta { color: var(--muted); }
   .tile-cta svg { transition: transform .15s ease; }
-  .tile.live:hover .tile-cta svg { transform: translateX(3px); }
+  .tile:hover .tile-cta svg { transform: translateX(4px); }
+
+  /* Internal section visuals */
+  .internal-section {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .internal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .internal-header .lock-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(6,72,133,0.10);
+    color: var(--venice-blue);
+    flex-shrink: 0;
+  }
+  .internal-header h2 {
+    font-family: 'Domine', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+  }
+  .internal-subheader {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 20px 48px;
+  }
+
+  /* Family group label (inside Internal) */
+  .family-group {
+    margin-top: 26px;
+  }
+  .family-group:first-child { margin-top: 0; }
+  .family-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Domine', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fam);
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .family-label::before {
+    content: '';
+    flex: 0 0 22px;
+    height: 3px;
+    background: var(--fam);
+    border-radius: 2px;
+  }
+  .family-label .family-sub {
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .family-group[data-family="oo"]       { --fam: var(--fam-oo); }
+  .family-group[data-family="pos"]      { --fam: var(--fam-pos); }
+  .family-group[data-family="kiosk"]    { --fam: var(--fam-kiosk); }
+  .family-group[data-family="combined"] { --fam: var(--fam-combined); }
+  .family-group[data-family="cross"]    { --fam: var(--fam-cross); }
+  .family-group[data-family="phone"]    { --fam: var(--fam-phone); }
+
+  /* Empty state (when filter matches nothing in a section) */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--muted);
+    padding: 32px 16px;
+    font-size: 14px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    background: #fff;
+  }
+  .section-hidden { display: none !important; }
 
   /* ---------- Footer ---------- */
   footer {
@@ -299,13 +421,16 @@
   @media (max-width: 640px) {
     .topbar { padding: 12px 18px; }
     .topbar-tag { display: none; }
-    .hero { padding: 36px 18px 16px; }
-    h1 { font-size: 32px; letter-spacing: -0.4px; }
+    .hero { padding: 40px 18px 16px; }
+    h1 { font-size: 34px; letter-spacing: -0.4px; }
     .lede { font-size: 16px; }
-    .grid-wrap { padding: 16px 18px 32px; }
+    .filter-wrap { padding: 10px 18px; }
+    .filter-label { display: none; }
+    .grid-wrap { padding: 20px 18px 32px; }
     .tile { min-height: auto; }
-    .internal-section-label { margin-top: 32px; padding-top: 20px; }
-    .section-sublabel { width: 100%; margin-left: 0; }
+    .internal-section { margin-top: 28px; padding-top: 20px; }
+    .internal-subheader { margin-left: 0; }
+    .section-label { font-size: 18px; }
   }
 </style>
 </head>
@@ -318,14 +443,14 @@
         <path d="M581.63,126.64c5.01,0.42,9.77,1.06,14.48,3.15c4,1.82,6.77,4.78,9.03,8.45c2.03,3.42,0.92,7.69-2.76,10.19 c-3.19,2.28-6.78,2.15-10.27-0.6c-1.4-1.01-2.78-2.49-4.18-3.5c-3.48-2.99-9.7-3.21-13.61-0.72c-2.45,1.59-3.75,4.41-3.12,7.06 c0.64,2.18,2.02,3.66,4.15,4.45c1.89,0.78,4.03,1.1,5.92,1.65c4.27,1.11,8.53,2.22,12.55,3.56c4.96,1.85,8.93,4.62,11.88,9.03 c5.23,7.6,4.62,18.1-0.92,25.8c-4.27,5.59-9.88,8.74-16.85,9.69c-8.42,1.37-16.53,0.61-24.29-3.25c-4.46-2.31-8.18-5.55-10.89-9.95 c-1.8-3.17-1.43-6.75,1.05-9.29c3.73-3.93,8.52-4,12.68-0.03c0.69,0.74,1.38,1.48,2.07,2.23c3.45,3.95,7.94,5.54,12.97,5.24 c1.92-0.17,3.61-0.59,5.32-1.72c3.92-2.73,4.12-8.23,0.15-11c-1.87-1.26-4-1.82-6.14-2.37c-4.26-1.35-8.77-2.23-13.02-3.81 c-4.97-1.61-9.17-4.63-11.88-9.03c-5-7.35-4.39-17.86,1.62-25.3c3.65-4.64,8.22-7.56,13.62-9.08 C574.59,126.52,578.13,126.52,581.63,126.64z"/>
         <path d="M365.85,243.99c5.74,0,10.28-4.53,10.28-10.25l0-22.39v-16.36c5.93,6.03,13.69,9.69,22.19,9.69 c18.61,0,33.7-17.51,33.7-39.11c0-21.6-15.09-39.11-33.7-39.11c-8.51,0-16.28,3.67-22.21,9.72c-0.28-5.46-4.7-9.72-10.26-9.72 c-5.74,0-10.28,4.53-10.28,10.25v15.95l0,58.68l0,22.39C355.56,239.46,360.11,243.99,365.85,243.99z M394.65,144.32 c10.33,0,18.7,9.51,18.7,21.25c0,11.74-8.37,21.25-18.7,21.25c-10.33,0-18.7-9.51-18.7-21.25 C375.95,153.84,384.32,144.32,394.65,144.32z"/>
         <path d="M502.01,90.92c-5.74,0-10.28,4.53-10.28,10.25v18.52v16.36c-5.93-6.03-13.69-9.69-22.19-9.69 c-18.61,0-33.7,17.51-33.7,39.11s15.09,39.11,33.7,39.11c8.51,0,16.28-3.67,22.21-9.72c0.28,5.46,4.7,9.72,10.26,9.72 c5.74,0,10.28-4.53,10.28-10.25v-15.95V119.7v-18.52C512.29,95.45,507.75,90.92,502.01,90.92z M473.21,186.72 c-10.33,0-18.7-9.51-18.7-21.25c0-11.74,8.37-21.25,18.7-21.25c10.33,0,18.7,9.51,18.7,21.25 C491.91,177.21,483.54,186.72,473.21,186.72z"/>
-        <path d="M205.01,128.94h-3.21l-0.23-3.4c-0.27-2.73-0.96-5.26-1.65-8.02c-3.37-12.77-10.11-23.36-19.75-32.04 c-9.39-8.43-20.23-13.49-32.27-15.66c0.72-1.69,1.2-3.37,1.2-5.3c0-6.99-5.54-12.53-12.52-12.53c-6.74,0-12.52,5.54-12.52,12.53 c0,1.93,0.48,3.61,1.2,5.06c-3.13,0.48-6.5,1.45-9.63,2.41c-7.95,2.89-15.17,6.99-21.43,12.53H42.92 c-5.06,0.24-9.15,4.34-9.15,9.39s4.09,9.15,9.15,9.15h37.08c-0.72,1.2-1.2,2.41-1.93,3.61H55.69c-5.06,0-9.15,4.1-9.15,9.15 c0,5.06,4.09,9.15,9.15,9.15h17.1c-0.24,1.19-0.42,2.6-0.48,3.95h-4.99c-4.62,0-8.39,3.78-8.39,8.39v0.84 c0,4.62,3.78,8.39,8.39,8.39h50.72l-0.23,10.46l-30.34,12.04c-2.41,0.96-4.33,2.89-5.06,5.54c-0.72,2.41-0.48,5.3,0.72,7.47 l7.95,13.73c1.69,2.89,4.82,4.58,7.71,4.58c1.44,0,3.13-0.48,4.58-1.2c4.33-2.65,5.78-8.19,3.13-12.53l-2.65-4.58l26.25-10.84 c3.37-1.45,5.54-4.58,5.54-8.19l0.48-16.48h3.44l10.53,21.3l-13.97,22.88c-1.69,2.89-1.93,6.26-0.24,9.15 c1.69,2.89,4.58,4.58,7.95,4.58h16.62c5.06,0,9.15-4.1,9.15-9.15c0-5.06-4.09-9.15-9.15-9.15h-0.48l8.19-13.25 c1.69-2.65,1.93-6.02,0.48-8.91l-8.6-17.44h45c4.62,0,8.39-3.78,8.39-8.39v-0.84C213.4,132.72,209.63,128.94,205.01,128.94z M177.77,126.29c-0.13,0.01-0.25,0.01-0.38,0.01c-2.57,0-4.73-2.01-4.93-4.58c-1.33-17.67-13.42-23.89-20.51-26.03 c-2.61-0.79-4.1-3.55-3.31-6.16c0.78-2.6,3.55-4.09,6.16-3.31c16.2,4.88,26.23,17.55,27.52,34.76 C182.54,123.71,180.49,126.09,177.77,126.29z"/>
+        <path d="M205.01,128.94h-3.21l-0.23-3.4c-0.27-2.73-0.96-5.26-1.65-8.02c-3.37-12.77-10.11-23.36-19.75-32.04 c-9.39-8.43-20.23-13.49-32.27-15.66c0.72-1.69,1.2-3.37,1.2-5.3c0-6.99-5.54-12.53-12.52-12.53c-6.74,0-12.52,5.54-12.52,12.53 c0,1.93,0.48,3.61,1.2,5.06c-3.13,0.48-6.5,1.45-9.63,2.41c-7.95,2.89-15.17,6.99-21.43,12.53H42.92 c-5.06,0.24-9.15,4.34-9.15,9.39s4.09,9.15,9.15,9.15h37.08c-0.72,1.2-1.2,2.41-1.93,3.61H55.69c-5.06,0-9.15,4.1-9.15,9.15 c0,5.06,4.09,9.15,9.15,9.15h17.1c-0.24,1.19-0.42,2.6-0.48,3.95h-4.99c-4.62,0-8.39,3.78-8.39,8.39v0.84 c0,4.62,3.78,8.39,8.39,8.39h50.72l-0.23,10.46l-30.34,12.04c-2.41,0.96-4.33,2.89-5.06,5.54c-0.72,2.41-0.48,5.3,0.72,7.47 l7.95,13.73c1.69,2.89,4.82,4.58,7.71,4.58c1.44,0,3.13-0.48,4.58-1.2c4.33-2.65,5.78-8.19,3.13-12.53l-2.65-4.58l26.25-10.84 c3.37-1.45,5.54-4.58,5.54-8.19l0.48-16.48h3.44l10.53,21.3l-13.97,22.88c-1.69,2.89-1.93,6.26-0.24,9.15 c1.69,2.89,4.58,4.58,7.95,4.58h16.62c5.06,0,9.15-4.1,9.15-9.15c0-5.06-4.09-9.15-9.15-9.15h-0.48l8.19-13.25 c1.69-2.65,1.93-6.02,0.48-8.91l-8.6-17.44h45c4.62,0,8.39-3.78,8.39-8.39v-0.84C213.4,132.72,209.63,128.94,205.01,128.94z M177.77,126.29c-0.13,0.01-0.25,0.01-0.38,0.01c-2.57,0-4.73-2.01-4.93-4.58c-1.33-17.67-13.42-23.89-20.51-26.03 c-2.61-0.79-4.1-3.55-3.31-6.16c0.78-2.60,3.55-4.09,6.16-3.31c16.2,4.88,26.23,17.55,27.52,34.76 C182.54,123.71,180.49,126.09,177.77,126.29z"/>
         <path d="M326.41,115.27c-4.65-4.65-4.65-12.29,0.17-17.1c4.65-4.65,12.45-4.82,17.27,0c4.82,4.82,4.82,12.45,0,17.27 C339.03,120.25,331.23,120.08,326.41,115.27z"/>
         <path d="M345.42,194.06c0,5.73-4.69,10.42-10.42,10.42l0,0c-5.73,0-10.42-4.69-10.42-10.42v-57.18 c0-5.73,4.69-10.42,10.42-10.42h0c5.73,0,10.42,4.69,10.42,10.42V194.06z"/>
         <path d="M524.27,115.27c-4.65-4.65-4.65-12.29,0.17-17.1c4.65-4.65,12.45-4.82,17.27,0s4.82,12.45,0,17.27 C536.89,120.25,529.09,120.08,524.27,115.27z"/>
         <path d="M543.28,194.06c0,5.73-4.69,10.42-10.42,10.42l0,0c-5.73,0-10.42-4.69-10.42-10.42v-57.18 c0-5.73,4.69-10.42,10.42-10.42h0c5.73,0,10.42,4.69,10.42,10.42V194.06z"/>
         <path d="M314.39,194.13c0,5.73-4.69,10.42-10.42,10.42l0,0c-5.73,0-10.42-4.69-10.42-10.42V99.58 c0-5.73,4.69-10.42,10.42-10.42h0c5.73,0,10.42,4.69,10.42,10.42V194.13z"/>
         <path d="M265.37,112.27c1.28-1.96,3.17-3.51,5.85-4.11c1.42-0.3,2.92-0.38,4.17-0.46c2.02-0.13,4.01,0.19,5.77-0.06 c6.27-0.75,9.03-7.28,5.77-12.55c-1.76-2.76-4.26-4.27-7.28-5.02c-4.26-1.25-8.53-1.25-13.04-0.75 c-13.04,1.76-22.33,11.29-23.33,24.59c-0.18,2.95-0.23,5.76-0.25,8.63l-0.01,0.01v3.16v3.24h-9.95c-4.85,0-8.81,3.97-8.81,8.81 c0,4.85,3.97,8.81,8.81,8.81h9.95l0.14,47.71c0,5.73,4.69,10.42,10.42,10.42c5.73,0,10.42-4.69,10.42-10.42l0.01-47.57v-0.14h10.54 c4.85,0,8.81-3.97,8.81-8.81c0-4.85-3.97-8.81-8.81-8.81h-10.54v-12.95C264.02,114.68,264.65,113.37,265.37,112.27z"/>
-        <path d="M684.97,145.6c-2.26-8.28-6.53-14.8-14.57-18.31c-5.78-2.76-12.06-3.26-18.34-2.26 c-5.94,0.99-11.15,3.21-15.39,7.59V98.75c0-5.73-4.69-10.42-10.42-10.42c-5.73,0-10.42,4.69-10.42,10.42v95.84 c0,5.73,4.69,10.42,10.42,10.42c5.73,0,10.42-4.69,10.42-10.42v-39.1c0.84-3.86,2.57-7.06,5.84-9.38 c3.27-2.51,7.04-2.76,11.06-2.26c5.03,0.75,8.54,3.26,10.3,7.77c1.01,2.51,1.26,5.02,1.26,7.52c0,13.04,0,22.29,0,35.33 c0,5.77,4.52,10.53,10.55,10.53c5.78,0,10.55-4.76,10.55-10.53c0-14.3,0-24.8,0-39.34C686.23,151.87,685.72,148.61,684.97,145.6z"/>
+        <path d="M684.97,145.6c-2.26-8.28-6.53-14.8-14.57-18.31c-5.78-2.76-12.06-3.26-18.34-2.26 c-5.94,0.99-11.15,3.21-15.39,7.59V98.75c0-5.73-4.69-10.42-10.42-10.42c-5.73,0-10.42,4.69-10.42,10.42v95.84 c0,5.73,4.69,10.42,10.42,10.42c5.73,0,10.42-4.69,10.42-10.42v-39.1c0.84-3.86,2.57-7.06,5.84-9.38 c3.27-2.51,7.04-2.76,11.06-2.26c5.03,0.75,8.54,3.26,10.30,7.77c1.01,2.51,1.26,5.02,1.26,7.52c0,13.04,0,22.29,0,35.33 c0,5.77,4.52,10.53,10.55,10.53c5.78,0,10.55-4.76,10.55-10.53c0-14.30,0-24.80,0-39.34C686.23,151.87,685.72,148.61,684.97,145.6z"/>
       </g>
     </svg>
   </div>
@@ -335,242 +460,329 @@
 <section class="hero">
   <span class="eyebrow">For commercial teams</span>
   <h1>See what restaurants stand to gain</h1>
-  <p class="lede">Quick, transparent calculators that show the real financial impact of switching to Flipdish.</p>
+  <p class="lede">Transparent, mobile-friendly calculators that show the real financial impact of switching to Flipdish — and the internal tools to price every deal with confidence.</p>
 </section>
+
+<!-- Filter chips -->
+<div class="filter-wrap">
+  <div class="filter-inner">
+    <span class="filter-label">Filter</span>
+    <button class="chip active" data-family="all"><span class="dot"></span>All</button>
+    <button class="chip" data-family="oo"><span class="dot"></span>Online Ordering</button>
+    <button class="chip" data-family="pos"><span class="dot"></span>POS</button>
+    <button class="chip" data-family="kiosk"><span class="dot"></span>Kiosk</button>
+    <button class="chip" data-family="combined"><span class="dot"></span>POS + Kiosk</button>
+    <button class="chip" data-family="cross"><span class="dot"></span>Cross-product &amp; Renewal</button>
+    <button class="chip" data-family="phone"><span class="dot"></span>Phone AI</button>
+  </div>
+</div>
 
 <main class="grid-wrap">
 
-  <h2 class="section-label">External calculators</h2>
-  <div class="grid">
+  <!-- =================================================== -->
+  <!-- EXTERNAL                                            -->
+  <!-- =================================================== -->
+  <section class="section-block" id="section-external">
+    <h2 class="section-label">
+      External calculators
+      <span class="section-count" id="count-external">5</span>
+    </h2>
+    <div class="grid" id="grid-external">
 
-    <!-- KIOSK (LIVE) -->
-    <a class="tile live" href="kiosk/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M9 21h6"/><path d="M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
+      <!-- ONLINE ORDERING -->
+      <a class="tile" data-family="oo" href="online-ordering/">
+        <div class="tile-head">
+          <div class="tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <span class="badge live">Live</span>
         </div>
-        <span class="badge live">Live</span>
-      </div>
-      <h3 class="tile-title">Kiosk</h3>
-      <p class="tile-desc">Self-service ordering kiosks. Calculate labour savings or revenue uplift, with hardware payback baked in.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+        <h3 class="tile-title">Online Ordering</h3>
+        <p class="tile-desc">Flipdish direct ordering vs third-party marketplaces. Two scenarios: restaurant has own drivers, or uses Flipdish delivery.</p>
+        <span class="tile-cta">Open calculator
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
 
-    <!-- ONLINE ORDERING (LIVE) -->
-    <a class="tile live" href="online-ordering/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <!-- UBER DIRECT (OO-family delivery variant) -->
+      <a class="tile" data-family="oo" href="uber-direct/">
+        <div class="tile-head">
+          <div class="tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <span class="badge live">Live</span>
         </div>
-        <span class="badge live">Live</span>
-      </div>
-      <h3 class="tile-title">Online Ordering</h3>
-      <p class="tile-desc">Flipdish direct ordering vs third-party marketplaces. Two scenarios: restaurant has own drivers, or uses Flipdish delivery.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+        <h3 class="tile-title">Uber Direct</h3>
+        <p class="tile-desc">Flipdish + Uber Direct vs marketplace delivery. Shows what the restaurant takes home and what the customer pays. UK, Ireland, US.</p>
+        <span class="tile-cta">Open calculator
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
 
-    <!-- UBER DIRECT (LIVE) -->
-    <a class="tile live" href="uber-direct/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      <!-- FOX DELIVERY (OO-family delivery variant) -->
+      <a class="tile" data-family="oo" href="fox-delivery/">
+        <div class="tile-head">
+          <div class="tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17.5" r="3.5"/><circle cx="19" cy="17.5" r="3.5"/><path d="M12 17.5h-4l-3-6h7l3 6"/><path d="M19 17.5l-3-9h-4"/></svg>
+          </div>
+          <span class="badge live">Live</span>
         </div>
-        <span class="badge live">Live</span>
-      </div>
-      <h3 class="tile-title">Uber Direct</h3>
-      <p class="tile-desc">Flipdish + Uber Direct vs marketplace delivery. Shows what the restaurant takes home and what the customer pays. UK, Ireland and US.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+        <h3 class="tile-title">Fox Delivery</h3>
+        <p class="tile-desc">Flipdish + Fox Delivery vs marketplaces. Restaurant and end-customer cost savings for the Ireland market.</p>
+        <span class="tile-cta">Open calculator
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
 
-    <!-- FOX DELIVERY (LIVE) -->
-    <a class="tile live" href="fox-delivery/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17.5" r="3.5"/><circle cx="19" cy="17.5" r="3.5"/><path d="M12 17.5h-4l-3-6h7l3 6"/><path d="M19 17.5l-3-9h-4"/></svg>
+      <!-- KIOSK -->
+      <a class="tile" data-family="kiosk" href="kiosk/">
+        <div class="tile-head">
+          <div class="tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M9 21h6"/><path d="M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
+          </div>
+          <span class="badge live">Live</span>
         </div>
-        <span class="badge live">Live</span>
-      </div>
-      <h3 class="tile-title">Fox Delivery</h3>
-      <p class="tile-desc">Flipdish + Fox Delivery vs marketplaces. Restaurant and end-customer cost savings for the Ireland market.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+        <h3 class="tile-title">Kiosk</h3>
+        <p class="tile-desc">Self-service ordering kiosks. Calculate labour savings or revenue uplift, with hardware payback baked in.</p>
+        <span class="tile-cta">Open calculator
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
 
-    <!-- PHONE AI (LIVE) -->
-    <a class="tile live" href="phone-ai/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <!-- PHONE AI -->
+      <a class="tile" data-family="phone" href="phone-ai/">
+        <div class="tile-head">
+          <div class="tile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <span class="badge live">Live</span>
         </div>
-        <span class="badge live">Live</span>
-      </div>
-      <h3 class="tile-title">Phone AI</h3>
-      <p class="tile-desc">Automated phone ordering — value of capturing missed calls and freeing staff from the phone during peak service.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <h3 class="tile-title">Phone AI</h3>
+        <p class="tile-desc">Automated phone ordering — value of capturing missed calls and freeing staff from the phone during peak service.</p>
+        <span class="tile-cta">Open calculator
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </a>
+
+    </div>
+    <div class="empty-state" id="empty-external" style="display:none;">No external calculators match that filter.</div>
+  </section>
+
+  <!-- =================================================== -->
+  <!-- INTERNAL                                            -->
+  <!-- =================================================== -->
+  <section class="section-block internal-section" id="section-internal">
+    <div class="internal-header">
+      <span class="lock-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </span>
-    </a>
+      <h2>Internal calculators</h2>
+      <span class="section-count" id="count-internal">7</span>
+    </div>
+    <p class="internal-subheader">Flipdish staff only — login required · grouped by product family</p>
 
-  </div>
-
-  <h2 class="section-label internal-section-label">
-    <span class="lock-icon" aria-hidden="true">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    </span>
-    Internal calculators
-    <span class="section-sublabel">Flipdish staff only &mdash; login required &middot; grouped by product</span>
-  </h2>
-
-  <!-- ============================================================ -->
-  <!-- ONLINE ORDERING                                               -->
-  <!-- ============================================================ -->
-  <h3 class="family-label">Online Ordering <span class="family-sub">UK · IE · ES · US</span></h3>
-  <div class="grid">
-
-    <a class="tile live internal-tile" href="internal/online-ordering/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
+    <!-- Online Ordering family -->
+    <div class="family-group" data-family="oo">
+      <h3 class="family-label">Online Ordering <span class="family-sub">UK · IE · US · ES</span></h3>
+      <div class="grid">
+        <a class="tile" data-family="oo" href="internal/online-ordering/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">Online Ordering — SNR</h3>
+          <p class="tile-desc">Two pricing tools in one: Total Fee Calculator and Sub vs Commission-Only comparison. UK, Ireland, USA, Spain.</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
       </div>
-      <h3 class="tile-title">Online Ordering — SNR</h3>
-      <p class="tile-desc">Two pricing tools in one: Total Fee Calculator and Sub vs Commission-Only comparison. UK, Ireland, USA, Spain.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+    </div>
 
-  </div>
+    <!-- POS family -->
+    <div class="family-group" data-family="pos">
+      <h3 class="family-label">POS <span class="family-sub">UK · IE</span></h3>
+      <div class="grid">
+        <a class="tile" data-family="pos" href="internal/pos-total-fee/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="7" y1="15" x2="9" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">POS — Total Fee</h3>
+          <p class="tile-desc">Monthly Software Net Revenue from a POS deal. Shows what Flipdish actually keeps after card processing cost.</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
 
-  <!-- ============================================================ -->
-  <!-- POS                                                           -->
-  <!-- ============================================================ -->
-  <h3 class="family-label">POS <span class="family-sub">UK · IE</span></h3>
-  <div class="grid">
-
-    <a class="tile live internal-tile" href="internal/pos-total-fee/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="7" y1="15" x2="9" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
+        <a class="tile" data-family="pos" href="internal/pos-discount-approval/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8l-8 8"/><circle cx="9" cy="9" r="1.5"/><circle cx="15" cy="15" r="1.5"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">POS — Discount Approval</h3>
+          <p class="tile-desc">Maximum allowable hardware discount and minimum sales price. CCEP/CCH subsidy supported.</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
       </div>
-      <h3 class="tile-title">POS — Total Fee</h3>
-      <p class="tile-desc">Monthly Software Net Revenue from a POS deal. Shows what Flipdish actually keeps after card processing cost is taken out of the processing fee.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+    </div>
 
-    <a class="tile live internal-tile" href="internal/pos-discount-approval/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8l-8 8"/><circle cx="9" cy="9" r="1.5"/><circle cx="15" cy="15" r="1.5"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
+    <!-- Kiosk family -->
+    <div class="family-group" data-family="kiosk">
+      <h3 class="family-label">Kiosk <span class="family-sub">UK · IE · US · ES</span></h3>
+      <div class="grid">
+        <a class="tile" data-family="kiosk" href="internal/kiosk-discount-approval/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M9 21h6"/><path d="M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">Kiosk — Discount Approval</h3>
+          <p class="tile-desc">Kiosk-only hardware deal. Max discount and minimum sales price, no CCEP/CCH (Kiosk-only deals don't qualify).</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
       </div>
-      <h3 class="tile-title">POS — Discount Approval</h3>
-      <p class="tile-desc">Should you approve this hardware discount? Shows the discount given (after CCEP/CCH subsidy) and how many months it takes the Software Net Revenue to pay it back.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+    </div>
 
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- KIOSK                                                         -->
-  <!-- ============================================================ -->
-  <h3 class="family-label">Kiosk <span class="family-sub">UK · IE · US · ES</span></h3>
-  <div class="grid">
-
-    <a class="tile live internal-tile" href="internal/kiosk-discount-approval/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M9 21h6"/><path d="M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
+    <!-- POS + Kiosk Combined family -->
+    <div class="family-group" data-family="combined">
+      <h3 class="family-label">POS + Kiosk Combined <span class="family-sub">UK · IE</span></h3>
+      <div class="grid">
+        <a class="tile" data-family="combined" href="internal/pos-kiosk-discount-approval/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="1"/><rect x="13" y="3" width="9" height="15" rx="1"/><path d="M5.5 21h2"/><path d="M16.5 21h2"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">POS + Kiosk — Discount Approval</h3>
+          <p class="tile-desc">Combined POS + Kiosk hardware on one deal. One verdict across both ladders and subs (POS gets CCEP/CCH, Kiosk doesn't).</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
       </div>
-      <h3 class="tile-title">Kiosk — Discount Approval</h3>
-      <p class="tile-desc">Kiosk-only hardware deal. Shows the minimum sales price you can charge and whether a proposed discount pays back inside 3 months of operating margin. No CCEP/CCH — Kiosk-only deals don't qualify.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+    </div>
 
-  </div>
+    <!-- Cross-product pricing & renewal family -->
+    <div class="family-group" data-family="cross">
+      <h3 class="family-label">Cross-product pricing &amp; renewal <span class="family-sub">UK · IE · US · ES</span></h3>
+      <div class="grid">
+        <a class="tile" data-family="cross" href="internal/pos-web-net-fee-sensitivity/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">POS + Web — Net Fee Sensitivity</h3>
+          <p class="tile-desc">Customer on both OO and POS. Which lever (OO commission vs POS processing) earns more per +0.1% — plus a full sensitivity matrix.</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
 
-  <!-- ============================================================ -->
-  <!-- POS + KIOSK COMBINED                                          -->
-  <!-- ============================================================ -->
-  <h3 class="family-label">POS + Kiosk Combined <span class="family-sub">UK · IE</span></h3>
-  <div class="grid">
-
-    <a class="tile live internal-tile" href="internal/pos-kiosk-discount-approval/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="1"/><rect x="13" y="3" width="9" height="15" rx="1"/><path d="M5.5 21h2"/><path d="M16.5 21h2"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
+        <a class="tile" data-family="cross" href="internal/current-vs-new-fee-impact/">
+          <div class="tile-head">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+            </div>
+            <span class="badge internal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Internal
+            </span>
+          </div>
+          <h3 class="tile-title">Current vs New Fee Impact — Renewal</h3>
+          <p class="tile-desc">Renewal tool. Enter current vs proposed pricing across POS, OO and Kiosk. Shows per-product and grand-total monthly + annual SNR change.</p>
+          <span class="tile-cta">Open calculator
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
       </div>
-      <h3 class="tile-title">POS + Kiosk — Discount Approval</h3>
-      <p class="tile-desc">Customer is taking POS hardware <em>and</em> Kiosk hardware on one deal. Combines both hardware ladders (POS gets CCEP/CCH, Kiosk doesn't) and both subscriptions into one verdict.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
+    </div>
 
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- CROSS-PRODUCT PRICING & RENEWAL                              -->
-  <!-- ============================================================ -->
-  <h3 class="family-label">Cross-product pricing &amp; renewal <span class="family-sub">UK · IE · US · ES</span></h3>
-  <div class="grid">
-
-    <a class="tile live internal-tile" href="internal/pos-web-net-fee-sensitivity/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
-      </div>
-      <h3 class="tile-title">POS + Web — Net Fee Sensitivity</h3>
-      <p class="tile-desc">Customer on both OO and POS. Shows SNR uplift from moving their rates, a full sensitivity matrix, and which lever (OO vs POS) gives the most bang per +0.1%.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
-
-    <a class="tile live internal-tile" href="internal/current-vs-new-fee-impact/">
-      <div class="tile-head">
-        <div class="tile-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
-        </div>
-        <span class="badge internal">Internal</span>
-      </div>
-      <h3 class="tile-title">Current vs New Fee Impact — Renewal</h3>
-      <p class="tile-desc">Renewal tool. Enter current vs proposed pricing across POS, Online Ordering and Kiosk. Shows per-product and grand-total monthly and annual SNR change for Flipdish.</p>
-      <span class="tile-cta">Open calculator
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </span>
-    </a>
-
-  </div>
+    <div class="empty-state" id="empty-internal" style="display:none;">No internal calculators match that filter.</div>
+  </section>
 
 </main>
 
 <footer>
   Flipdish Business Value Calculators &middot; Built for the commercial team
 </footer>
+
+<script>
+  // Filter chip behavior
+  const chips = document.querySelectorAll('.chip');
+  const externalTiles = document.querySelectorAll('#grid-external .tile');
+  const familyGroups = document.querySelectorAll('.family-group');
+  const emptyExternal = document.getElementById('empty-external');
+  const emptyInternal = document.getElementById('empty-internal');
+  const sectionExternal = document.getElementById('section-external');
+  const sectionInternal = document.getElementById('section-internal');
+  const countExternal = document.getElementById('count-external');
+  const countInternal = document.getElementById('count-internal');
+
+  function applyFilter(family) {
+    // External: filter individual tiles
+    let extShown = 0;
+    externalTiles.forEach(t => {
+      const match = family === 'all' || t.dataset.family === family;
+      t.style.display = match ? '' : 'none';
+      if (match) extShown++;
+    });
+    emptyExternal.style.display = extShown === 0 ? 'block' : 'none';
+    countExternal.textContent = extShown;
+    sectionExternal.classList.toggle('section-hidden', extShown === 0 && family !== 'all');
+
+    // Internal: filter whole family groups
+    let intShown = 0;
+    familyGroups.forEach(g => {
+      const match = family === 'all' || g.dataset.family === family;
+      g.style.display = match ? '' : 'none';
+      if (match) intShown += g.querySelectorAll('.tile').length;
+    });
+    emptyInternal.style.display = intShown === 0 ? 'block' : 'none';
+    countInternal.textContent = intShown;
+    sectionInternal.classList.toggle('section-hidden', intShown === 0 && family !== 'all');
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      applyFilter(chip.dataset.family);
+    });
+  });
+</script>
 
 </body>
 </html>
