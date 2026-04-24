@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Flipdish cost justification</title>
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Password gate (the rep is the one opening this; the page reads from the rep's browser) -->
+<script src="../auth.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --flipdish-blue: #0074D9;
+    --flipdish-blue-dark: #064885;
+    --flipdish-blue-light: #E6F1FB;
+    --flipdish-blue-line: #BEDAF2;
+    --flipdish-dark: #1A1A1A;
+    --muted: #6B7280;
+    --bg: #F6F9FC;
+    --card: #FFFFFF;
+    --border: #E5E7EB;
+    --green-strong: #2E8B57;
+    --green-soft: #E6F4EC;
+    --green-border: #9DCDB1;
+    --amber-strong: #B8860B;
+    --amber-soft: #FFF6D6;
+    --amber-border: #E6CD66;
+    --red-strong: #C0392B;
+    --red-soft: #FBE9E7;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg); color: var(--flipdish-dark);
+    line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: 'Domine', Georgia, serif; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar .brand { display: flex; align-items: center; gap: 12px; }
+  .topbar .brand svg { height: 30px; width: auto; display: block; }
+  .topbar .date-stamp { font-size: 13px; color: var(--muted); }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  /* ---------- Header ---------- */
+  .doc-header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--flipdish-blue-line);
+  }
+  .doc-kicker {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--flipdish-blue);
+    margin-bottom: 10px;
+  }
+  .doc-title {
+    font-size: 34px; font-weight: 700;
+    color: var(--flipdish-blue-dark); line-height: 1.15;
+    margin: 0 0 8px; letter-spacing: -0.01em;
+  }
+  .doc-subtitle {
+    font-size: 16px; color: var(--muted); margin: 0;
+  }
+  .doc-meta {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-top: 14px; font-size: 13px; color: var(--muted);
+  }
+  .doc-meta .meta-item { display: inline-flex; align-items: center; gap: 6px; }
+  .doc-meta .meta-item strong { color: var(--flipdish-dark); }
+
+  /* ---------- Value hero ---------- */
+  .hero {
+    background: linear-gradient(135deg, #E6F4EC 0%, #C9E5D5 100%);
+    border: 1px solid var(--green-border);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin: 0 0 24px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;
+  }
+  .hero.no-value {
+    background: linear-gradient(135deg, #FFF6D6 0%, #F5E5A1 100%);
+    border-color: var(--amber-border);
+  }
+  .hero .cell .label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: #1B5C36; margin-bottom: 4px;
+  }
+  .hero.no-value .cell .label { color: #6B5500; }
+  .hero .cell .big {
+    font-family: 'Domine', Georgia, serif;
+    font-size: 38px; font-weight: 700;
+    color: #1B5C36; line-height: 1.1; letter-spacing: -0.02em;
+    margin: 2px 0 6px;
+  }
+  .hero.no-value .cell .big { color: #6B5500; }
+  .hero .cell .sub {
+    font-size: 12px; color: #1B5C36; opacity: 0.82;
+  }
+  .hero.no-value .cell .sub { color: #6B5500; }
+  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; gap: 18px; } }
+
+  /* ---------- Section heading ---------- */
+  .section-title {
+    font-size: 20px; font-weight: 600;
+    color: var(--flipdish-blue-dark);
+    margin: 32px 0 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .dot {
+    width: 10px; height: 10px; border-radius: 999px;
+    background: var(--flipdish-blue); flex: 0 0 auto;
+  }
+
+  /* ---------- Comparison tiles (today vs with Flipdish) ---------- */
+  .compare-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 760px) { .compare-grid { grid-template-columns: 1fr; } }
+
+  .compare {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 22px;
+  }
+  .compare .compare-title {
+    font-family: 'Domine', Georgia, serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--flipdish-blue-dark);
+    margin: 0 0 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare .row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; font-size: 14px;
+  }
+  .compare .row .k { color: var(--muted); }
+  .compare .row .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .compare .total-row {
+    display: flex; justify-content: space-between;
+    padding: 12px 0 0; margin-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 15px; font-weight: 600;
+  }
+  .compare .total-row .v { color: var(--flipdish-blue-dark); }
+
+  .save-callout {
+    display: inline-block;
+    font-size: 13px; font-weight: 700;
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--green-soft); color: var(--green-strong);
+    margin-top: 12px;
+  }
+  .save-callout.negative { background: var(--red-soft); color: var(--red-strong); }
+  .save-callout.zero { background: #F0F4F8; color: var(--muted); }
+
+  /* ---------- New-revenue panel (Phone AI) ---------- */
+  .new-rev {
+    background: var(--flipdish-blue-light);
+    border: 1px solid var(--flipdish-blue-line);
+    border-radius: 12px; padding: 20px 22px;
+    margin-bottom: 18px;
+  }
+  .new-rev h4 {
+    font-family: 'Domine', Georgia, serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--flipdish-blue-dark);
+    margin: 0 0 6px;
+  }
+  .new-rev .big {
+    font-family: 'Domine', Georgia, serif;
+    font-size: 26px; font-weight: 700;
+    color: var(--flipdish-blue-dark); margin: 8px 0 4px;
+  }
+  .new-rev .desc { font-size: 13px; color: var(--flipdish-blue-dark); opacity: 0.85; margin: 0 0 10px; }
+  .new-rev .explain {
+    font-size: 12px; color: var(--flipdish-blue-dark); opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  /* ---------- Investment block ---------- */
+  .invest {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 24px; margin-bottom: 18px;
+  }
+  .invest-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0; font-size: 14px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .invest-row:last-of-type { border-bottom: 0; }
+  .invest-row .k { color: var(--muted); }
+  .invest-row .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Bottom line ---------- */
+  .bottom-line {
+    background: var(--flipdish-blue-dark);
+    color: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 28px 0 20px;
+  }
+  .bottom-line .bl-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; opacity: 0.85;
+  }
+  .bottom-line .bl-big {
+    font-family: 'Domine', Georgia, serif;
+    font-size: 36px; font-weight: 700; margin: 6px 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .bottom-line .bl-sub { font-size: 14px; opacity: 0.9; }
+
+  /* ---------- Notes / fine print ---------- */
+  .fineprint {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.6;
+    margin: 18px 0 0;
+  }
+
+  /* ---------- Actions ---------- */
+  .action-row {
+    display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;
+    margin: 24px 0 10px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 16px;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; font: inherit; font-size: 14px; font-weight: 500;
+    color: var(--flipdish-dark);
+    transition: all .15s ease;
+  }
+  .btn:hover { border-color: var(--flipdish-blue); color: var(--flipdish-blue); }
+  .btn-primary {
+    background: var(--flipdish-blue-dark); border-color: var(--flipdish-blue-dark); color: white;
+  }
+  .btn-primary:hover { background: var(--flipdish-blue); border-color: var(--flipdish-blue); color: white; }
+  .btn svg { width: 15px; height: 15px; }
+
+  /* ---------- Empty / error state ---------- */
+  .empty {
+    background: var(--amber-soft); border: 1px solid var(--amber-border);
+    border-radius: 12px; padding: 24px;
+    color: #6B5500; font-size: 14px;
+  }
+  .empty a { color: var(--amber-strong); }
+
+  footer {
+    margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center;
+    padding-top: 20px; border-top: 1px solid var(--border);
+  }
+
+  /* ---------- Print ---------- */
+  @media print {
+    body { background: white; }
+    .topbar { border-bottom: 1px solid #000; padding: 10px 20px; }
+    .action-row, .back-link { display: none !important; }
+    .wrap { padding: 12px 16px; max-width: none; }
+    .hero, .compare, .new-rev, .invest, .bottom-line {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .bottom-line { background: #eef; color: #000; }
+    .bottom-line .bl-label { color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP BAR ===================== -->
+<div class="topbar">
+  <div class="brand">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 288" aria-label="Flipdish">
+      <g fill="#020203">
+        <path d="M581.63,126.64c5.01,0.42,9.77,1.06,14.48,3.15c4,1.82,6.77,4.78,9.03,8.45c2.03,3.42,0.92,7.69-2.76,10.19 c-3.19,2.28-6.78,2.15-10.27-0.6c-1.4-1.01-2.78-2.49-4.18-3.5c-3.48-2.99-9.7-3.21-13.61-0.72c-2.45,1.59-3.75,4.41-3.12,7.06 c0.64,2.18,2.02,3.66,4.15,4.45c1.89,0.78,4.03,1.1,5.92,1.65c4.27,1.11,8.53,2.22,12.55,3.56c4.96,1.85,8.93,4.62,11.88,9.03 c5.23,7.6,4.62,18.1-0.92,25.8c-4.27,5.59-9.88,8.74-16.85,9.69c-8.42,1.37-16.53,0.61-24.29-3.25c-4.46-2.31-8.18-5.55-10.89-9.95 c-1.8-3.17-1.43-6.75,1.05-9.29c3.73-3.93,8.52-4,12.68-0.03c0.69,0.74,1.38,1.48,2.07,2.23c3.45,3.95,7.94,5.54,12.97,5.24 c1.92-0.17,3.61-0.59,5.32-1.72c3.92-2.73,4.12-8.23,0.15-11c-1.87-1.26-4-1.82-6.14-2.37c-4.26-1.35-8.77-2.23-13.02-3.81 c-4.97-1.61-9.17-4.63-11.88-9.03c-5-7.35-4.39-17.86,1.62-25.3c3.65-4.64,8.22-7.56,13.62-9.08 C574.59,126.52,578.13,126.52,581.63,126.64z"/>
+        <path d="M365.85,243.99c5.74,0,10.28-4.53,10.28-10.25l0-22.39v-16.36c5.93,6.03,13.69,9.69,22.19,9.69 c18.61,0,33.7-17.51,33.7-39.11c0-21.6-15.09-39.11-33.7-39.11c-8.51,0-16.28,3.67-22.21,9.72c-0.28-5.46-4.7-9.72-10.26-9.72 c-5.74,0-10.28,4.53-10.28,10.25v15.95l0,58.68l0,22.39C355.56,239.46,360.11,243.99,365.85,243.99z M394.65,144.32 c10.33,0,18.7,9.51,18.7,21.25c0,11.74-8.37,21.25-18.7,21.25c-10.33,0-18.7-9.51-18.7-21.25 C375.95,153.84,384.32,144.32,394.65,144.32z"/>
+        <path d="M502.01,90.92c-5.74,0-10.28,4.53-10.28,10.25v18.52v16.36c-5.93-6.03-13.69-9.69-22.19-9.69 c-18.61,0-33.7,17.51-33.7,39.11s15.09,39.11,33.7,39.11c8.51,0,16.28-3.67,22.21-9.72c0.28,5.46,4.7,9.72,10.26,9.72 c5.74,0,10.28-4.53,10.28-10.25v-15.95V119.7v-18.52C512.29,95.45,507.75,90.92,502.01,90.92z M473.21,186.72 c-10.33,0-18.7-9.51-18.7-21.25c0-11.74,8.37-21.25,18.7-21.25c10.33,0,18.7,9.51,18.7,21.25 C491.91,177.21,483.54,186.72,473.21,186.72z"/>
+        <path d="M205.01,128.94h-3.21l-0.23-3.4c-0.27-2.73-0.96-5.26-1.65-8.02c-3.37-12.77-10.11-23.36-19.75-32.04 c-9.39-8.43-20.23-13.49-32.27-15.66c0.72-1.69,1.2-3.37,1.2-5.3c0-6.99-5.54-12.53-12.52-12.53c-6.74,0-12.52,5.54-12.52,12.53 c0,1.93,0.48,3.61,1.2,5.06c-3.13,0.48-6.5,1.45-9.63,2.41c-7.95,2.89-15.17,6.99-21.43,12.53H42.92 c-5.06,0.24-9.15,4.34-9.15,9.39s4.09,9.15,9.15,9.15h37.08c-0.72,1.2-1.2,2.41-1.93,3.61H55.69c-5.06,0-9.15,4.1-9.15,9.15 c0,5.06,4.09,9.15,9.15,9.15h17.1c-0.24,1.19-0.42,2.6-0.48,3.95h-4.99c-4.62,0-8.39,3.78-8.39,8.39v0.84 c0,4.62,3.78,8.39,8.39,8.39h50.72l-0.23,10.46l-30.34,12.04c-2.41,0.96-4.33,2.89-5.06,5.54c-0.72,2.41-0.48,5.3,0.72,7.47 l7.95,13.73c1.69,2.89,4.82,4.58,7.71,4.58c1.44,0,3.13-0.48,4.58-1.2c4.33-2.65,5.78-8.19,3.13-12.53l-2.65-4.58l26.25-10.84 c3.37-1.45,5.54-4.58,5.54-8.19l0.48-16.48h3.44l10.53,21.3l-13.97,22.88c-1.69,2.89-1.93,6.26-0.24,9.15 c1.69,2.89,4.58,4.58,7.95,4.58h16.62c5.06,0,9.15-4.1,9.15-9.15c0-5.06-4.09-9.15-9.15-9.15h-0.48l8.19-13.25 c1.69-2.65,1.93-6.02,0.48-8.91l-8.6-17.44h45c4.62,0,8.39-3.78,8.39-8.39v-0.84C213.4,132.72,209.63,128.94,205.01,128.94z M177.77,126.29c-0.13,0.01-0.25,0.01-0.38,0.01c-2.57,0-4.73-2.01-4.93-4.58c-1.33-17.67-13.42-23.89-20.51-26.03 c-2.61-0.79-4.1-3.55-3.31-6.16c0.78-2.60,3.55-4.09,6.16-3.31c16.2,4.88,26.23,17.55,27.52,34.76 C182.54,123.71,180.49,126.09,177.77,126.29z"/>
+      </g>
+    </svg>
+  </div>
+  <div class="date-stamp" id="dateStamp">—</div>
+</div>
+
+<div class="wrap">
+
+  <!-- Main render area -->
+  <div id="mainContent"></div>
+
+  <!-- Empty-state placeholder (shown when no prospect matches ?id=...) -->
+  <div class="empty" id="emptyState" style="display:none;">
+    <strong>We couldn't load this deal.</strong>
+    <p style="margin: 6px 0 0;">This cost justification is generated from a saved deal in the Deal Room. If you got here by accident, please go back and open it from there.</p>
+    <p style="margin: 12px 0 0;"><a href="./">← Back to all deals</a></p>
+  </div>
+
+</div>
+
+<footer>Flipdish · Cost justification · v1.0</footer>
+
+<script>
+  // ====================================================================
+  // customer.html — external cost-justification view.
+  // Reads the prospect from localStorage via ?id=..., renders a
+  // customer-friendly summary of the value story. No inputs, no edits.
+  // ====================================================================
+
+  var STORAGE_KEY = 'flipdishProspects';
+  var CCY  = { UK: '£', IE: '€', US: '$', ES: '€' };
+  var LOC  = { UK: 'United Kingdom', IE: 'Ireland', US: 'United States', ES: 'Spain' };
+  var PHONE_COMMISSION_DEFAULT = 5;  // %
+  var DAYS_PER_MONTH = 30;
+
+  // ---------- URL + storage ----------
+  function getQueryParam(key) {
+    var q = window.location.search.replace(/^\?/, '').split('&');
+    for (var i = 0; i < q.length; i++) {
+      var pair = q[i].split('=');
+      if (decodeURIComponent(pair[0]) === key) return decodeURIComponent(pair[1] || '');
+    }
+    return null;
+  }
+  function loadAll() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
+  // ---------- HTML escape ----------
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ---------- Money formatter ----------
+  function fmtMoney(n, country) {
+    if (!isFinite(n)) return '—';
+    var sym = CCY[country] || '£';
+    var s = n < 0 ? '-' : '';
+    return s + sym + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+
+  // ---------- Calculation (mirrors detail.html so both pages stay in sync) ----------
+  function computeValueStory(p) {
+    var result = {
+      ooSavings: 0, posSavings: 0,
+      phoneNewRevenue: 0, phoneLabourSaving: 0,
+      phoneAiCost: 0, phoneAiCommissionCost: 0,
+      fdMonthlySub: 0, hardwareOneOff: 0, contractMonths: 36,
+      detail: {}
+    };
+    var c = p.current || {};
+    var f = p.flipdish || {};
+    var N = function (v) { var x = parseFloat(v); return isNaN(x) ? 0 : x; };
+
+    if (p.includeOO) {
+      var ooGmv   = N(c.ooGmv);
+      var ooCur   = N(c.ooCommission) / 100;
+      var ooNew   = N(f.ooRate) / 100;
+      var ooCurCost = ooGmv * ooCur;
+      var ooNewCost = ooGmv * ooNew;
+      result.ooSavings = ooCurCost - ooNewCost;
+      result.detail.oo = {
+        gmv: ooGmv, curPct: N(c.ooCommission), newPct: N(f.ooRate),
+        curCost: ooCurCost, newCost: ooNewCost,
+        provider: c.ooProvider || ''
+      };
+    }
+    if (p.includePOS) {
+      var posGmv = N(c.posGmv);
+      var aov    = N(c.aov);
+      var posTxn = aov > 0 ? (posGmv / aov) : 0;
+      var curRate = N(c.posRate) / 100, newRate = N(f.posRate) / 100;
+      var curTxnFee = N(c.posTransFee), newTxnFee = N(f.posTransFee);
+      var curSub = N(c.posSub);
+      var curPosCost = (posGmv * curRate) + (posTxn * curTxnFee) + curSub;
+      var fdPosCost  = (posGmv * newRate) + (posTxn * newTxnFee);
+      result.posSavings = curPosCost - fdPosCost;
+      result.detail.pos = {
+        gmv: posGmv, txn: posTxn, aov: aov,
+        curRate: N(c.posRate), newRate: N(f.posRate),
+        curTxnFee: curTxnFee, newTxnFee: newTxnFee, curSub: curSub,
+        curTotal: curPosCost, newTotal: fdPosCost,
+        provider: c.posProvider || '', cashierCount: N(c.cashierCount)
+      };
+    }
+    if (p.includePhoneAI) {
+      var orders = N(c.phoneOrdersPerDay);
+      var missed = Math.min(100, Math.max(0, N(c.phoneMissedPct)));
+      var callLen = N(c.phoneCallLenMin);
+      var phoneAov = N(c.phoneAov) > 0 ? N(c.phoneAov) : N(c.aov);
+      var wage = N(c.hourlyWage);
+      var monthlyOrders = orders * DAYS_PER_MONTH;
+      var missedRevenueGross = monthlyOrders * (missed / 100) * phoneAov;
+      var phoneCommPct = N(f.phoneAiCommPct) / 100;
+      var commCostAllOrders = monthlyOrders * phoneAov * phoneCommPct;
+      var missedRevenueNet = missedRevenueGross * (1 - phoneCommPct);
+      var labour = monthlyOrders * (callLen / 60) * wage;
+      result.phoneNewRevenue = missedRevenueNet;
+      result.phoneLabourSaving = labour;
+      result.phoneAiCost = N(f.phoneAiSub);
+      result.phoneAiCommissionCost = commCostAllOrders - (missedRevenueGross * phoneCommPct);
+      result.detail.phone = {
+        orders: monthlyOrders, missedPct: missed, aov: phoneAov, wage: wage,
+        callLen: callLen, commPct: N(f.phoneAiCommPct),
+        missedRevenueGross: missedRevenueGross, missedRevenueNet: missedRevenueNet,
+        labour: labour,
+        commissionOnPreviouslyAnswered: commCostAllOrders - (missedRevenueGross * phoneCommPct)
+      };
+    }
+    result.fdMonthlySub = parseFloat(f.monthlySub) || 0;
+    result.hardwareOneOff = parseFloat(f.hardwareOneOff) || 0;
+    result.contractMonths = Math.max(1, Math.round(parseFloat(f.contractMonths)) || 36);
+
+    result.netMonthly =
+        result.ooSavings + result.posSavings
+      + result.phoneNewRevenue + result.phoneLabourSaving
+      - result.fdMonthlySub - result.phoneAiCost - result.phoneAiCommissionCost;
+
+    result.annualValue = (result.netMonthly * 12) - result.hardwareOneOff;
+    result.contractValue = (result.netMonthly * result.contractMonths) - result.hardwareOneOff;
+
+    // Payback: how many months until cumulative net value covers the hardware one-off
+    if (result.netMonthly > 0 && result.hardwareOneOff > 0) {
+      result.paybackMonths = result.hardwareOneOff / result.netMonthly;
+    } else if (result.netMonthly > 0) {
+      result.paybackMonths = 0;  // no one-off to recover
+    } else {
+      result.paybackMonths = null;
+    }
+    return result;
+  }
+
+  // ---------- Render helpers ----------
+  function saveCallout(amount, country) {
+    if (amount > 0) {
+      return '<span class="save-callout">You save ' + fmtMoney(amount, country) + '/mo</span>';
+    } else if (amount < 0) {
+      return '<span class="save-callout negative">+' + fmtMoney(-amount, country) + '/mo vs today</span>';
+    }
+    return '<span class="save-callout zero">Same as today</span>';
+  }
+
+  function ooCompareHtml(v, country) {
+    var d = v.detail.oo;
+    if (!d || d.gmv <= 0) return '';
+    var providerLabel = d.provider ? escapeHtml(d.provider) : 'Your current provider';
+    return '' +
+      '<div class="compare">' +
+        '<div class="compare-title">Online Ordering commission</div>' +
+        '<div class="row"><span class="k">Monthly GMV on this channel</span><span class="v">' + fmtMoney(d.gmv, country) + '</span></div>' +
+        '<div class="row"><span class="k">' + providerLabel + ' — ' + d.curPct + '%</span><span class="v">-' + fmtMoney(d.curCost, country) + '/mo</span></div>' +
+        '<div class="row"><span class="k">Flipdish — ' + d.newPct + '%</span><span class="v">-' + fmtMoney(d.newCost, country) + '/mo</span></div>' +
+        '<div class="total-row"><span>Monthly saving</span><span class="v">' + fmtMoney(v.ooSavings, country) + '</span></div>' +
+        saveCallout(v.ooSavings, country) +
+      '</div>';
+  }
+
+  function posCompareHtml(v, country) {
+    var d = v.detail.pos;
+    if (!d || d.gmv <= 0) return '';
+    var providerLabel = d.provider ? escapeHtml(d.provider) : 'Your current POS';
+    return '' +
+      '<div class="compare">' +
+        '<div class="compare-title">POS &amp; card processing</div>' +
+        '<div class="row"><span class="k">Monthly in-store GMV</span><span class="v">' + fmtMoney(d.gmv, country) + '</span></div>' +
+        '<div class="row"><span class="k">' + providerLabel + ' — all-in monthly</span><span class="v">-' + fmtMoney(d.curTotal, country) + '</span></div>' +
+        '<div class="row"><span class="k">Flipdish — all-in monthly</span><span class="v">-' + fmtMoney(d.newTotal, country) + '</span></div>' +
+        '<div class="total-row"><span>Monthly saving</span><span class="v">' + fmtMoney(v.posSavings, country) + '</span></div>' +
+        saveCallout(v.posSavings, country) +
+      '</div>';
+  }
+
+  function phoneNewRevHtml(v, country) {
+    var d = v.detail.phone;
+    if (!d || d.orders <= 0) return '';
+    var lines = [];
+    if (d.missedPct > 0 && v.phoneNewRevenue > 0) {
+      lines.push(
+        '<div class="new-rev">' +
+          '<h4>Phone AI — revenue we recover</h4>' +
+          '<p class="desc">Today, ' + d.missedPct + '% of your phone calls go unanswered. Phone AI picks them up and turns them into orders.</p>' +
+          '<div class="big">+' + fmtMoney(v.phoneNewRevenue, country) + '/mo <span style="font-size:14px;font-weight:400;opacity:.85">new revenue captured</span></div>' +
+          '<p class="explain">Based on ' + d.orders.toLocaleString() + ' phone orders/month at ' + fmtMoney(d.aov, country) + ' AOV, net of the ' + d.commPct + '% Phone AI commission. Flipdish only takes commission on phone orders — the rest of your business is unaffected.</p>' +
+        '</div>'
+      );
+    }
+    if (d.callLen > 0 && d.wage > 0 && v.phoneLabourSaving > 0) {
+      lines.push(
+        '<div class="new-rev">' +
+          '<h4>Phone AI — staff time returned</h4>' +
+          '<p class="desc">Every minute your team was on the phone is a minute on the floor.</p>' +
+          '<div class="big">+' + fmtMoney(v.phoneLabourSaving, country) + '/mo <span style="font-size:14px;font-weight:400;opacity:.85">staff time freed up</span></div>' +
+          '<p class="explain">' + d.orders.toLocaleString() + ' calls/month × ' + d.callLen + ' min each × ' + fmtMoney(d.wage, country) + '/hr wage = hours back with your customers.</p>' +
+        '</div>'
+      );
+    }
+    return lines.join('');
+  }
+
+  function investmentHtml(v, country) {
+    var rows = [];
+    if (v.fdMonthlySub > 0) rows.push({ k: 'Flipdish monthly subscription', v: fmtMoney(v.fdMonthlySub, country) + '/mo' });
+    if (v.phoneAiCost > 0)  rows.push({ k: 'Phone AI monthly subscription', v: fmtMoney(v.phoneAiCost, country) + '/mo' });
+    if (v.hardwareOneOff > 0) rows.push({ k: 'Hardware (one-off, net of any subsidy)', v: fmtMoney(v.hardwareOneOff, country) });
+    if (!rows.length) return '';
+    return '<div class="invest">' +
+      rows.map(function (r) {
+        return '<div class="invest-row"><span class="k">' + r.k + '</span><span class="v">' + r.v + '</span></div>';
+      }).join('') +
+    '</div>';
+  }
+
+  function paybackLine(v, country) {
+    if (v.paybackMonths == null) {
+      return 'On these numbers the monthly figures don\'t yet show a positive return. Ask your Flipdish rep to review the rates.';
+    }
+    if (v.paybackMonths === 0) {
+      return 'No hardware one-off to recover — you\'re net-positive from day one.';
+    }
+    if (v.paybackMonths <= 12) {
+      var whole = Math.round(v.paybackMonths);
+      return 'The ' + fmtMoney(v.hardwareOneOff, country) + ' hardware investment pays back in roughly <strong>' + whole + ' month' + (whole === 1 ? '' : 's') + '</strong> — after that, the full monthly saving is yours.';
+    }
+    var yrs = (v.paybackMonths / 12).toFixed(1);
+    return 'The ' + fmtMoney(v.hardwareOneOff, country) + ' hardware investment pays back in about <strong>' + yrs + ' years</strong> on these numbers.';
+  }
+
+  // ---------- Main render ----------
+  function render() {
+    var id = getQueryParam('id');
+    var list = loadAll();
+    var prospect = id ? list.find(function (p) { return p.id === id; }) : null;
+
+    // Always date-stamp the top right
+    var today = new Date();
+    document.getElementById('dateStamp').textContent =
+      today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+    if (!prospect) {
+      document.getElementById('emptyState').style.display = '';
+      return;
+    }
+
+    var country = prospect.country || 'UK';
+    var v = computeValueStory(prospect);
+
+    var hasAnything = prospect.includeOO || prospect.includePOS || prospect.includePhoneAI;
+
+    // Build the header
+    var headerHtml = '' +
+      '<div class="doc-header">' +
+        '<div class="doc-kicker">Cost justification</div>' +
+        '<h1 class="doc-title">' + escapeHtml(prospect.name || 'Your business') + '</h1>' +
+        '<p class="doc-subtitle">Here\'s what moving to Flipdish looks like for your business, month on month.</p>' +
+        '<div class="doc-meta">' +
+          (prospect.locations ? '<span class="meta-item"><strong>' + prospect.locations + '</strong> ' + (prospect.locations == 1 ? 'location' : 'locations') + '</span>' : '') +
+          '<span class="meta-item"><strong>' + LOC[country] + '</strong></span>' +
+          (prospect.contactName ? '<span class="meta-item">Prepared for <strong>' + escapeHtml(prospect.contactName) + '</strong></span>' : '') +
+          (prospect.ownerName ? '<span class="meta-item">Your Flipdish rep: <strong>' + escapeHtml(prospect.ownerName) + '</strong></span>' : '') +
+        '</div>' +
+      '</div>';
+
+    if (!hasAnything) {
+      document.getElementById('mainContent').innerHTML = headerHtml +
+        '<div class="empty"><strong>No levers selected yet.</strong><p style="margin:6px 0 0;">This deal hasn\'t had Online Ordering, POS or Phone AI switched on in the Deal Room yet, so there\'s nothing to show here.</p></div>';
+      return;
+    }
+
+    // Hero
+    var heroClass = (v.netMonthly > 0) ? 'hero' : 'hero no-value';
+    var monthlyLabel = v.netMonthly >= 0 ? 'What you save + earn / month' : 'Net monthly delta';
+    var heroHtml = '' +
+      '<div class="' + heroClass + '">' +
+        '<div class="cell">' +
+          '<div class="label">' + monthlyLabel + '</div>' +
+          '<div class="big">' + fmtMoney(v.netMonthly, country) + '</div>' +
+          '<div class="sub">After Flipdish subscription &amp; any Phone AI commission</div>' +
+        '</div>' +
+        '<div class="cell">' +
+          '<div class="label">Year 1 value</div>' +
+          '<div class="big">' + fmtMoney(v.annualValue, country) + '</div>' +
+          '<div class="sub">12 months, net of hardware one-off</div>' +
+        '</div>' +
+        '<div class="cell">' +
+          '<div class="label">Over the ' + v.contractMonths + '-month contract</div>' +
+          '<div class="big">' + fmtMoney(v.contractValue, country) + '</div>' +
+          '<div class="sub">Total value across the term</div>' +
+        '</div>' +
+      '</div>';
+
+    // Savings section (OO + POS)
+    var savingsHtml = '';
+    var savingsTiles = [];
+    if (prospect.includeOO) {
+      var ooTile = ooCompareHtml(v, country);
+      if (ooTile) savingsTiles.push(ooTile);
+    }
+    if (prospect.includePOS) {
+      var posTile = posCompareHtml(v, country);
+      if (posTile) savingsTiles.push(posTile);
+    }
+    if (savingsTiles.length) {
+      savingsHtml = '<h2 class="section-title"><span class="dot"></span>Where the savings come from</h2>' +
+        '<div class="compare-grid">' + savingsTiles.join('') + '</div>';
+    }
+
+    // New revenue (Phone AI)
+    var newRevHtml = '';
+    if (prospect.includePhoneAI) {
+      var phoneHtml = phoneNewRevHtml(v, country);
+      if (phoneHtml) {
+        newRevHtml = '<h2 class="section-title"><span class="dot"></span>New revenue &amp; time returned</h2>' + phoneHtml;
+      }
+    }
+
+    // Investment
+    var investHtml = investmentHtml(v, country);
+    var investSectionHtml = investHtml
+      ? '<h2 class="section-title"><span class="dot"></span>What it costs</h2>' + investHtml
+      : '';
+
+    // Bottom line + payback
+    var blLabel = v.netMonthly > 0 ? 'Bottom line' : 'Where we stand today';
+    var blBig = fmtMoney(v.netMonthly, country) + '/mo';
+    var blSub = paybackLine(v, country);
+    var bottomLineHtml = '' +
+      '<div class="bottom-line">' +
+        '<div class="bl-label">' + blLabel + '</div>' +
+        '<div class="bl-big">' + blBig + '</div>' +
+        '<div class="bl-sub">' + blSub + '</div>' +
+      '</div>';
+
+    // Fine-print footnote
+    var finePrint = '<p class="fineprint">Figures above are based on what you and your Flipdish rep captured about your current setup and the rates in our proposal. Final quote values, contract terms and payment schedules are in the signed order form from Salesforce; this page is a summary for discussion.</p>';
+
+    // Actions (not shown when printing)
+    var actionsHtml = '' +
+      '<div class="action-row">' +
+        '<button class="btn btn-primary" id="printBtn" type="button">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>' +
+          'Print / save as PDF' +
+        '</button>' +
+      '</div>';
+
+    document.getElementById('mainContent').innerHTML =
+      headerHtml + heroHtml + savingsHtml + newRevHtml + investSectionHtml + bottomLineHtml + finePrint + actionsHtml;
+
+    var printBtn = document.getElementById('printBtn');
+    if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render);
+  } else {
+    render();
+  }
+</script>
+</body>
+</html>
