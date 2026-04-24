@@ -364,7 +364,7 @@
       </svg>
       <span class="tag">Business Value Assessment</span>
     </div>
-    <div class="meta">Flipdish Phone AI · Missed orders + staff time returned · v1.3</div>
+    <div class="meta">Flipdish Phone AI · Missed orders + staff time returned · v1.4</div>
   </header>
 
   <h1 id="pageTitle">Take the phone off your team's hands</h1>
@@ -469,7 +469,8 @@
     <ol>
       <li><strong>Get the missed-call rate.</strong> Most operators underestimate this. 5% is conservative — many phone-heavy restaurants lose 10–20% of calls during the Friday/Saturday dinner rush. A simple "how many calls does your POS show vs how many got answered?" almost always uncovers a bigger number.</li>
       <li><strong>Pin down the call length honestly.</strong> 3–5 minutes is typical for a phone order with menu questions and payment. The labour line scales linearly with this number, so don't overstate it — a credible 4 minutes beats an aggressive 8.</li>
-      <li><strong>Enter the Phone AI monthly cost.</strong> The <em>Net monthly value</em> on the right shows what the restaurant actually pockets each month after subtracting it.</li>
+      <li><strong>Enter the Phone AI monthly cost.</strong> The <em>Net monthly value</em> on the right shows what the restaurant actually pockets each month after subtracting the subscription <em>and</em> Flipdish's 5% commission on every order Phone AI handles.</li>
+      <li><strong>5% commission is already baked in.</strong> You don't need to add it anywhere — the net figure already deducts 5% of (monthly phone orders × AOV). Mention this explicitly to the client so there are no surprises on invoice 1.</li>
     </ol>
   </div>
 
@@ -517,6 +518,7 @@
 
   // ---------- Calculation ----------
   const DAYS_PER_MONTH = 30;
+  const COMMISSION_RATE = 0.05; // Flipdish takes a 5% commission on every order handled by Phone AI
 
   function calc() {
     const ordersPerDay = num('ordersPerDay');
@@ -531,15 +533,19 @@
 
     const monthlyOrders = ordersPerDay * DAYS_PER_MONTH;
 
-    // Stream 1: missed orders captured
+    // Stream 1: missed orders captured (gross, pre-commission)
     const missed = monthlyOrders * (clampedMissed / 100) * aov;
 
     // Stream 2: staff time returned
     const labour = monthlyOrders * (callLength / 60) * hourlyWage;
 
+    // Commission cost — 5% of every phone order now runs through Flipdish Phone AI
+    const commissionMonthly = monthlyOrders * aov * COMMISSION_RATE;
+
     const grossMonthly = missed + labour;
     const grossAnnual  = grossMonthly * 12;
-    const netMonthly   = grossMonthly - phoneAiCost;
+    // Net = gross value − Phone AI subscription − 5% commission on all handled orders
+    const netMonthly   = grossMonthly - phoneAiCost - commissionMonthly;
 
     // Render stream cards
     setText($('streamMissed'), fmtMoney2(missed), 'flash');
@@ -556,18 +562,19 @@
     setText($('heroBig'),     fmtMoney(grossAnnual)  + '/yr', 'flash');
     setText($('heroMonthly'), fmtMoney(grossMonthly) + '/mo', 'flash');
     $('heroSub').textContent =
-      `Missed orders captured + staff time returned · ${labels[activeCountry]}`;
+      `Missed orders captured + staff time returned · ${labels[activeCountry]} · before 5% commission`;
 
-    // ROI readout — always show net; treat 0 as "Phone AI is included free"
+    // ROI readout — always show net; include 5% commission alongside the subscription
     const netReadout = $('netReadout');
     const negative   = netMonthly < 0;
+    const totalCost  = phoneAiCost + commissionMonthly;
     let subText;
     if (phoneAiCost === 0) {
-      subText = 'No cost applied — net = gross value';
+      subText = `No subscription entered · 5% commission (${fmtMoney2(commissionMonthly)}/mo) already subtracted`;
     } else if (negative) {
-      subText = `Phone AI cost (${fmtMoney2(phoneAiCost)}/mo) exceeds the gross value`;
+      subText = `Total cost ${fmtMoney2(totalCost)}/mo (sub ${fmtMoney2(phoneAiCost)} + 5% commission ${fmtMoney2(commissionMonthly)}) exceeds gross value`;
     } else {
-      subText = `Gross ${fmtMoney2(grossMonthly)}/mo − Phone AI ${fmtMoney2(phoneAiCost)}/mo`;
+      subText = `Gross ${fmtMoney2(grossMonthly)}/mo − sub ${fmtMoney2(phoneAiCost)}/mo − 5% commission ${fmtMoney2(commissionMonthly)}/mo`;
     }
     netReadout.innerHTML = `
       <div class="net-label">Net monthly value</div>

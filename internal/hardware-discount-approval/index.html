@@ -862,6 +862,7 @@
         <div class="row subtract mode-pos-or-combined"><span class="name">− <span class="subsidyName">CCEP</span> approved</span><span class="val" id="subsidyTotal">—</span></div>
         <div class="row subtract"><span class="name">− Maximum discount allowed</span><span class="val" id="maxDiscountRow2">—</span></div>
         <div class="row total"><span class="name">= Minimum sales price <span class="row-help">(do not go below this)</span></span><span class="val" id="minPriceRow">—</span></div>
+        <div class="row total"><span class="name">= Max discount off list <span class="row-help">(what the client sees — includes subsidy)</span></span><span class="val" id="maxPctOffList">—</span></div>
       </div>
 
       <h3>How the payback period is calculated <span style="font-family:'Roboto',sans-serif;font-weight:400;font-size:12px;color:var(--muted);">(uses your proposed price)</span></h3>
@@ -872,6 +873,7 @@
         <div class="row total"><span class="name">= Discount being given</span><span class="val" id="discountGiven">—</span></div>
         <div class="row"><span class="name">÷ Operating margin / mo</span><span class="val" id="opMarginShown">—</span></div>
         <div class="row total"><span class="name">= Payback period <span class="row-help">(months — at operating margin)</span></span><span class="val" id="paybackMonths">—</span></div>
+        <div class="row total"><span class="name">= Total discount off list <span class="row-help">(what the client sees — "I gave you X% off")</span></span><span class="val" id="totalPctOffList">—</span></div>
       </div>
 
       <div class="note">
@@ -890,12 +892,13 @@
       <li><strong>Hardware.</strong> Type the hardware list price. On POS and Combined deals, type any approved CCEP (UK) or CCH (IE) subsidy amount — otherwise leave it at 0. <strong>Kiosk-only deals don't qualify for CCEP/CCH.</strong></li>
       <li><strong>Read the floor.</strong> The big number on the left is the lowest sales price the rep can charge. Don't sell below it.</li>
       <li><strong>(Optional) Check a price.</strong> If the rep has a number in mind, type it into "Got a price in mind?" on the right. The payback period lights up green / amber / red — green is comfortable, amber is at the limit, red is over.</li>
+      <li><strong>What to quote the client.</strong> The verdict line now tells you the percentage off list (e.g. "that's 55% off list"). This is the number the client experiences — it combines any CCEP/CCH subsidy <em>and</em> your rep discount, because the client only sees list price → sales price.</li>
       <li><strong>Why 0.75 in the math?</strong> Finance applies a 25% cost-to-serve haircut, so the calculator approves discounts off real margin, not gross revenue. Click "Show me the math" if you want to see the full ladder.</li>
     </ol>
   </div>
 
   <footer>
-    Flipdish Hardware Discount Approval Calculator · Internal · Live calculation, nothing is saved · v1.0
+    Flipdish Hardware Discount Approval Calculator · Internal · Live calculation, nothing is saved · v1.1
     <br><span id="rates-updated-line"></span>
   </footer>
 
@@ -1094,6 +1097,15 @@
       paybackMonths = discountGiven / opMargin;
     } // else null = op margin ≤ 0
 
+    // Total discount % off list — this is the number the rep quotes to the client.
+    // It combines the subsidy + the rep's own discount, because the client only sees list → sales price.
+    //   maxTotalOffListPct  = floor view: (list − minSalesPrice) / list × 100
+    //   totalOffListPct     = actual view: (list − salesPrice)    / list × 100   (only when rep typed a price)
+    const pctOffList = (list, paid) => (list > 0 ? ((list - paid) / list) * 100 : 0);
+    const maxTotalOffListPct = pctOffList(hwList, minSalesPrice);
+    const totalOffListPct    = (salesPrice > 0) ? pctOffList(hwList, salesPrice) : null;
+    const fmtPct = p => (p >= 10 ? p.toFixed(0) : p.toFixed(1)) + '%';
+
     // ====================================================================
     // RENDER — math ladders
     // ====================================================================
@@ -1114,6 +1126,10 @@
     setText($('discountGiven'),   fmtMoney(discountGiven, 0),  true);
     setText($('opMarginShown'),   fmtMoney(opMargin, 2) + '/mo', true);
 
+    // % off list — what the client sees on quote
+    setText($('maxPctOffList'),   (hwList > 0 && maxTotalOffListPct > 0) ? fmtPct(maxTotalOffListPct) : '—', true);
+    setText($('totalPctOffList'), (totalOffListPct !== null && totalOffListPct > 0) ? fmtPct(totalOffListPct) : '—', true);
+
     // HEADLINE HEROES
     setText($('heroMinPrice'), fmtMoney(minSalesPrice, 0), true);
     // Support line: "Leaves room for up to £X of discount off the list (after CCEP)."
@@ -1125,8 +1141,11 @@
       : ' (after ' + subsidyName + ')';
     const heroSupport = $('heroSupportLine');
     if (heroSupport) {
+      const maxPctSuffix = (hwList > 0 && maxTotalOffListPct > 0)
+        ? ' — <strong>up to ' + fmtPct(maxTotalOffListPct) + ' off list</strong> from the client\'s point of view'
+        : '';
       heroSupport.innerHTML = 'Leaves room for up to <strong>' +
-        fmtMoney(maxDiscount, 0) + '</strong> of discount off the list' + supportSuffix + '.';
+        fmtMoney(maxDiscount, 0) + '</strong> of discount off the list' + supportSuffix + maxPctSuffix + '.';
     }
 
     // Verdict + payback banner
@@ -1158,26 +1177,36 @@
       heroClass = 'warn';
     } else if (discountGiven <= 0) {
       paybackText = '0 months';
-      paybackSubText = 'No discount being given — nothing to pay back.';
+      // Even with no rep discount, the client may still see a discount off list if the subsidy is shown on quote.
+      const clientSeesPct = (totalOffListPct !== null && totalOffListPct > 0)
+        ? ` Client still sees <strong>${fmtPct(totalOffListPct)} off list</strong> after subsidy.`
+        : '';
+      paybackSubText = 'No rep discount being given — nothing to pay back.';
       const afterSub = (activeMode === 'kiosk') ? '' : ' (after ' + subsidyName + ')';
-      verdictText = `<strong>Approve.</strong> The proposed sales price covers the list${afterSub}. No discount is being given. There's room to discount up to <strong>${fmtMoney(maxDiscount, 0)}</strong> (down to <strong>${fmtMoney(minSalesPrice, 0)}</strong>) if the deal needs sweetening.`;
+      verdictText = `<strong>Approve.</strong> The proposed sales price covers the list${afterSub}. No rep discount is being given.${clientSeesPct} There's room to discount up to <strong>${fmtMoney(maxDiscount, 0)}</strong> (down to <strong>${fmtMoney(minSalesPrice, 0)}</strong>, up to <strong>${fmtPct(maxTotalOffListPct)} off list</strong>) if the deal needs sweetening.`;
       verdictClass = 'green';
       heroClass = 'win';
     } else {
       paybackText = paybackMonths.toFixed(1) + ' months';
-      paybackSubText = `${fmtMoney(discountGiven, 0)} discount ÷ ${fmtMoney(opMargin, 0)}/mo operating margin.`;
+      const pctSuffix = (totalOffListPct !== null)
+        ? ` · ${fmtPct(totalOffListPct)} off list from the client's point of view`
+        : '';
+      paybackSubText = `${fmtMoney(discountGiven, 0)} discount ÷ ${fmtMoney(opMargin, 0)}/mo operating margin${pctSuffix}.`;
+      const pctLine = (totalOffListPct !== null)
+        ? ` (that's <strong>${fmtPct(totalOffListPct)} off list</strong> to the client)`
+        : '';
       if (paybackMonths < PAYBACK_TARGET_MONTHS - 0.05) {
         const headroom = maxDiscount - discountGiven;
-        verdictText = `<strong>Approve.</strong> Discount of <strong>${fmtMoney(discountGiven, 0)}</strong> pays back in <strong>${paybackMonths.toFixed(1)} months</strong> — comfortably under the ${PAYBACK_TARGET_MONTHS}-month limit. Headroom of <strong>${fmtMoney(headroom, 0)}</strong> available if needed.`;
+        verdictText = `<strong>Approve.</strong> Discount of <strong>${fmtMoney(discountGiven, 0)}</strong>${pctLine} pays back in <strong>${paybackMonths.toFixed(1)} months</strong> — comfortably under the ${PAYBACK_TARGET_MONTHS}-month limit. Headroom of <strong>${fmtMoney(headroom, 0)}</strong> available if needed.`;
         verdictClass = 'green';
         heroClass = 'win';
       } else if (paybackMonths <= PAYBACK_TARGET_MONTHS + 0.05) {
-        verdictText = `<strong>OK to approve, at the limit.</strong> Discount of <strong>${fmtMoney(discountGiven, 0)}</strong> pays back in <strong>${paybackMonths.toFixed(1)} months</strong> — right at the ${PAYBACK_TARGET_MONTHS}-month cap. Within bounds, but no headroom for further discount.`;
+        verdictText = `<strong>OK to approve, at the limit.</strong> Discount of <strong>${fmtMoney(discountGiven, 0)}</strong>${pctLine} pays back in <strong>${paybackMonths.toFixed(1)} months</strong> — right at the ${PAYBACK_TARGET_MONTHS}-month cap. Within bounds, but no headroom for further discount.`;
         verdictClass = 'amber';
         heroClass = 'warn';
       } else {
         const overBy = discountGiven - maxDiscount;
-        verdictText = `<strong>Do not approve as proposed.</strong> Discount of <strong>${fmtMoney(discountGiven, 0)}</strong> would take <strong>${paybackMonths.toFixed(1)} months</strong> to pay back — over the ${PAYBACK_TARGET_MONTHS}-month limit. Reduce the discount by <strong>${fmtMoney(overBy, 0)}</strong> (raise sales price to <strong>${fmtMoney(minSalesPrice, 0)}</strong> or higher) to stay within bounds. If the deal needs to go through as is, escalate for sign-off.`;
+        verdictText = `<strong>Do not approve as proposed.</strong> Discount of <strong>${fmtMoney(discountGiven, 0)}</strong>${pctLine} would take <strong>${paybackMonths.toFixed(1)} months</strong> to pay back — over the ${PAYBACK_TARGET_MONTHS}-month limit. Reduce the discount by <strong>${fmtMoney(overBy, 0)}</strong> (raise sales price to <strong>${fmtMoney(minSalesPrice, 0)}</strong> or higher) to stay within bounds. If the deal needs to go through as is, escalate for sign-off.`;
         verdictClass = 'red';
         heroClass = 'lose';
       }
