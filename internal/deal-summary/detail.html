@@ -243,6 +243,18 @@
     background: linear-gradient(135deg, #E6F1FB 0%, #C6DEF3 100%);
     border-color: #BEDAF2;
   }
+  .hero.warm {
+    background: linear-gradient(135deg, #FFF4E0 0%, #FCE3B2 100%);
+    border-color: #F2C878;
+  }
+  .hero.warm .hero-label { color: #8A5A12; }
+  .hero.emphasis {
+    background: linear-gradient(135deg, #0B3D66 0%, #064885 100%);
+    border-color: #064885; color: #fff;
+  }
+  .hero.emphasis .hero-label { color: #CFE3F5; opacity: 1; }
+  .hero.emphasis .hero-value { color: #fff; }
+  .hero.emphasis .hero-sub { color: #CFE3F5; }
   .hero.muted-hero {
     background: #F4F6F8; border-color: var(--border);
     color: var(--muted);
@@ -252,6 +264,29 @@
     letter-spacing: 0.08em; color: var(--flipdish-blue-dark); opacity: 0.85;
   }
   .hero.muted-hero .hero-label { color: var(--muted); }
+  /* Two-column dual-story grouping */
+  .answer-group-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    margin-top: 12px;
+  }
+  @media (max-width: 820px) { .answer-group-row { grid-template-columns: 1fr; } }
+  .answer-group {
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 14px 18px; background: #fff;
+  }
+  .answer-group h3 {
+    font-family: 'Domine', Georgia, serif;
+    font-size: 15px; color: var(--flipdish-blue-dark);
+    margin: 4px 6px 12px; font-weight: 700;
+  }
+  .answer-group h3 .group-sub {
+    display: block; font-family: inherit; font-size: 12px;
+    color: var(--muted); font-weight: 400; margin-top: 2px;
+  }
+  .answer-group .answer-wrap {
+    margin-top: 0;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
   .hero-value {
     font-family: 'Domine', Georgia, serif;
     font-size: 32px; font-weight: 700; color: var(--flipdish-dark);
@@ -262,12 +297,53 @@
   }
 
   /* Narrative + breakdown */
+  .narrative-wrap {
+    position: relative; margin-top: 14px;
+  }
   .narrative {
     background: #FBFDFF; border: 1px solid var(--flipdish-blue-line);
-    border-radius: 12px; padding: 18px 22px; margin-top: 14px;
+    border-radius: 12px; padding: 18px 22px;
     font-size: 15px; line-height: 1.6;
+    min-height: 60px;
   }
   .narrative strong { color: var(--flipdish-blue-dark); }
+  .narrative[contenteditable="true"] {
+    background: #FFFCE8; border-color: #E4C564;
+    outline: none; box-shadow: 0 0 0 3px rgba(228, 197, 100, .25);
+  }
+  .narrative-actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+    margin-top: 8px;
+  }
+  .narrative-actions .btn-sm {
+    font-size: 12px; padding: 6px 12px;
+    background: #fff; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .narrative-actions .btn-sm:hover {
+    border-color: var(--flipdish-blue); color: var(--flipdish-blue);
+  }
+  .narrative-actions .btn-sm svg { width: 12px; height: 12px; }
+  .narrative-actions .btn-sm[disabled] {
+    opacity: 0.45; cursor: not-allowed;
+  }
+  .narrative-edit-hint {
+    font-size: 11px; color: #8A5A12;
+    background: #FFFCE8; border: 1px dashed #E4C564;
+    padding: 6px 10px; border-radius: 6px;
+    margin-top: 6px; display: none;
+  }
+  .btn-salesforce {
+    background: #fff; color: var(--muted);
+    border: 1.5px dashed var(--border);
+  }
+  .btn-coming-soon-tag {
+    font-size: 10px; padding: 2px 6px; border-radius: 4px;
+    background: #F4F6F8; color: var(--muted); margin-left: 4px;
+    font-weight: 700; letter-spacing: 0.04em;
+  }
   .breakdown {
     margin-top: 14px; background: #fff; border: 1px solid var(--border);
     border-radius: 12px; overflow: hidden;
@@ -418,7 +494,15 @@
       </div>
     </div>
 
-    <div class="grid wide">
+    <div class="grid">
+      <div class="field">
+        <label for="locations">Number of locations</label>
+        <input type="number" id="locations" class="plain" min="1" step="1" value="1" />
+        <div class="hint">Subscriptions that scale per site (POS, Kiosk) will multiply by this number automatically.</div>
+      </div>
+    </div>
+
+    <div class="grid wide" style="margin-top: 14px;">
       <div class="field">
         <label for="notes">Notes — discovery call, context, objections</label>
         <textarea id="notes" class="plain" placeholder="e.g. 3-location group, currently on Toast POS + Deliveroo for online. Unhappy with Deliveroo commissions. Decision-maker: Andrea (Operations Director)."></textarea>
@@ -429,29 +513,93 @@
   <!-- ================= STEP 2 — PRODUCT SCOPE ================= -->
   <div class="step">
     <span class="num">2</span>
-    <span class="text">What are we pricing?<span class="sub">Flip the switches for the Flipdish products in scope</span></span>
+    <span class="text">What are we pricing?<span class="sub">Flip on the Flipdish products in scope for this deal</span></span>
   </div>
 
   <div class="card">
+    <p style="margin: 0 0 14px; font-size: 13px; color: var(--muted);">
+      Flip a toggle <strong>on</strong> to add a product to this deal. Its "current setup" and "Flipdish proposal" blocks will appear below. Everything defaults to off — only pick the products you're actually pitching.
+    </p>
+
+    <!-- Online Ordering -->
     <div class="toggle-row">
       <label class="toggle">
-        <input type="checkbox" id="includeOO" checked>
+        <input type="checkbox" id="includeOO">
         <span class="toggle-slider"></span>
       </label>
-      <div>
+      <div style="flex: 1;">
         <div class="toggle-label">Online Ordering</div>
-        <div class="toggle-hint">Website / app — their current commission vs our rate + subscription</div>
+        <div class="toggle-hint">Website / App — their current commission (Deliveroo / UE / JustEat) vs Flipdish rate + sub</div>
+        <div id="ooSubTypeWrap" style="display: none; margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">Subscription tier</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+            <button type="button" class="country-btn ooSubType-btn" data-subtype="web">Web only</button>
+            <button type="button" class="country-btn ooSubType-btn" data-subtype="webapp">Web + App</button>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- POS -->
     <div class="toggle-row">
       <label class="toggle">
-        <input type="checkbox" id="includePOS" checked>
+        <input type="checkbox" id="includePOS">
         <span class="toggle-slider"></span>
       </label>
       <div>
         <div class="toggle-label">POS</div>
-        <div class="toggle-hint">In-store card + subscription — current provider vs Flipdish POS</div>
+        <div class="toggle-hint">In-store card processing + subscription — current provider vs Flipdish POS Pro</div>
       </div>
+    </div>
+
+    <!-- Kiosk -->
+    <div class="toggle-row">
+      <label class="toggle">
+        <input type="checkbox" id="includeKiosk">
+        <span class="toggle-slider"></span>
+      </label>
+      <div>
+        <div class="toggle-label">Kiosk</div>
+        <div class="toggle-hint">Self-service ordering kiosks — hardware + subscription + processing</div>
+      </div>
+    </div>
+
+    <!-- QROP -->
+    <div class="toggle-row">
+      <label class="toggle">
+        <input type="checkbox" id="includeQROP">
+        <span class="toggle-slider"></span>
+      </label>
+      <div>
+        <div class="toggle-label">QROP <span style="font-weight: 400; font-size: 12px; color: var(--muted);">· QR Order &amp; Pay</span></div>
+        <div class="toggle-hint">Table QR ordering + pay. Auto-uses the discounted bundle price if POS is also on.</div>
+      </div>
+    </div>
+
+    <!-- FMM -->
+    <div class="toggle-row">
+      <label class="toggle">
+        <input type="checkbox" id="includeFMM">
+        <span class="toggle-slider"></span>
+      </label>
+      <div style="flex: 1;">
+        <div class="toggle-label">FMM <span style="font-weight: 400; font-size: 12px; color: var(--muted);">· Flipdish Managed Marketing</span></div>
+        <div class="toggle-hint">Google Ads / PPC managed service. Pick a monthly spend tier.</div>
+        <div id="fmmTierWrap" style="display: none; margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">Managed spend tier</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+            <button type="button" class="country-btn fmmTier-btn" data-tier="A">Tier A</button>
+            <button type="button" class="country-btn fmmTier-btn" data-tier="B">Tier B</button>
+            <button type="button" class="country-btn fmmTier-btn" data-tier="C">Tier C</button>
+            <button type="button" class="country-btn fmmTier-btn" data-tier="D">Tier D</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Placeholder for future add-ons -->
+    <div style="margin-top: 14px; padding: 12px 14px; background: #FAFBFC; border: 1px dashed var(--border); border-radius: 10px; font-size: 13px; color: var(--muted); text-align: center;">
+      <strong style="color: var(--flipdish-dark);">+ Add another product</strong> <span style="opacity: 0.7;">· coming soon — will read live from the Flipdish price book (Inventory Management, Customer Feedback, KDS, Reputation Management, Phone Marketing, and more).</span>
     </div>
   </div>
 
@@ -462,8 +610,11 @@
   </div>
 
   <div class="card">
+    <div id="currentEmptyState" style="padding: 20px; text-align: center; color: var(--muted); font-size: 14px;">
+      Nothing in scope yet — flip a toggle on in Section 2 and the matching "today" block will appear here.
+    </div>
     <!-- OO current -->
-    <div class="subsection" id="currentOOSection">
+    <div class="subsection" id="currentOOSection" style="display: none;">
       <div class="subsection-title">Online Ordering — today</div>
       <div class="grid">
         <div class="field">
@@ -490,7 +641,7 @@
     </div>
 
     <!-- POS current -->
-    <div class="subsection" id="currentPOSSection">
+    <div class="subsection" id="currentPOSSection" style="display: none;">
       <div class="subsection-title">POS — today</div>
       <div class="grid">
         <div class="field">
@@ -536,6 +687,119 @@
         </div>
       </div>
     </div>
+
+    <!-- Kiosk current -->
+    <div class="subsection" id="currentKioskSection" style="display: none;">
+      <div class="subsection-title">Kiosk — today</div>
+      <p style="margin: 0 0 10px; font-size: 12px; color: var(--muted);">Leave blank if they have no current kiosk setup — Flipdish Kiosk will be told as new revenue, not a saving.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="curKioskProvider">Current provider</label>
+          <input type="text" id="curKioskProvider" class="plain" placeholder="e.g. Toast Kiosk, Vita Mojo, McDonald's KOSK" />
+        </div>
+        <div class="field">
+          <label for="curKioskRate">Processing rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="curKioskRate" step="0.01" min="0" max="100" placeholder="1.75" />
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="curKioskTransFee">Per-transaction fee</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curKioskTransFeeCcy">£</span>
+            <input type="number" id="curKioskTransFee" step="0.01" min="0" placeholder="0.10" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="curKioskSub">Monthly subscription (per kiosk)</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curKioskSubCcy">£</span>
+            <input type="number" id="curKioskSub" step="1" min="0" placeholder="99" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="curKioskGmv">Monthly kiosk GMV</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curKioskGmvCcy">£</span>
+            <input type="number" id="curKioskGmv" step="100" min="0" placeholder="15000" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="curKioskTransactions">Monthly transactions</label>
+          <input type="number" id="curKioskTransactions" step="10" min="0" placeholder="800" />
+        </div>
+        <div class="field">
+          <label for="curKioskCount">Number of kiosks</label>
+          <input type="number" id="curKioskCount" step="1" min="0" placeholder="2" />
+          <div class="hint">How many kiosks do they have today?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QROP current -->
+    <div class="subsection" id="currentQROPSection" style="display: none;">
+      <div class="subsection-title">QROP — today</div>
+      <p style="margin: 0 0 10px; font-size: 12px; color: var(--muted);">Leave blank if they have no current QR table-ordering tool.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="curQROPProvider">Current provider</label>
+          <input type="text" id="curQROPProvider" class="plain" placeholder="e.g. Me&amp;u, Sunday, Flyt, none" />
+        </div>
+        <div class="field">
+          <label for="curQROPRate">Processing rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="curQROPRate" step="0.01" min="0" max="100" placeholder="1.75" />
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="curQROPTransFee">Per-transaction fee</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curQROPTransFeeCcy">£</span>
+            <input type="number" id="curQROPTransFee" step="0.01" min="0" placeholder="0.20" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="curQROPSub">Monthly subscription</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curQROPSubCcy">£</span>
+            <input type="number" id="curQROPSub" step="1" min="0" placeholder="59" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="curQROPGmv">Monthly QR GMV</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curQROPGmvCcy">£</span>
+            <input type="number" id="curQROPGmv" step="100" min="0" placeholder="8000" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="curQROPTransactions">Monthly transactions</label>
+          <input type="number" id="curQROPTransactions" step="10" min="0" placeholder="400" />
+        </div>
+      </div>
+    </div>
+
+    <!-- FMM current -->
+    <div class="subsection" id="currentFMMSection" style="display: none;">
+      <div class="subsection-title">Marketing — today</div>
+      <p style="margin: 0 0 10px; font-size: 12px; color: var(--muted);">Leave blank if they do no paid marketing today.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="curFMMProvider">Current provider</label>
+          <input type="text" id="curFMMProvider" class="plain" placeholder="e.g. In-house, freelance agency, none" />
+        </div>
+        <div class="field">
+          <label for="curFMMSub">Monthly spend (ads + management)</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="curFMMSubCcy">£</span>
+            <input type="number" id="curFMMSub" step="10" min="0" placeholder="400" />
+          </div>
+          <div class="hint">What they spend on paid marketing every month, all in.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ================= STEP 4 — FLIPDISH PROPOSAL ================= -->
@@ -545,17 +809,29 @@
   </div>
 
   <div class="card">
+    <div id="flipdishEmptyState" style="padding: 20px; text-align: center; color: var(--muted); font-size: 14px;">
+      Nothing in scope yet — flip a toggle on in Section 2 and the matching Flipdish proposal block will appear here, pre-filled with standard rates for the chosen country.
+    </div>
     <!-- OO proposal -->
-    <div class="subsection" id="flipdishOOSection">
+    <div class="subsection" id="flipdishOOSection" style="display: none;">
       <div class="subsection-title">Online Ordering — Flipdish proposal</div>
       <div class="grid">
         <div class="field">
           <label for="fdOORate">Commission rate</label>
           <div class="input-wrap has-suffix">
-            <input type="number" id="fdOORate" step="0.1" min="0" max="100" placeholder="7" />
+            <input type="number" id="fdOORate" step="0.1" min="0" max="100" placeholder="5" />
             <span class="suffix">%</span>
           </div>
           <div class="hint">What Flipdish charges per online order</div>
+          <div class="floor-warn" id="fdOORateWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+        <div class="field">
+          <label for="fdOOEndUserFee">End-user fee (per order)</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="fdOOEndUserFeeCcy">£</span>
+            <input type="number" id="fdOOEndUserFee" step="0.01" min="0" placeholder="0.80" />
+          </div>
+          <div class="floor-warn" id="fdOOEndUserFeeWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
         </div>
         <div class="field">
           <label for="fdOOSub">Monthly subscription</label>
@@ -563,13 +839,14 @@
             <span class="prefix" id="fdOOSubCcy">£</span>
             <input type="number" id="fdOOSub" step="1" min="0" placeholder="99" />
           </div>
-          <div class="hint">Software subscription (if applicable)</div>
+          <div class="hint">Auto-set from the Web-only vs Web+App tier picked above.</div>
+          <div class="floor-warn" id="fdOOSubWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
         </div>
       </div>
     </div>
 
     <!-- POS proposal -->
-    <div class="subsection" id="flipdishPOSSection">
+    <div class="subsection" id="flipdishPOSSection" style="display: none;">
       <div class="subsection-title">POS — Flipdish proposal</div>
       <div class="grid">
         <div class="field">
@@ -578,20 +855,110 @@
             <input type="number" id="fdPOSRate" step="0.01" min="0" max="100" placeholder="1.5" />
             <span class="suffix">%</span>
           </div>
+          <div class="floor-warn" id="fdPOSRateWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
         </div>
         <div class="field">
           <label for="fdPOSTransFee">Per-transaction fee</label>
           <div class="input-wrap has-prefix">
             <span class="prefix" id="fdPOSTransFeeCcy">£</span>
-            <input type="number" id="fdPOSTransFee" step="0.01" min="0" placeholder="0.08" />
+            <input type="number" id="fdPOSTransFee" step="0.01" min="0" placeholder="0.20" />
           </div>
+          <div class="floor-warn" id="fdPOSTransFeeWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
         </div>
         <div class="field">
-          <label for="fdPOSSub">Monthly subscription</label>
+          <label for="fdPOSSub">Monthly subscription (per site)</label>
           <div class="input-wrap has-prefix">
             <span class="prefix" id="fdPOSSubCcy">£</span>
-            <input type="number" id="fdPOSSub" step="1" min="0" placeholder="129" />
+            <input type="number" id="fdPOSSub" step="1" min="0" placeholder="119" />
           </div>
+          <div class="hint">Multiplied by number of locations for total monthly sub.</div>
+          <div class="floor-warn" id="fdPOSSubWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kiosk proposal -->
+    <div class="subsection" id="flipdishKioskSection" style="display: none;">
+      <div class="subsection-title">Kiosk — Flipdish proposal</div>
+      <div class="grid">
+        <div class="field">
+          <label for="fdKioskRate">Processing rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="fdKioskRate" step="0.01" min="0" max="100" placeholder="1.5" />
+            <span class="suffix">%</span>
+          </div>
+          <div class="floor-warn" id="fdKioskRateWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+        <div class="field">
+          <label for="fdKioskTransFee">Per-transaction fee</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="fdKioskTransFeeCcy">£</span>
+            <input type="number" id="fdKioskTransFee" step="0.01" min="0" placeholder="0.20" />
+          </div>
+          <div class="floor-warn" id="fdKioskTransFeeWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+        <div class="field">
+          <label for="fdKioskSub">Monthly subscription (per kiosk)</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="fdKioskSubCcy">£</span>
+            <input type="number" id="fdKioskSub" step="1" min="0" placeholder="79" />
+          </div>
+          <div class="floor-warn" id="fdKioskSubWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+        <div class="field">
+          <label for="fdKioskCount">Number of kiosks</label>
+          <input type="number" id="fdKioskCount" step="1" min="1" value="1" />
+          <div class="hint">Multiplies the sub for total monthly Kiosk subscription.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QROP proposal -->
+    <div class="subsection" id="flipdishQROPSection" style="display: none;">
+      <div class="subsection-title">QROP — Flipdish proposal</div>
+      <p style="margin: 0 0 10px; font-size: 12px; color: var(--muted);">If POS is also on, the subscription auto-applies the bundle price (e.g. £20 vs £49 standalone in UK).</p>
+      <div class="grid">
+        <div class="field">
+          <label for="fdQROPRate">Processing rate</label>
+          <div class="input-wrap has-suffix">
+            <input type="number" id="fdQROPRate" step="0.01" min="0" max="100" placeholder="1.5" />
+            <span class="suffix">%</span>
+          </div>
+          <div class="floor-warn" id="fdQROPRateWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+        <div class="field">
+          <label for="fdQROPTransFee">Per-transaction fee</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="fdQROPTransFeeCcy">£</span>
+            <input type="number" id="fdQROPTransFee" step="0.01" min="0" placeholder="0.20" />
+          </div>
+          <div class="floor-warn" id="fdQROPTransFeeWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+        <div class="field">
+          <label for="fdQROPSub">Monthly subscription</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="fdQROPSubCcy">£</span>
+            <input type="number" id="fdQROPSub" step="1" min="0" placeholder="49" />
+          </div>
+          <div class="hint" id="fdQROPSubHint">Standalone price. If POS is on, this auto-switches to the bundle price.</div>
+          <div class="floor-warn" id="fdQROPSubWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FMM proposal -->
+    <div class="subsection" id="flipdishFMMSection" style="display: none;">
+      <div class="subsection-title">FMM — Flipdish proposal</div>
+      <p style="margin: 0 0 10px; font-size: 12px; color: var(--muted);">Monthly managed spend tier. Picked in Section 2.</p>
+      <div class="grid">
+        <div class="field">
+          <label for="fdFMMSub">Monthly managed spend</label>
+          <div class="input-wrap has-prefix">
+            <span class="prefix" id="fdFMMSubCcy">£</span>
+            <input type="number" id="fdFMMSub" step="10" min="0" placeholder="200" />
+          </div>
+          <div class="hint">Auto-fills from the tier chosen above.</div>
+          <div class="floor-warn" id="fdFMMSubWarn" style="display: none; font-size: 11px; color: var(--amber-strong); margin-top: 4px; font-weight: 600;">⚠ Below standard — needs approval</div>
         </div>
       </div>
     </div>
@@ -603,26 +970,69 @@
     <span class="text">The answer<span class="sub">What this deal looks like for the customer and for Flipdish</span></span>
   </div>
 
-  <div class="answer-wrap">
-    <div class="hero">
-      <div class="hero-label">Monthly saving — customer</div>
-      <div class="hero-value" id="heroMonthly">—</div>
-      <div class="hero-sub">Total reduction in cost of sale per month</div>
+  <!-- Dual-story heroes: Customer side + Flipdish side -->
+  <div class="answer-group-row">
+    <div class="answer-group">
+      <h3>For the customer
+        <span class="group-sub">What they save by switching to Flipdish</span>
+      </h3>
+      <div class="answer-wrap">
+        <div class="hero">
+          <div class="hero-label">Monthly saving</div>
+          <div class="hero-value" id="heroMonthly">—</div>
+          <div class="hero-sub">Total reduction in cost of sale per month</div>
+        </div>
+        <div class="hero">
+          <div class="hero-label">Annual saving</div>
+          <div class="hero-value" id="heroAnnual">—</div>
+          <div class="hero-sub">Over 12 months, at their current volume</div>
+        </div>
+      </div>
     </div>
-    <div class="hero">
-      <div class="hero-label">Annual saving — customer</div>
-      <div class="hero-value" id="heroAnnual">—</div>
-      <div class="hero-sub">Over 12 months, at their current volume</div>
-    </div>
-    <div class="hero neutral">
-      <div class="hero-label">Monthly SNR — Flipdish</div>
-      <div class="hero-value" id="heroSNR">—</div>
-      <div class="hero-sub">Software Net Revenue Flipdish earns per month</div>
+    <div class="answer-group">
+      <h3>For Flipdish
+        <span class="group-sub">What this deal is worth to us</span>
+      </h3>
+      <div class="answer-wrap">
+        <div class="hero neutral">
+          <div class="hero-label">Monthly Flipdish revenue</div>
+          <div class="hero-value" id="heroSNR">—</div>
+          <div class="hero-sub" id="heroSNRSub">Software Net Revenue per month</div>
+        </div>
+        <div class="hero emphasis">
+          <div class="hero-label">Year-1 total value</div>
+          <div class="hero-value" id="heroYear1">—</div>
+          <div class="hero-sub">Monthly Flipdish revenue × 12</div>
+        </div>
+      </div>
+      <!-- Optional amber tile, only shown when new revenue > 0 -->
+      <div class="answer-wrap" id="heroNewRevWrap" style="margin-top: 12px; display: none;">
+        <div class="hero warm">
+          <div class="hero-label">New monthly revenue</div>
+          <div class="hero-value" id="heroNewRev">—</div>
+          <div class="hero-sub">From products the prospect doesn't have today</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="narrative" id="narrative">
-    Fill in the current setup and Flipdish proposal above — the deal story appears here.
+  <div class="narrative-wrap">
+    <div class="narrative" id="narrative">
+      Fill in the current setup and Flipdish proposal above — the deal story appears here.
+    </div>
+    <div class="narrative-edit-hint" id="narrativeEditHint">
+      ✍️ Edit the story below — click Save when you're done.
+    </div>
+    <div class="narrative-actions no-print">
+      <button type="button" class="btn-sm" id="editNarrativeBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span id="editNarrativeLabel">Edit the story</span>
+      </button>
+      <button type="button" class="btn-sm" id="resetNarrativeBtn" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Reset to auto
+      </button>
+    </div>
   </div>
 
   <div class="breakdown" id="breakdown">
@@ -641,6 +1051,18 @@
       <button type="button" class="btn" id="printBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / save as PDF
+      </button>
+      <button type="button" class="btn" id="copyLinkBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span id="copyLinkLabel">Copy shareable link</span>
+      </button>
+      <button type="button" class="btn" id="emailBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email the summary
+      </button>
+      <button type="button" class="btn btn-salesforce" id="salesforceBtn" disabled title="Coming soon — will push this deal to Salesforce">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Push to Salesforce<span class="btn-coming-soon-tag">SOON</span>
       </button>
     </div>
     <div class="right">
@@ -661,6 +1083,43 @@
   // ====================================================================
   var STORAGE_KEY = 'flipdishProspects';
   var ccyMap = { UK: '£', IE: '€', ES: '€', US: '$' };
+
+  // ====================================================================
+  // Per-market price table — Phase 1 defaults.
+  // Pulled from "Flipdish Price Books - Products & Prices" Google Sheet.
+  // Commercial fees (processing %, per-txn fee, end-user fee) set to UK
+  // numbers across all markets for now — verify later with Commercial Finance.
+  // ====================================================================
+  var PRICE_TABLE = {
+    UK: {
+      oo:    { webSub: 69,  webAppSub: 99,  rate: 5,   endUserFee: 0.80 },
+      pos:   { sub: 119, rate: 1.5, transFee: 0.20 },
+      kiosk: { sub: 79,  rate: 1.5, transFee: 0.20 },
+      qrop:  { sub: 49,  subBundle: 20, rate: 1.5, transFee: 0.20 },
+      fmm:   { tierA: 200, tierB: 300, tierC: 400, tierD: 600 }
+    },
+    IE: {
+      oo:    { webSub: 69,  webAppSub: 99,  rate: 5,   endUserFee: 0.80 },
+      pos:   { sub: 129, rate: 1.5, transFee: 0.20 },
+      kiosk: { sub: 79,  rate: 1.5, transFee: 0.20 },
+      qrop:  { sub: 59,  subBundle: 20, rate: 1.5, transFee: 0.20 },
+      fmm:   { tierA: 200, tierB: 300, tierC: 400, tierD: 600 }
+    },
+    US: {
+      oo:    { webSub: 149, webAppSub: 249, rate: 5,   endUserFee: 0.80 },
+      pos:   { sub: 129, rate: 1.5, transFee: 0.20 },
+      kiosk: { sub: 99,  rate: 1.5, transFee: 0.20 },
+      qrop:  { sub: 69,  subBundle: 20, rate: 1.5, transFee: 0.20 },
+      fmm:   { tierA: 200, tierB: 300, tierC: 400, tierD: 600 }
+    },
+    ES: {
+      oo:    { webSub: 69,  webAppSub: 99,  rate: 5,   endUserFee: 0.80 },
+      pos:   { sub: 129, rate: 1.5, transFee: 0.20 },
+      kiosk: { sub: 79,  rate: 1.5, transFee: 0.20 },
+      qrop:  { sub: 59,  subBundle: 20, rate: 1.5, transFee: 0.20 },
+      fmm:   { tierA: 200, tierB: 300, tierC: 400, tierD: 600 }
+    }
+  };
 
   // ---------- id + query ----------
   function getQueryParam(name) {
@@ -696,16 +1155,31 @@
       name: '',
       country: 'UK',
       notes: '',
-      includeOO: true,
-      includePOS: true,
+      locations: 1,
+      // Scope toggles — all default OFF
+      includeOO: false,
+      includePOS: false,
+      includeKiosk: false,
+      includeQROP: false,
+      includeFMM: false,
+      // Tier choices
+      ooSubType: 'webapp',  // 'web' or 'webapp'
+      fmmTier: 'A',         // 'A' | 'B' | 'C' | 'D'
+      // Narrative override (rep can edit the auto-story)
+      narrativeOverride: null,
       current: {
         ooProvider: '', ooCommission: '', ooGmv: '',
-        posProvider: '', posRate: '', posTransFee: '', posSub: '',
-        posGmv: '', posTransactions: ''
+        posProvider: '', posRate: '', posTransFee: '', posSub: '', posGmv: '', posTransactions: '',
+        kioskProvider: '', kioskRate: '', kioskTransFee: '', kioskSub: '', kioskGmv: '', kioskTransactions: '', kioskCount: '',
+        qropProvider: '', qropRate: '', qropTransFee: '', qropSub: '', qropGmv: '', qropTransactions: '',
+        fmmProvider: '', fmmSub: ''
       },
       flipdish: {
-        ooRate: '', ooSub: '',
-        posRate: '', posTransFee: '', posSub: ''
+        ooRate: '', ooEndUserFee: '', ooSub: '',
+        posRate: '', posTransFee: '', posSub: '',
+        kioskRate: '', kioskTransFee: '', kioskSub: '', kioskCount: 1,
+        qropRate: '', qropTransFee: '', qropSub: '',
+        fmmSub: ''
       },
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -737,26 +1211,64 @@
   function hydrate() {
     $('prospectName').value = prospect.name || '';
     $('notes').value = prospect.notes || '';
+    $('locations').value = prospect.locations || 1;
+    // Toggles
     $('includeOO').checked = !!prospect.includeOO;
     $('includePOS').checked = !!prospect.includePOS;
+    $('includeKiosk').checked = !!prospect.includeKiosk;
+    $('includeQROP').checked = !!prospect.includeQROP;
+    $('includeFMM').checked = !!prospect.includeFMM;
 
     var c = prospect.current || {};
+    // OO
     $('curOOProvider').value = c.ooProvider || '';
     $('curOOCommission').value = c.ooCommission || '';
     $('curOOGmv').value = c.ooGmv || '';
+    // POS
     $('curPOSProvider').value = c.posProvider || '';
     $('curPOSRate').value = c.posRate || '';
     $('curPOSTransFee').value = c.posTransFee || '';
     $('curPOSSub').value = c.posSub || '';
     $('curPOSGmv').value = c.posGmv || '';
     $('curPOSTransactions').value = c.posTransactions || '';
+    // Kiosk
+    $('curKioskProvider').value = c.kioskProvider || '';
+    $('curKioskRate').value = c.kioskRate || '';
+    $('curKioskTransFee').value = c.kioskTransFee || '';
+    $('curKioskSub').value = c.kioskSub || '';
+    $('curKioskGmv').value = c.kioskGmv || '';
+    $('curKioskTransactions').value = c.kioskTransactions || '';
+    $('curKioskCount').value = c.kioskCount || '';
+    // QROP
+    $('curQROPProvider').value = c.qropProvider || '';
+    $('curQROPRate').value = c.qropRate || '';
+    $('curQROPTransFee').value = c.qropTransFee || '';
+    $('curQROPSub').value = c.qropSub || '';
+    $('curQROPGmv').value = c.qropGmv || '';
+    $('curQROPTransactions').value = c.qropTransactions || '';
+    // FMM
+    $('curFMMProvider').value = c.fmmProvider || '';
+    $('curFMMSub').value = c.fmmSub || '';
 
     var f = prospect.flipdish || {};
     $('fdOORate').value = f.ooRate || '';
+    $('fdOOEndUserFee').value = f.ooEndUserFee || '';
     $('fdOOSub').value = f.ooSub || '';
     $('fdPOSRate').value = f.posRate || '';
     $('fdPOSTransFee').value = f.posTransFee || '';
     $('fdPOSSub').value = f.posSub || '';
+    $('fdKioskRate').value = f.kioskRate || '';
+    $('fdKioskTransFee').value = f.kioskTransFee || '';
+    $('fdKioskSub').value = f.kioskSub || '';
+    $('fdKioskCount').value = f.kioskCount || 1;
+    $('fdQROPRate').value = f.qropRate || '';
+    $('fdQROPTransFee').value = f.qropTransFee || '';
+    $('fdQROPSub').value = f.qropSub || '';
+    $('fdFMMSub').value = f.fmmSub || '';
+
+    // Tier-button active states
+    updateSubTypeButtons();
+    updateFMMTierButtons();
 
     setCountry(prospect.country || 'UK', /*skipSave*/ true);
     applyToggleVisibility();
@@ -768,8 +1280,12 @@
   function collect() {
     prospect.name = val('prospectName').trim();
     prospect.notes = val('notes');
-    prospect.includeOO = $('includeOO').checked;
-    prospect.includePOS = $('includePOS').checked;
+    prospect.locations = Math.max(1, parseInt(val('locations'), 10) || 1);
+    prospect.includeOO    = $('includeOO').checked;
+    prospect.includePOS   = $('includePOS').checked;
+    prospect.includeKiosk = $('includeKiosk').checked;
+    prospect.includeQROP  = $('includeQROP').checked;
+    prospect.includeFMM   = $('includeFMM').checked;
     prospect.current = {
       ooProvider: val('curOOProvider'),
       ooCommission: val('curOOCommission'),
@@ -779,14 +1295,38 @@
       posTransFee: val('curPOSTransFee'),
       posSub: val('curPOSSub'),
       posGmv: val('curPOSGmv'),
-      posTransactions: val('curPOSTransactions')
+      posTransactions: val('curPOSTransactions'),
+      kioskProvider: val('curKioskProvider'),
+      kioskRate: val('curKioskRate'),
+      kioskTransFee: val('curKioskTransFee'),
+      kioskSub: val('curKioskSub'),
+      kioskGmv: val('curKioskGmv'),
+      kioskTransactions: val('curKioskTransactions'),
+      kioskCount: val('curKioskCount'),
+      qropProvider: val('curQROPProvider'),
+      qropRate: val('curQROPRate'),
+      qropTransFee: val('curQROPTransFee'),
+      qropSub: val('curQROPSub'),
+      qropGmv: val('curQROPGmv'),
+      qropTransactions: val('curQROPTransactions'),
+      fmmProvider: val('curFMMProvider'),
+      fmmSub: val('curFMMSub')
     };
     prospect.flipdish = {
       ooRate: val('fdOORate'),
+      ooEndUserFee: val('fdOOEndUserFee'),
       ooSub: val('fdOOSub'),
       posRate: val('fdPOSRate'),
       posTransFee: val('fdPOSTransFee'),
-      posSub: val('fdPOSSub')
+      posSub: val('fdPOSSub'),
+      kioskRate: val('fdKioskRate'),
+      kioskTransFee: val('fdKioskTransFee'),
+      kioskSub: val('fdKioskSub'),
+      kioskCount: Math.max(1, parseInt(val('fdKioskCount'), 10) || 1),
+      qropRate: val('fdQROPRate'),
+      qropTransFee: val('fdQROPTransFee'),
+      qropSub: val('fdQROPSub'),
+      fmmSub: val('fdFMMSub')
     };
     prospect.updatedAt = Date.now();
     $('printName').textContent = prospect.name || 'Untitled prospect';
@@ -824,26 +1364,145 @@
   function setCountry(country, skipSave) {
     prospect.country = country;
     var ccy = ccyMap[country] || '£';
-    // Prefixes
-    ['curOOGmvCcy','curPOSTransFeeCcy','curPOSSubCcy','curPOSGmvCcy',
-     'fdOOSubCcy','fdPOSTransFeeCcy','fdPOSSubCcy'].forEach(function (id) {
+    // Currency-symbol prefixes across all sections
+    [
+      // Current setup
+      'curOOGmvCcy','curPOSTransFeeCcy','curPOSSubCcy','curPOSGmvCcy',
+      'curKioskTransFeeCcy','curKioskSubCcy','curKioskGmvCcy',
+      'curQROPTransFeeCcy','curQROPSubCcy','curQROPGmvCcy',
+      'curFMMSubCcy',
+      // Flipdish proposal
+      'fdOOSubCcy','fdOOEndUserFeeCcy','fdPOSTransFeeCcy','fdPOSSubCcy',
+      'fdKioskTransFeeCcy','fdKioskSubCcy',
+      'fdQROPTransFeeCcy','fdQROPSubCcy',
+      'fdFMMSubCcy'
+    ].forEach(function (id) {
       var el = $(id); if (el) el.textContent = ccy;
     });
-    // Buttons
+    // Country buttons active state — only the top country bar buttons
     document.querySelectorAll('.country-btn').forEach(function (b) {
-      b.classList.toggle('active', b.dataset.country === country);
+      if (b.dataset.country) b.classList.toggle('active', b.dataset.country === country);
     });
-    if (!skipSave) { scheduleSave(); recompute(); }
+    if (!skipSave) {
+      // Re-apply standards for any currently-on product (country change updates defaults)
+      ['oo','pos','kiosk','qrop','fmm'].forEach(function (p) {
+        var toggle = { oo: 'includeOO', pos: 'includePOS', kiosk: 'includeKiosk', qrop: 'includeQROP', fmm: 'includeFMM' }[p];
+        if ($(toggle).checked) applyStandardsForProduct(p, /*force*/ true);
+      });
+      scheduleSave();
+      recompute();
+      checkFloors();
+    }
   }
 
   // ---------- toggle section visibility ----------
   function applyToggleVisibility() {
-    var showOO = $('includeOO').checked;
-    var showPOS = $('includePOS').checked;
-    $('currentOOSection').style.display = showOO ? '' : 'none';
-    $('flipdishOOSection').style.display = showOO ? '' : 'none';
-    $('currentPOSSection').style.display = showPOS ? '' : 'none';
-    $('flipdishPOSSection').style.display = showPOS ? '' : 'none';
+    var pairs = [
+      { on: $('includeOO').checked,    cur: 'currentOOSection',    prop: 'flipdishOOSection' },
+      { on: $('includePOS').checked,   cur: 'currentPOSSection',   prop: 'flipdishPOSSection' },
+      { on: $('includeKiosk').checked, cur: 'currentKioskSection', prop: 'flipdishKioskSection' },
+      { on: $('includeQROP').checked,  cur: 'currentQROPSection',  prop: 'flipdishQROPSection' },
+      { on: $('includeFMM').checked,   cur: 'currentFMMSection',   prop: 'flipdishFMMSection' }
+    ];
+    var anyOn = false;
+    pairs.forEach(function (p) {
+      if (p.on) anyOn = true;
+      $(p.cur).style.display  = p.on ? '' : 'none';
+      $(p.prop).style.display = p.on ? '' : 'none';
+    });
+    // Empty states
+    $('currentEmptyState').style.display  = anyOn ? 'none' : '';
+    $('flipdishEmptyState').style.display = anyOn ? 'none' : '';
+    // OO sub-type picker
+    $('ooSubTypeWrap').style.display = $('includeOO').checked ? '' : 'none';
+    // FMM tier picker
+    $('fmmTierWrap').style.display = $('includeFMM').checked ? '' : 'none';
+  }
+
+  // ---------- tier/sub-type button states ----------
+  function updateSubTypeButtons() {
+    document.querySelectorAll('.ooSubType-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.subtype === (prospect.ooSubType || 'webapp'));
+    });
+  }
+  function updateFMMTierButtons() {
+    document.querySelectorAll('.fmmTier-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.tier === (prospect.fmmTier || 'A'));
+    });
+  }
+
+  // ---------- apply market standards to a product's Flipdish proposal fields ----------
+  function applyStandardsForProduct(product, force) {
+    var m = PRICE_TABLE[prospect.country] || PRICE_TABLE.UK;
+    function setIfEmpty(id, v) {
+      var el = $(id);
+      if (force || !el.value) el.value = v;
+    }
+    if (product === 'oo') {
+      setIfEmpty('fdOORate', m.oo.rate);
+      setIfEmpty('fdOOEndUserFee', m.oo.endUserFee);
+      // Sub always tracks the tier choice
+      var sub = (prospect.ooSubType === 'web') ? m.oo.webSub : m.oo.webAppSub;
+      $('fdOOSub').value = sub;
+    } else if (product === 'pos') {
+      setIfEmpty('fdPOSRate', m.pos.rate);
+      setIfEmpty('fdPOSTransFee', m.pos.transFee);
+      setIfEmpty('fdPOSSub', m.pos.sub);
+    } else if (product === 'kiosk') {
+      setIfEmpty('fdKioskRate', m.kiosk.rate);
+      setIfEmpty('fdKioskTransFee', m.kiosk.transFee);
+      setIfEmpty('fdKioskSub', m.kiosk.sub);
+    } else if (product === 'qrop') {
+      setIfEmpty('fdQROPRate', m.qrop.rate);
+      setIfEmpty('fdQROPTransFee', m.qrop.transFee);
+      // Sub switches between standalone and bundle based on POS toggle
+      var qropSub = $('includePOS').checked ? m.qrop.subBundle : m.qrop.sub;
+      $('fdQROPSub').value = qropSub;
+      $('fdQROPSubHint').textContent = $('includePOS').checked
+        ? 'Bundled with POS — discounted bundle price applied.'
+        : 'Standalone price. If POS is on, this auto-switches to the bundle price.';
+    } else if (product === 'fmm') {
+      var tierMap = { A: m.fmm.tierA, B: m.fmm.tierB, C: m.fmm.tierC, D: m.fmm.tierD };
+      $('fdFMMSub').value = tierMap[prospect.fmmTier || 'A'];
+    }
+  }
+
+  // ---------- below-floor warnings ----------
+  function checkFloors() {
+    var m = PRICE_TABLE[prospect.country] || PRICE_TABLE.UK;
+    function warn(id, current, standard) {
+      var el = $(id); if (!el) return;
+      var n = parseFloat(current);
+      var s = parseFloat(standard);
+      var below = !isNaN(n) && !isNaN(s) && n < s;
+      el.style.display = below ? '' : 'none';
+    }
+    if ($('includeOO').checked) {
+      warn('fdOORateWarn', $('fdOORate').value, m.oo.rate);
+      warn('fdOOEndUserFeeWarn', $('fdOOEndUserFee').value, m.oo.endUserFee);
+      var ooSubStd = (prospect.ooSubType === 'web') ? m.oo.webSub : m.oo.webAppSub;
+      warn('fdOOSubWarn', $('fdOOSub').value, ooSubStd);
+    }
+    if ($('includePOS').checked) {
+      warn('fdPOSRateWarn', $('fdPOSRate').value, m.pos.rate);
+      warn('fdPOSTransFeeWarn', $('fdPOSTransFee').value, m.pos.transFee);
+      warn('fdPOSSubWarn', $('fdPOSSub').value, m.pos.sub);
+    }
+    if ($('includeKiosk').checked) {
+      warn('fdKioskRateWarn', $('fdKioskRate').value, m.kiosk.rate);
+      warn('fdKioskTransFeeWarn', $('fdKioskTransFee').value, m.kiosk.transFee);
+      warn('fdKioskSubWarn', $('fdKioskSub').value, m.kiosk.sub);
+    }
+    if ($('includeQROP').checked) {
+      warn('fdQROPRateWarn', $('fdQROPRate').value, m.qrop.rate);
+      warn('fdQROPTransFeeWarn', $('fdQROPTransFee').value, m.qrop.transFee);
+      var qropStd = $('includePOS').checked ? m.qrop.subBundle : m.qrop.sub;
+      warn('fdQROPSubWarn', $('fdQROPSub').value, qropStd);
+    }
+    if ($('includeFMM').checked) {
+      var tierMap = { A: m.fmm.tierA, B: m.fmm.tierB, C: m.fmm.tierC, D: m.fmm.tierD };
+      warn('fdFMMSubWarn', $('fdFMMSub').value, tierMap[prospect.fmmTier || 'A']);
+    }
   }
 
   // ---------- formatters ----------
@@ -862,81 +1521,175 @@
   // ---------- compute ----------
   function recompute() {
     collect();
-    var showOO  = prospect.includeOO;
-    var showPOS = prospect.includePOS;
-    var lines = [];
+    var locs = prospect.locations || 1;
+
+    // Savings lines (products with a current equivalent) + New Revenue lines (products without)
+    var savingsLines = [];
+    var newRevLines = [];
     var monthlySaving = 0;
+    var monthlyNewRev = 0;
     var monthlySNR = 0;
 
-    if (showOO) {
-      var ooGmv = num('curOOGmv');
-      var curOORate = num('curOOCommission');
-      var fdOORate  = num('fdOORate');
-      var fdOOSub   = num('fdOOSub');
+    function pushLine(cfg) {
+      // cfg: { label, curCost, fdCost, hasCurrent, detail }
+      var delta = cfg.curCost - cfg.fdCost;
+      monthlySNR += cfg.fdCost;
+      if (cfg.hasCurrent) {
+        monthlySaving += delta;
+        savingsLines.push({ label: cfg.label, today: cfg.curCost, flipdish: cfg.fdCost, delta: delta, detail: cfg.detail });
+      } else {
+        monthlyNewRev += cfg.fdCost;
+        newRevLines.push({ label: cfg.label, flipdish: cfg.fdCost, detail: cfg.detail });
+      }
+    }
 
-      var curOOCost = ooGmv * curOORate / 100;
-      var fdOOCost  = ooGmv * fdOORate / 100 + fdOOSub;
-      var ooDelta = curOOCost - fdOOCost;
-      monthlySaving += ooDelta;
-      monthlySNR += fdOOCost;
-
-      if (ooGmv > 0 || curOORate > 0 || fdOORate > 0 || fdOOSub > 0) {
-        lines.push({
-          label: 'Online Ordering',
-          today: curOOCost,
-          flipdish: fdOOCost,
-          delta: ooDelta,
-          detail: '(' + (curOORate || 0) + '% of ' + fmtMoney(ooGmv) + ' vs '
-                + (fdOORate || 0) + '% + ' + fmtMoney(fdOOSub) + ' sub)'
+    // ---- Online Ordering ----
+    if (prospect.includeOO) {
+      var ooGmv      = num('curOOGmv');
+      var curOORate  = num('curOOCommission');
+      var fdOORate   = num('fdOORate');
+      var fdOOSub    = num('fdOOSub');
+      var curOOCost  = ooGmv * curOORate / 100;
+      var fdOOCost   = ooGmv * fdOORate / 100 + fdOOSub;
+      var hasCurOO   = ooGmv > 0 && curOORate > 0;
+      if (hasCurOO || fdOORate > 0 || fdOOSub > 0) {
+        pushLine({
+          label: 'Online Ordering' + (prospect.ooSubType === 'web' ? ' (Web)' : ' (Web + App)'),
+          curCost: curOOCost, fdCost: fdOOCost, hasCurrent: hasCurOO,
+          detail: hasCurOO
+            ? (curOORate + '% of ' + fmtMoney(ooGmv) + ' vs ' + fdOORate + '% + ' + fmtMoney(fdOOSub) + ' sub')
+            : (fdOORate + '% of ' + fmtMoney(ooGmv) + ' + ' + fmtMoney(fdOOSub) + ' sub')
         });
       }
     }
 
-    if (showPOS) {
-      var posGmv    = num('curPOSGmv');
-      var posTrans  = num('curPOSTransactions');
+    // ---- POS ----
+    if (prospect.includePOS) {
+      var posGmv     = num('curPOSGmv');
+      var posTrans   = num('curPOSTransactions');
       var curPOSRate = num('curPOSRate');
       var curPOSTF   = num('curPOSTransFee');
-      var curPOSSub  = num('curPOSSub');
+      var curPOSSub  = num('curPOSSub');  // per-site in current (single figure — rep enters total today)
       var fdPOSRate  = num('fdPOSRate');
       var fdPOSTF    = num('fdPOSTransFee');
-      var fdPOSSub   = num('fdPOSSub');
-
+      var fdPOSSub   = num('fdPOSSub') * locs;  // Flipdish sub × locations
       var curPOSCost = posGmv * curPOSRate / 100 + posTrans * curPOSTF + curPOSSub;
       var fdPOSCost  = posGmv * fdPOSRate / 100 + posTrans * fdPOSTF + fdPOSSub;
-      var posDelta = curPOSCost - fdPOSCost;
-      monthlySaving += posDelta;
-      monthlySNR += fdPOSCost;
-
-      if (posGmv > 0 || posTrans > 0 || curPOSRate > 0 || fdPOSRate > 0 || curPOSSub > 0 || fdPOSSub > 0) {
-        lines.push({
-          label: 'POS',
-          today: curPOSCost,
-          flipdish: fdPOSCost,
-          delta: posDelta,
-          detail: '(' + (curPOSRate || 0) + '% + ' + fmtMoney(curPOSTF, 2) + '/txn + ' + fmtMoney(curPOSSub) + ' sub'
-                + ' vs ' + (fdPOSRate || 0) + '% + ' + fmtMoney(fdPOSTF, 2) + '/txn + ' + fmtMoney(fdPOSSub) + ' sub)'
+      var hasCurPOS  = (posGmv > 0 && curPOSRate > 0) || curPOSSub > 0;
+      if (hasCurPOS || fdPOSRate > 0 || fdPOSSub > 0) {
+        pushLine({
+          label: 'POS' + (locs > 1 ? ' (×' + locs + ' sites)' : ''),
+          curCost: curPOSCost, fdCost: fdPOSCost, hasCurrent: hasCurPOS,
+          detail: hasCurPOS
+            ? (curPOSRate + '% + ' + fmtMoney(curPOSTF, 2) + '/txn + ' + fmtMoney(curPOSSub) + ' sub vs ' + fdPOSRate + '% + ' + fmtMoney(fdPOSTF, 2) + '/txn + ' + fmtMoney(fdPOSSub) + ' sub')
+            : (fdPOSRate + '% + ' + fmtMoney(fdPOSTF, 2) + '/txn + ' + fmtMoney(fdPOSSub) + ' sub')
         });
       }
     }
 
+    // ---- Kiosk ----
+    if (prospect.includeKiosk) {
+      var kioskGmv   = num('curKioskGmv');
+      var kioskTrans = num('curKioskTransactions');
+      var curKRate   = num('curKioskRate');
+      var curKTF     = num('curKioskTransFee');
+      var curKSub    = num('curKioskSub') * (num('curKioskCount') || 1);
+      var fdKRate    = num('fdKioskRate');
+      var fdKTF      = num('fdKioskTransFee');
+      var kioskCount = Math.max(1, parseInt($('fdKioskCount').value, 10) || 1);
+      var fdKSub     = num('fdKioskSub') * kioskCount;
+      var curKCost   = kioskGmv * curKRate / 100 + kioskTrans * curKTF + curKSub;
+      var fdKCost    = kioskGmv * fdKRate / 100 + kioskTrans * fdKTF + fdKSub;
+      var hasCurK    = (kioskGmv > 0 && curKRate > 0) || curKSub > 0;
+      if (hasCurK || fdKRate > 0 || fdKSub > 0) {
+        pushLine({
+          label: 'Kiosk' + (kioskCount > 1 ? ' (×' + kioskCount + ')' : ''),
+          curCost: curKCost, fdCost: fdKCost, hasCurrent: hasCurK,
+          detail: hasCurK
+            ? (curKRate + '% + ' + fmtMoney(curKTF, 2) + '/txn + ' + fmtMoney(curKSub) + ' sub vs ' + fdKRate + '% + ' + fmtMoney(fdKTF, 2) + '/txn + ' + fmtMoney(fdKSub) + ' sub')
+            : (fdKRate + '% + ' + fmtMoney(fdKTF, 2) + '/txn + ' + fmtMoney(fdKSub) + ' sub')
+        });
+      }
+    }
+
+    // ---- QROP ----
+    if (prospect.includeQROP) {
+      var qropGmv   = num('curQROPGmv');
+      var qropTrans = num('curQROPTransactions');
+      var curQRate  = num('curQROPRate');
+      var curQTF    = num('curQROPTransFee');
+      var curQSub   = num('curQROPSub');
+      var fdQRate   = num('fdQROPRate');
+      var fdQTF     = num('fdQROPTransFee');
+      var fdQSub    = num('fdQROPSub');
+      var curQCost  = qropGmv * curQRate / 100 + qropTrans * curQTF + curQSub;
+      var fdQCost   = qropGmv * fdQRate / 100 + qropTrans * fdQTF + fdQSub;
+      var hasCurQ   = (qropGmv > 0 && curQRate > 0) || curQSub > 0;
+      if (hasCurQ || fdQRate > 0 || fdQSub > 0) {
+        pushLine({
+          label: 'QROP' + (prospect.includePOS ? ' (bundle)' : ''),
+          curCost: curQCost, fdCost: fdQCost, hasCurrent: hasCurQ,
+          detail: hasCurQ
+            ? (curQRate + '% + ' + fmtMoney(curQTF, 2) + '/txn + ' + fmtMoney(curQSub) + ' sub vs ' + fdQRate + '% + ' + fmtMoney(fdQTF, 2) + '/txn + ' + fmtMoney(fdQSub) + ' sub')
+            : (fdQRate + '% + ' + fmtMoney(fdQTF, 2) + '/txn + ' + fmtMoney(fdQSub) + ' sub')
+        });
+      }
+    }
+
+    // ---- FMM ----
+    if (prospect.includeFMM) {
+      var curFMMSub = num('curFMMSub');
+      var fdFMMSub  = num('fdFMMSub');
+      var hasCurFMM = curFMMSub > 0;
+      if (hasCurFMM || fdFMMSub > 0) {
+        pushLine({
+          label: 'FMM (Tier ' + (prospect.fmmTier || 'A') + ')',
+          curCost: curFMMSub, fdCost: fdFMMSub, hasCurrent: hasCurFMM,
+          detail: hasCurFMM
+            ? (fmtMoney(curFMMSub) + '/mo today vs ' + fmtMoney(fdFMMSub) + '/mo with Flipdish')
+            : (fmtMoney(fdFMMSub) + '/mo managed spend')
+        });
+      }
+    }
+
+    var totalLines = savingsLines.concat(newRevLines);
     var annualSaving = monthlySaving * 12;
 
-    // Heroes
-    $('heroMonthly').textContent = lines.length ? fmtMoney(monthlySaving) : '—';
-    $('heroAnnual').textContent  = lines.length ? fmtMoney(annualSaving) : '—';
-    $('heroSNR').textContent     = lines.length ? fmtMoney(monthlySNR) : '—';
+    // Heroes — dual story (Customer + Flipdish)
+    var hasAny = totalLines.length > 0;
+    $('heroMonthly').textContent = hasAny ? fmtMoney(monthlySaving) : '—';
+    $('heroAnnual').textContent  = hasAny ? fmtMoney(annualSaving) : '—';
+    $('heroSNR').textContent     = hasAny ? fmtMoney(monthlySNR) : '—';
+    $('heroYear1').textContent   = hasAny ? fmtMoney(monthlySNR * 12) : '—';
 
-    // Narrative
-    renderNarrative(lines, monthlySaving, annualSaving, monthlySNR);
+    // Optional "new monthly revenue" tile (only if there's revenue from products the
+    // prospect doesn't currently have)
+    if (monthlyNewRev > 0) {
+      $('heroNewRevWrap').style.display = '';
+      $('heroNewRev').textContent = fmtMoney(monthlyNewRev);
+      $('heroSNRSub').textContent = 'Incl. ' + fmtMoney(monthlyNewRev) + ' from new products';
+    } else {
+      $('heroNewRevWrap').style.display = 'none';
+      $('heroSNRSub').textContent = 'Software Net Revenue per month';
+    }
+
+    // Narrative — honour override if the rep has edited the story
+    if (prospect.narrativeOverride) {
+      $('narrative').innerHTML = prospect.narrativeOverride;
+    } else {
+      renderNarrative(savingsLines, newRevLines, monthlySaving, annualSaving, monthlySNR, monthlyNewRev);
+    }
+    // Reset button only shows when an override exists
+    $('resetNarrativeBtn').style.display = prospect.narrativeOverride ? '' : 'none';
 
     // Breakdown
-    renderBreakdown(lines, monthlySaving);
+    renderBreakdown(totalLines, monthlySaving);
   }
 
-  function renderNarrative(lines, monthlySaving, annualSaving, monthlySNR) {
+  function renderNarrative(savingsLines, newRevLines, monthlySaving, annualSaving, monthlySNR, monthlyNewRev) {
     var el = $('narrative');
-    if (!lines.length) {
+    var hasAnything = (savingsLines && savingsLines.length) || (newRevLines && newRevLines.length);
+    if (!hasAnything) {
       el.innerHTML = 'Fill in the current setup and Flipdish proposal above — the deal story appears here.';
       return;
     }
@@ -944,26 +1697,44 @@
     var country = { UK: 'UK', IE: 'Ireland', US: 'USA', ES: 'Spain' }[prospect.country] || prospect.country;
     var parts = [];
 
-    if (monthlySaving > 0) {
-      parts.push('<strong>' + escapeHtml(name) + '</strong> currently pays more than they need to for their ordering and payments stack. Switching to Flipdish brings their monthly cost down by <strong>' + fmtMoney(monthlySaving) + '</strong> — <strong>' + fmtMoney(annualSaving) + ' a year</strong>.');
-    } else if (monthlySaving < 0) {
-      parts.push('Heads up: on the numbers above, Flipdish would <strong>cost ' + escapeHtml(name) + ' ' + fmtMoney(Math.abs(monthlySaving)) + '/month more</strong> than their current setup. Either the proposed rates need to come down, or the conversation needs to be about product value (growth, ops, customer data) rather than price.');
-    } else {
-      parts.push('On the numbers above, Flipdish matches their current cost exactly. The conversation is about value, not price.');
+    // ---- Part 1: the customer savings story (only if there are savings lines) ----
+    if (savingsLines && savingsLines.length) {
+      if (monthlySaving > 0) {
+        parts.push('<strong>' + escapeHtml(name) + '</strong> currently pays more than they need to for their ordering and payments stack. Switching to Flipdish brings their monthly cost down by <strong>' + fmtMoney(monthlySaving) + '</strong> — <strong>' + fmtMoney(annualSaving) + ' a year</strong>.');
+      } else if (monthlySaving < 0) {
+        parts.push('Heads up: on the numbers above, Flipdish would <strong>cost ' + escapeHtml(name) + ' ' + fmtMoney(Math.abs(monthlySaving)) + '/month more</strong> than their current setup. Either the proposed rates need to come down, or the conversation needs to be about product value (growth, ops, customer data) rather than price.');
+      } else {
+        parts.push('On the numbers above, Flipdish matches their current cost exactly — so the conversation becomes about value, not price.');
+      }
+
+      // Per-line colour commentary — list the biggest saver / biggest cost increase
+      var sorted = savingsLines.slice().sort(function (a, b) { return b.delta - a.delta; });
+      if (sorted.length >= 2) {
+        var top = sorted[0];
+        var bottom = sorted[sorted.length - 1];
+        var topPart = top.delta > 0
+          ? ('the biggest win is <strong>' + fmtMoney(top.delta) + '/mo</strong> on ' + escapeHtml(top.label))
+          : ('nothing in the current stack is actually cheaper on Flipdish — the closest is ' + escapeHtml(top.label));
+        if (bottom.delta < 0 && bottom !== top) {
+          parts.push('Breakdown: ' + topPart + ', while <strong>' + escapeHtml(bottom.label) + '</strong> would cost <strong>' + fmtMoney(Math.abs(bottom.delta)) + '/mo more</strong> than today.');
+        } else {
+          parts.push('Breakdown: ' + topPart + '.');
+        }
+      }
     }
 
-    // Per-line colour
-    var oo = lines.find(function (l) { return l.label === 'Online Ordering'; });
-    var pos = lines.find(function (l) { return l.label === 'POS'; });
-    if (oo && pos) {
-      var ooPart = oo.delta > 0 ? ('<strong>' + fmtMoney(oo.delta) + '/mo</strong> from Online Ordering')
-                                 : ('Online Ordering is <strong>' + fmtMoney(Math.abs(oo.delta)) + '/mo more expensive</strong> on Flipdish');
-      var posPart = pos.delta > 0 ? ('<strong>' + fmtMoney(pos.delta) + '/mo</strong> from POS')
-                                   : ('POS is <strong>' + fmtMoney(Math.abs(pos.delta)) + '/mo more expensive</strong> on Flipdish');
-      parts.push('Breakdown: ' + ooPart + ' and ' + posPart + '.');
+    // ---- Part 2: the new-products story (only if there's new revenue) ----
+    if (newRevLines && newRevLines.length && monthlyNewRev > 0) {
+      var newLabels = newRevLines.map(function (l) { return escapeHtml(l.label); });
+      var newList;
+      if (newLabels.length === 1) newList = newLabels[0];
+      else if (newLabels.length === 2) newList = newLabels.join(' and ');
+      else newList = newLabels.slice(0, -1).join(', ') + ' and ' + newLabels[newLabels.length - 1];
+      parts.push('On top of that, the deal adds <strong>' + newList + '</strong> — products ' + escapeHtml(name) + ' doesn\'t have today, worth <strong>' + fmtMoney(monthlyNewRev) + '/mo</strong> in new Flipdish revenue.');
     }
 
-    parts.push('For Flipdish, this deal brings in <strong>' + fmtMoney(monthlySNR) + '/month</strong> in Software Net Revenue (' + fmtMoney(monthlySNR * 12) + '/year) from ' + escapeHtml(country) + '.');
+    // ---- Part 3: the Flipdish value line — always shows ----
+    parts.push('For Flipdish, this deal is worth <strong>' + fmtMoney(monthlySNR) + '/month</strong> — a <strong>' + fmtMoney(monthlySNR * 12) + ' Year-1 total</strong> from ' + escapeHtml(country) + '.');
 
     el.innerHTML = parts.join(' ');
   }
@@ -1010,29 +1781,157 @@
       persistNow();
     }
 
-    // Any input change -> recompute + save
+    // Any input change -> recompute + save + re-check floors
     var allInputs = document.querySelectorAll(
-      '#prospectName, #notes, ' +
+      '#prospectName, #notes, #locations, ' +
+      // Current — OO
       '#curOOProvider, #curOOCommission, #curOOGmv, ' +
+      // Current — POS
       '#curPOSProvider, #curPOSRate, #curPOSTransFee, #curPOSSub, #curPOSGmv, #curPOSTransactions, ' +
-      '#fdOORate, #fdOOSub, #fdPOSRate, #fdPOSTransFee, #fdPOSSub'
+      // Current — Kiosk
+      '#curKioskProvider, #curKioskRate, #curKioskTransFee, #curKioskSub, #curKioskGmv, #curKioskTransactions, #curKioskCount, ' +
+      // Current — QROP
+      '#curQROPProvider, #curQROPRate, #curQROPTransFee, #curQROPSub, #curQROPGmv, #curQROPTransactions, ' +
+      // Current — FMM
+      '#curFMMProvider, #curFMMSub, ' +
+      // Flipdish proposal
+      '#fdOORate, #fdOOEndUserFee, #fdOOSub, ' +
+      '#fdPOSRate, #fdPOSTransFee, #fdPOSSub, ' +
+      '#fdKioskRate, #fdKioskTransFee, #fdKioskSub, #fdKioskCount, ' +
+      '#fdQROPRate, #fdQROPTransFee, #fdQROPSub, ' +
+      '#fdFMMSub'
     );
     allInputs.forEach(function (el) {
-      el.addEventListener('input', function () { recompute(); scheduleSave(); });
-      el.addEventListener('change', function () { recompute(); scheduleSave(); });
+      el.addEventListener('input', function () { recompute(); checkFloors(); scheduleSave(); });
+      el.addEventListener('change', function () { recompute(); checkFloors(); scheduleSave(); });
     });
 
-    // Toggles
-    $('includeOO').addEventListener('change', function () { applyToggleVisibility(); recompute(); scheduleSave(); });
-    $('includePOS').addEventListener('change', function () { applyToggleVisibility(); recompute(); scheduleSave(); });
+    // Toggle helper — on toggle, apply standards + visibility + recompute
+    function wireToggle(id, productKey) {
+      $(id).addEventListener('change', function () {
+        if ($(id).checked) applyStandardsForProduct(productKey);
+        applyToggleVisibility();
+        // Toggling POS can change QROP's bundle status
+        if (productKey === 'pos' && $('includeQROP').checked) applyStandardsForProduct('qrop', /*force*/ true);
+        recompute();
+        checkFloors();
+        scheduleSave();
+      });
+    }
+    wireToggle('includeOO', 'oo');
+    wireToggle('includePOS', 'pos');
+    wireToggle('includeKiosk', 'kiosk');
+    wireToggle('includeQROP', 'qrop');
+    wireToggle('includeFMM', 'fmm');
 
-    // Country buttons
-    document.querySelectorAll('.country-btn').forEach(function (btn) {
+    // OO sub-type buttons (Web only / Web + App)
+    document.querySelectorAll('.ooSubType-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        prospect.ooSubType = btn.dataset.subtype;
+        updateSubTypeButtons();
+        applyStandardsForProduct('oo', /*force*/ true);
+        recompute();
+        checkFloors();
+        scheduleSave();
+      });
+    });
+
+    // FMM tier buttons
+    document.querySelectorAll('.fmmTier-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        prospect.fmmTier = btn.dataset.tier;
+        updateFMMTierButtons();
+        applyStandardsForProduct('fmm', /*force*/ true);
+        recompute();
+        checkFloors();
+        scheduleSave();
+      });
+    });
+
+    // Top country bar buttons (the ones in the country-bar div, not tier pickers)
+    document.querySelectorAll('.country-bar .country-btn').forEach(function (btn) {
       btn.addEventListener('click', function () { setCountry(btn.dataset.country); });
     });
 
     // Print
     $('printBtn').addEventListener('click', function () { window.print(); });
+
+    // ---- Edit-the-story (narrative) ----
+    var narrativeEl = $('narrative');
+    var editBtn = $('editNarrativeBtn');
+    var resetBtn = $('resetNarrativeBtn');
+    var editLabel = $('editNarrativeLabel');
+    var editHint = $('narrativeEditHint');
+
+    editBtn.addEventListener('click', function () {
+      var isEditing = narrativeEl.getAttribute('contenteditable') === 'true';
+      if (!isEditing) {
+        // Enter edit mode
+        narrativeEl.setAttribute('contenteditable', 'true');
+        narrativeEl.focus();
+        editLabel.textContent = 'Save story';
+        editHint.style.display = 'block';
+      } else {
+        // Save edit
+        narrativeEl.setAttribute('contenteditable', 'false');
+        editLabel.textContent = 'Edit the story';
+        editHint.style.display = 'none';
+        prospect.narrativeOverride = narrativeEl.innerHTML;
+        scheduleSave();
+        resetBtn.style.display = '';
+      }
+    });
+
+    resetBtn.addEventListener('click', function () {
+      if (!confirm('Reset the story to the auto-generated version? Your edits will be lost.')) return;
+      prospect.narrativeOverride = null;
+      scheduleSave();
+      // Exit edit mode if we're in it
+      narrativeEl.setAttribute('contenteditable', 'false');
+      editLabel.textContent = 'Edit the story';
+      editHint.style.display = 'none';
+      recompute(); // this will regenerate the auto narrative
+    });
+
+    // ---- Copy shareable link ----
+    $('copyLinkBtn').addEventListener('click', function () {
+      var url = window.location.href;
+      var label = $('copyLinkLabel');
+      var done = function () {
+        var orig = label.textContent;
+        label.textContent = 'Link copied!';
+        setTimeout(function () { label.textContent = orig; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function () {
+          window.prompt('Copy this link:', url);
+        });
+      } else {
+        // Fallback for older browsers
+        var ta = document.createElement('textarea');
+        ta.value = url; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { window.prompt('Copy this link:', url); }
+        document.body.removeChild(ta);
+      }
+    });
+
+    // ---- Email the summary (opens mail client, pre-filled) ----
+    $('emailBtn').addEventListener('click', function () {
+      var name = prospect.name || 'your business';
+      var subject = 'Flipdish proposal — ' + name;
+      // Strip HTML tags from the narrative for plain-text email body
+      var plainNarrative = narrativeEl.innerText || narrativeEl.textContent || '';
+      var body = 'Hi,\n\nHere\'s a quick summary of what a move to Flipdish could look like for ' + name + ':\n\n'
+               + plainNarrative + '\n\n'
+               + 'Happy to walk through the full breakdown whenever suits.\n\nBest,';
+      var mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = mailto;
+    });
+
+    // ---- Push to Salesforce (disabled / coming soon) ----
+    $('salesforceBtn').addEventListener('click', function () {
+      alert('Salesforce push is coming soon — this will create or update the Opportunity with all the deal numbers from this page.');
+    });
 
     // Delete
     $('deleteBtn').addEventListener('click', function () {
