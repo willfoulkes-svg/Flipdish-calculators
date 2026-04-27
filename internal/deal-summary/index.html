@@ -394,13 +394,15 @@
                  + (txn * N(f.posTransFee));
       monthly += (curPOS - fdPOS);
     }
-    // Subtract the Flipdish total monthly sub (per-product subs in v6+).
-    var locations = Math.max(1, Math.round(N(p.locations)) || 1);
-    var totalSub = 0;
-    if (p.includeOO)    totalSub += N(f.ooSub);
-    if (p.includePOS)   totalSub += N(f.posSub) * locations;
-    if (p.includeKiosk) totalSub += N(f.kioskSub);
-    if (totalSub === 0 && N(f.monthlySub) > 0) totalSub = N(f.monthlySub);  // legacy
+    // v7: bundled monthlySub directly. Falls back to summing legacy
+    // per-product subs (v5/v6) for old saved deals not yet migrated.
+    var totalSub = N(f.monthlySub);
+    if (totalSub === 0) {
+      var locations = Math.max(1, Math.round(N(p.locations)) || 1);
+      if (p.includeOO)    totalSub += N(f.ooSub);
+      if (p.includePOS)   totalSub += N(f.posSub) * locations;
+      if (p.includeKiosk) totalSub += N(f.kioskSub);
+    }
     monthly -= totalSub;
     return monthly * 12;
   }

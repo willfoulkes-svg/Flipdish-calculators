@@ -492,19 +492,12 @@
         provider: c.posProvider || ''
       };
     }
-    // Roll up per-product subs and hardware (schema 5+).
+    // v7: bundled monthlySub (single SFDC figure) + per-product hardware
     var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
-    var totalSub = 0;
+    var totalSub = N(f.monthlySub);
     var totalHw  = 0;
-    if (p.includeOO)    totalSub += N(f.ooSub);
-    if (p.includePOS) {
-      totalSub += N(f.posSub) * locations;
-      totalHw  += N(f.posHardware);
-    }
-    if (p.includeKiosk) {
-      totalSub += N(f.kioskSub);
-      totalHw  += N(f.kioskHardware);
-    }
+    if (p.includePOS)   totalHw += N(f.posHardware);
+    if (p.includeKiosk) totalHw += N(f.kioskHardware);
     result.fdMonthlySub   = totalSub;
     result.hardwareOneOff = totalHw;
     result.contractMonths = 12;  // Flipdish standard 12-month contract
@@ -636,25 +629,14 @@
       }
     }
 
-    // ---- Bundle subscription (rolled up from per-product subs in v5+) ----
+    // ---- Subscription (bundled — single figure from SFDC quote) ----
+    // List = sum of in-scope per-product list subs; Yours = bundled
+    // monthlySub. The discount IS the bundle discount.
     var listSubMonthly = 0;
-    var youSubMonthly = 0;
-    if (p.includeOO && rates.oo) {
-      listSubMonthly += rates.oo.sub;
-      youSubMonthly  += N(f.ooSub);
-    }
-    if (p.includePOS && rates.pos) {
-      listSubMonthly += rates.pos.sub * locations;
-      youSubMonthly  += N(f.posSub) * locations;
-    }
-    if (p.includeKiosk && rates.kiosk) {
-      // Kiosk uses totals directly; we don't know list sub for the
-      // customer's deal because count isn't tracked. Use the user's
-      // value as both list and yours (no compare row will render).
-      var kioskSubYou = N(f.kioskSub);
-      listSubMonthly += kioskSubYou;
-      youSubMonthly  += kioskSubYou;
-    }
+    if (p.includeOO    && rates.oo)    listSubMonthly += rates.oo.sub;
+    if (p.includePOS   && rates.pos)   listSubMonthly += rates.pos.sub * locations;
+    if (p.includeKiosk && rates.kiosk) listSubMonthly += rates.kiosk.sub;
+    var youSubMonthly = N(f.monthlySub);
     if (listSubMonthly > 0 && youSubMonthly > 0) {
       totalListMonthly += listSubMonthly;
       totalYouMonthly  += youSubMonthly;
