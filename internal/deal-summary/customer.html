@@ -490,8 +490,22 @@
         provider: c.posProvider || '', cashierCount: N(c.cashierCount)
       };
     }
-    result.fdMonthlySub = parseFloat(f.monthlySub) || 0;
-    result.hardwareOneOff = parseFloat(f.hardwareOneOff) || 0;
+    // Roll up per-product subs and hardware (schema 5+).
+    var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
+    var totalSub = 0;
+    var totalHw  = 0;
+    if (p.includeOO)    totalSub += N(f.ooSub);
+    if (p.includePOS) {
+      totalSub += N(f.posSub) * locations;
+      totalHw  += N(f.posHardware);
+    }
+    if (p.includeKiosk) {
+      var kc = Math.max(0, Math.round(N(f.kioskCount)) || 0);
+      totalSub += kc * N(f.kioskSubPerUnit);
+      totalHw  += kc * N(f.kioskHwListPerUnit);
+    }
+    result.fdMonthlySub   = totalSub;
+    result.hardwareOneOff = totalHw;
     result.contractMonths = Math.max(1, Math.round(parseFloat(f.contractMonths)) || 36);
 
     result.netMonthly = result.ooSavings + result.posSavings - result.fdMonthlySub;
@@ -621,16 +635,22 @@
       }
     }
 
-    // ---- Bundle subscription ----
-    // Build the list-rate sub from the sum of per-product subs in scope.
+    // ---- Bundle subscription (rolled up from per-product subs in v5+) ----
     var listSubMonthly = 0;
-    if (p.includeOO && rates.oo) listSubMonthly += rates.oo.sub * locations;
-    if (p.includePOS && rates.pos) listSubMonthly += rates.pos.sub * locations;
+    var youSubMonthly = 0;
+    if (p.includeOO && rates.oo) {
+      listSubMonthly += rates.oo.sub;
+      youSubMonthly  += N(f.ooSub);
+    }
+    if (p.includePOS && rates.pos) {
+      listSubMonthly += rates.pos.sub * locations;
+      youSubMonthly  += N(f.posSub) * locations;
+    }
     if (p.includeKiosk && rates.kiosk) {
       var kc = N(f.kioskCount);
       listSubMonthly += rates.kiosk.sub * kc;
+      youSubMonthly  += N(f.kioskSubPerUnit) * kc;
     }
-    var youSubMonthly = N(f.monthlySub);
     if (listSubMonthly > 0 && youSubMonthly > 0) {
       totalListMonthly += listSubMonthly;
       totalYouMonthly  += youSubMonthly;
@@ -653,15 +673,18 @@
       }
     }
 
-    // ---- Hardware (one-off) ----
+    // ---- Hardware (one-off) — sum per-product values ----
     var listHardware = 0;
-    if (p.includePOS && rates.pos) listHardware += rates.pos.hardwareStarter * locations;
+    var youHardware = 0;
+    if (p.includePOS && rates.pos) {
+      listHardware += rates.pos.hardwareStarter * locations;
+      youHardware  += N(f.posHardware);
+    }
     if (p.includeKiosk && rates.kiosk) {
       var kc2 = N(f.kioskCount);
-      var perUnit = N(f.kioskHwListPerUnit) || rates.kiosk.hardware;
-      listHardware += perUnit * kc2;
+      listHardware += rates.kiosk.hardware * kc2;
+      youHardware  += N(f.kioskHwListPerUnit) * kc2;
     }
-    var youHardware = N(f.hardwareOneOff);
     if (listHardware > 0 && youHardware >= 0) {
       totalListOneOff += listHardware;
       totalYouOneOff  += youHardware;
