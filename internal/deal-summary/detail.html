@@ -269,6 +269,116 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* ---------- "What you can offer" panel (Step 3, v8) ---------- */
+  /* Three colour states — green/headroom, grey/match, amber-red/tight.
+     Used for diagnosis + prescription BEFORE the rep types their actual
+     proposal in Step 4. Colour mirrors the verdict so reps can read the
+     state at a glance. */
+  .offer-panel {
+    background: linear-gradient(180deg, #F4F6F8 0%, #ECEFF2 100%);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--muted);
+    border-radius: 14px;
+    padding: 20px 22px 18px;
+    margin-bottom: 22px;
+  }
+  .offer-panel.headroom {
+    background: linear-gradient(180deg, #EAF7EE 0%, #DDF2E5 100%);
+    border-left-color: var(--green-strong);
+  }
+  .offer-panel.match {
+    background: linear-gradient(180deg, #FFF9EC 0%, #FFF2D8 100%);
+    border-left-color: var(--amber-strong);
+  }
+  .offer-panel.tight {
+    background: linear-gradient(180deg, #FFE9E2 0%, #FFD9CC 100%);
+    border-left-color: var(--red-strong);
+  }
+  .offer-panel.idle { background: linear-gradient(180deg, #F4F6F8 0%, #ECEFF2 100%); }
+  .offer-headline {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .offer-headline h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--flipdish-blue-dark);
+    font-weight: 700;
+  }
+  .offer-state-pill {
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--muted); color: #fff;
+    padding: 4px 12px; border-radius: 999px;
+  }
+  .offer-panel.headroom .offer-state-pill { background: var(--green-strong); }
+  .offer-panel.match    .offer-state-pill { background: var(--amber-strong); }
+  .offer-panel.tight    .offer-state-pill { background: var(--red-strong); }
+  .offer-summary {
+    font-size: 14px; line-height: 1.55;
+    color: var(--flipdish-dark);
+    margin-bottom: 14px;
+  }
+  .offer-summary strong { color: var(--flipdish-blue-dark); }
+  .offer-numbers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .offer-num {
+    background: rgba(255,255,255,0.65);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .offer-num-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--muted); font-weight: 600;
+  }
+  .offer-num-value {
+    font-size: 22px; font-weight: 700; color: var(--flipdish-blue-dark);
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+  .offer-num-value.positive { color: #2F7A4D; }
+  .offer-num-value.negative { color: #B23A2A; }
+  .offer-levers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .lever {
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .lever-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--muted); font-weight: 600;
+  }
+  .lever-value {
+    font-size: 18px; font-weight: 700; color: var(--flipdish-blue-dark);
+    font-variant-numeric: tabular-nums;
+    margin: 4px 0 4px;
+  }
+  .lever-detail {
+    font-size: 12.5px; color: var(--muted); line-height: 1.45;
+  }
+  .offer-suggested {
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px; line-height: 1.55;
+    color: var(--flipdish-dark);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .offer-suggested strong { color: var(--flipdish-blue-dark); }
+
   /* ---------- Document upload stub ---------- */
   /* Visible UI placeholder. Extraction wires up later — this is just the
      drag-target so reps know it's coming. */
@@ -612,10 +722,69 @@
   </div>
 
 
-  <!-- ===================== STEP 3 — FLIPDISH PROPOSAL ===================== -->
+  <!-- ===================== STEP 3 — WHAT YOU CAN OFFER ===================== -->
+  <!-- Diagnostic + prescriptive panel introduced in v8. Compares the
+       customer's current monthly spend (Step 2) against Flipdish at list
+       and tells the rep one of three things:
+         · "You have headroom" (customer pays more than Flipdish list)
+         · "Roughly matching"  (within ±10%)
+         · "Tight at list"     (Flipdish list > current spend — careful)
+       Plus three concrete levers (sub / hardware / processing) with
+       how-far-you-can-push numbers bound by the commercial guardrails. -->
   <div class="step">
     <span class="num">3</span>
-    <span class="text">Flipdish proposal <span class="sub">Pre-filled with list rates · use the live check to see how much you can discount before breaking the deal</span></span>
+    <span class="text">What you can offer <span class="sub">Compares their current spend to Flipdish list and tells you the maximum you can give without breaking the deal</span></span>
+  </div>
+
+  <div class="offer-panel idle" id="offerPanel">
+    <div class="offer-headline">
+      <span class="offer-state-pill" id="offerStatePill">Awaiting inputs</span>
+      <h3 id="offerTitle">Fill in Step 2 to unlock the prescription</h3>
+    </div>
+    <div class="offer-summary" id="offerSummary">
+      Pick a product (Online Ordering / POS / Kiosk) above and fill in what they pay today — this panel will then tell you how much room you have to discount before the deal stops working.
+    </div>
+    <div class="offer-numbers" id="offerNumbers" style="display:none;">
+      <div class="offer-num">
+        <div class="offer-num-label">They pay today</div>
+        <div class="offer-num-value" id="offerCurrentVal">—</div>
+      </div>
+      <div class="offer-num">
+        <div class="offer-num-label">Flipdish at list</div>
+        <div class="offer-num-value" id="offerListVal">—</div>
+      </div>
+      <div class="offer-num">
+        <div class="offer-num-label" id="offerDeltaLabel">Gap</div>
+        <div class="offer-num-value" id="offerDeltaVal">—</div>
+      </div>
+    </div>
+    <div class="offer-levers" id="offerLevers" style="display:none;">
+      <div class="lever">
+        <div class="lever-label">Bundled subscription</div>
+        <div class="lever-value" id="offerSubVal">—</div>
+        <div class="lever-detail" id="offerSubDetail">—</div>
+      </div>
+      <div class="lever">
+        <div class="lever-label">Hardware (one-off)</div>
+        <div class="lever-value" id="offerHwVal">—</div>
+        <div class="lever-detail" id="offerHwDetail">—</div>
+      </div>
+      <div class="lever">
+        <div class="lever-label">Processing rate</div>
+        <div class="lever-value" id="offerRateVal">—</div>
+        <div class="lever-detail" id="offerRateDetail">—</div>
+      </div>
+    </div>
+    <div class="offer-suggested" id="offerSuggested" style="display:none;"></div>
+  </div>
+
+  <!-- ===================== STEP 4 — FLIPDISH PROPOSAL ===================== -->
+  <!-- Renumbered 3 → 4 in v8 because the new "What you can offer" panel now
+       sits BETWEEN Step 2 (current spend) and the rep's actual proposal.
+       Order: prescription → proposal → validation. -->
+  <div class="step">
+    <span class="num">4</span>
+    <span class="text">Flipdish proposal <span class="sub">Type the rates from the SFDC quote · the Live Commercial Check below validates whether the deal sits inside the headroom Step 3 prescribed</span></span>
   </div>
 
   <!-- OO proposal — processing rate only (sub lives in the Subscription
@@ -697,9 +866,9 @@
     </div>
   </div>
 
-  <!-- ===================== STEP 4 — VALUE STORY ===================== -->
+  <!-- ===================== STEP 5 — VALUE STORY ===================== -->
   <div class="step">
-    <span class="num">4</span>
+    <span class="num">5</span>
     <span class="text">The value story <span class="sub">What this deal is worth to the customer · auto-calculated</span></span>
   </div>
 
@@ -1484,129 +1653,323 @@
         ? fmtMoney(v.detail.pos.curTotal) + '/mo (today) − ' + fmtMoney(v.detail.pos.newTotal) + '/mo (Flipdish)'
         : '—');
 
-    // Live commercial status strip (bottom of Step 3) — single plain-
-    // English verdict on whatever's currently typed. Recommendation
-    // panel removed in v7.
+    // What-you-can-offer panel (Step 3, v8) — diagnose customer current
+    // vs Flipdish list and prescribe the maximum the rep can give. This
+    // sits BEFORE Step 4 (rep's actual proposal) by design — prescription
+    // first, validation after.
+    renderOfferPanel(computeOfferPanel(prospect));
+
+    // Live commercial status strip (bottom of Step 4) — validates whether
+    // the rep's typed proposal sits inside the headroom Step 3 prescribed.
     renderLiveCheck(v);
 
     // Narrative
     $('narrativeBox').innerHTML = narrativeFor(prospect, v);
   }
 
-  // ---------- Recommendation engine — REMOVED in v7 ----------
-  // The recommendation panel was killed because it duplicated the live
-  // check's job and added confusion. Pre-fill from list rates is now
-  // the rep's starting point (see prefillProposalFromList()), and the
-  // status strip below tells them whether to push further. No "Apply"
-  // button. The dead function below is kept only to avoid breaking
-  // anything that might still reference it during transition; it's a
-  // no-op.
-  function _v7_unusedRec(p, v) {
+  // ---------- "What you can offer" engine (v8) ----------
+  // Diagnose the gap between what the customer pays today and what
+  // Flipdish would charge them at full list. Three states:
+  //
+  //   headroom — customer pays MORE today than Flipdish list. Rep has
+  //              room to discount AND still come out cheaper.
+  //   match    — customer current is within ±10% of Flipdish list.
+  //              No real room to discount — sell on platform value.
+  //   tight    — Flipdish list is MORE EXPENSIVE than what they pay
+  //              today. Discounting won't make it work; need to
+  //              reduce hardware scope, push back, or qualify out.
+  //
+  // For each state the engine also computes how far the rep can push
+  // each lever (sub / hardware / processing) without breaking the
+  // commercial guardrails (SNR floor, 3-month hardware payback, min
+  // margin above Stripe card-processing cost).
+  function computeOfferPanel(p) {
     var rates = LIST_RATES[p.country] || LIST_RATES.UK;
-    var rec = { rows: [], applies: {}, warnings: [] };
-
-    if (p.includeOO && rates.oo) {
-      var ooListPct = rates.oo.processing * 100;     // e.g. 5
-      // Drop ~30% off list, capped at 1pp above the Stripe processing cost
-      var ooFloorPct = (rates.ooCardPct || 0) * 100 + 1.0;
-      var ooRecPct = Math.max(ooFloorPct, ooListPct - 1.5);
-      ooRecPct = Math.round(ooRecPct * 10) / 10;
-      rec.rows.push({
-        label: 'OO processing %',
-        from: ooListPct + '%',
-        to: ooRecPct + '%',
-        delta: 'saves customer ~' + fmtMoney((ooListPct - ooRecPct) / 100 * (parseFloat(p.current && p.current.ooGmv) || 0)) + '/mo'
-      });
-      rec.applies.fdOOProcessingRate = String(ooRecPct);
-    }
-
-    if (p.includePOS && rates.pos) {
-      var posListPct = rates.pos.processing * 100;   // 1.2
-      var posFloorPct = (rates.posCardPct || 0) * 100 + 0.3;  // keep 0.3pp margin above card cost
-      var posRecPct = Math.max(posFloorPct, posListPct - 0.2);
-      posRecPct = Math.round(posRecPct * 100) / 100;
-      var posGmv = parseFloat(p.current && p.current.posGmv) || 0;
-      rec.rows.push({
-        label: 'POS processing %',
-        from: posListPct + '%',
-        to: posRecPct + '%',
-        delta: 'saves customer ~' + fmtMoney((posListPct - posRecPct) / 100 * posGmv) + '/mo'
-      });
-      rec.applies.fdPosRate = String(posRecPct);
-      // Per-txn fee: keep at list (small psychological weight)
-      rec.rows.push({
-        label: 'POS per-transaction fee',
-        from: rates.pos.txnFee.toFixed(2),
-        to: rates.pos.txnFee.toFixed(2),
-        delta: 'kept at list — discounting this is less visible than processing %'
-      });
-      rec.applies.fdPosTransFee = rates.pos.txnFee.toFixed(2);
-    }
-
-    // Hardware — modest 20% off list as a sweetener.
-    // Will: "we should be incentivising reps to offer as high as possible"
-    // — so the recommendation keeps prices CLOSER to list rather than
-    // pushing all the way to the payback floor. Reps who need to push
-    // harder can see how much further they can go via the Live Check.
-    var HARDWARE_REC_DISCOUNT_PCT = 0.20;
     var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
-    var posHwList = (p.includePOS && rates.pos) ? rates.pos.hardwareStarter * locations : 0;
-    var kioskHwUserTotal = parseFloat(p.flipdish && p.flipdish.kioskHardware) || 0;
-    var kioskHwListGuess = (p.includeKiosk && rates.kiosk && kioskHwUserTotal > 0) ? kioskHwUserTotal : 0;
-    var hwListTotal = posHwList + kioskHwListGuess;
-    if (hwListTotal > 0) {
-      var maxDiscount = Math.round(hwListTotal * HARDWARE_REC_DISCOUNT_PCT);
-      var recHwTotal = Math.max(0, hwListTotal - maxDiscount);
-      rec.rows.push({
-        label: 'Hardware (one-off)',
-        from: fmtMoney(hwListTotal),
-        to: fmtMoney(recHwTotal),
-        delta: fmtMoney(maxDiscount) + ' off (20% — keeps margin healthy; live check shows how far you can push)'
-      });
-      if (posHwList > 0) {
-        rec.applies.fdPosHardware = String(Math.round(posHwList * (1 - HARDWARE_REC_DISCOUNT_PCT)));
-      }
-      if (kioskHwListGuess > 0) {
-        rec.applies.fdKioskHardware = String(Math.round(kioskHwListGuess * (1 - HARDWARE_REC_DISCOUNT_PCT)));
-      }
+    var c = p.current || {};
+    var N = function (v) { var x = parseFloat(v); return isNaN(x) ? 0 : x; };
+
+    var hasScope = !!(p.includeOO || p.includePOS || p.includeKiosk);
+    if (!hasScope) {
+      return { state: 'idle' };
     }
 
-    // Per-product subs — keep at list. Recurring revenue holds clean.
+    // We need at least one current-spend signal to compare against
+    var hasCurrent = false;
+    if (p.includeOO  && N(c.ooGmv) > 0)  hasCurrent = true;
+    if (p.includePOS && N(c.posGmv) > 0) hasCurrent = true;
+    // Kiosk is a NEW offering — no displacement. If kiosk-only, we still
+    // show the panel but skip the comparison (kiosk-only deals are sold
+    // on incremental revenue, not cost replacement).
+    var kioskOnly = p.includeKiosk && !p.includeOO && !p.includePOS;
+    if (!hasCurrent && !kioskOnly) {
+      return { state: 'idle', awaitingCurrent: true };
+    }
+
+    // -------- Customer current monthly cost --------
+    var currentTotal = 0;
+    if (p.includeOO && N(c.ooGmv) > 0) {
+      var ooAov = N(c.ooAov) || N(c.aov) || 25;
+      var ooTxnCount = ooAov > 0 ? N(c.ooGmv) / ooAov : 0;
+      currentTotal += N(c.ooGmv) * (N(c.ooProcessingRate) / 100)
+                    + ooTxnCount * N(c.ooTransFee)
+                    + N(c.ooSub);
+    }
+    if (p.includePOS && N(c.posGmv) > 0) {
+      var posAov = N(c.aov) || 15;
+      var posTxnCount = posAov > 0 ? N(c.posGmv) / posAov : 0;
+      currentTotal += N(c.posGmv) * (N(c.posRate) / 100)
+                    + posTxnCount * N(c.posTransFee)
+                    + N(c.posSub);
+    }
+
+    // -------- Flipdish at-LIST monthly cost --------
+    // Recurring only — hardware sits as a one-off, compared separately.
+    var listSubTotal = 0;
+    var listProcTotal = 0;
     if (p.includeOO && rates.oo) {
-      rec.rows.push({
-        label: 'OO software subscription',
-        from: fmtMoney(rates.oo.sub),
-        to: fmtMoney(rates.oo.sub),
-        delta: 'kept at list — recurring revenue holds clean'
-      });
-      rec.applies.fdOOSub = String(rates.oo.sub);
+      listSubTotal  += rates.oo.sub;
+      listProcTotal += N(c.ooGmv) * rates.oo.processing;  // OO has no per-txn list fee
     }
     if (p.includePOS && rates.pos) {
-      rec.rows.push({
-        label: 'POS subscription (per till)',
-        from: fmtMoney(rates.pos.sub),
-        to: fmtMoney(rates.pos.sub),
-        delta: 'kept at list — recurring revenue holds clean'
-      });
-      rec.applies.fdPosSub = String(rates.pos.sub);
+      listSubTotal  += rates.pos.sub * locations;
+      var posAov2 = N(c.aov) || 15;
+      var posTxnCount2 = posAov2 > 0 ? N(c.posGmv) / posAov2 : 0;
+      listProcTotal += N(c.posGmv) * rates.pos.processing
+                    + posTxnCount2 * rates.pos.txnFee;
     }
     if (p.includeKiosk && rates.kiosk) {
-      rec.rows.push({
-        label: 'Kiosk subscription',
-        from: fmtMoney(rates.kiosk.sub),
-        to: fmtMoney(rates.kiosk.sub),
-        delta: 'kept at list'
-      });
-      rec.applies.fdKioskSub = String(rates.kiosk.sub);
+      listSubTotal += rates.kiosk.sub;
+    }
+    var listMonthly = listSubTotal + listProcTotal;
+
+    // -------- List hardware (one-off) --------
+    var listHardware = 0;
+    if (p.includePOS && rates.pos) listHardware += rates.pos.hardwareStarter * locations;
+    if (p.includeKiosk && rates.kiosk) listHardware += rates.kiosk.hardware;
+
+    // -------- State diagnosis --------
+    var delta = currentTotal - listMonthly;  // +ve = customer pays more today (headroom)
+    var threshold = Math.max(20, listMonthly * 0.10);  // 10% band, min £20
+    var state;
+    if (kioskOnly)              state = 'match';   // no displacement to compare
+    else if (delta >  threshold) state = 'headroom';
+    else if (delta < -threshold) state = 'tight';
+    else                         state = 'match';
+
+    // -------- Lever headroom calculations (at LIST rates as baseline) --------
+    // Compute SNR at list to find the absolute ceiling for hardware discount.
+    var snrAtList = 0;
+    if (p.includeOO && rates.oo) {
+      var ooGmv = N(c.ooGmv);
+      var ooAov3 = N(c.ooAov) || N(c.aov) || 25;
+      var ooTxn3 = ooAov3 > 0 ? ooGmv / ooAov3 : 0;
+      var ooProcRev = ooGmv * rates.oo.processing;
+      var ooCardCost = ooGmv * (rates.ooCardPct || 0) + ooTxn3 * (rates.ooCardFix || 0);
+      snrAtList += (ooProcRev - ooCardCost + rates.oo.sub);
+    }
+    if (p.includePOS && rates.pos) {
+      var posGmv2 = N(c.posGmv);
+      var posAov3 = N(c.aov) || 15;
+      var posTxn3 = posAov3 > 0 ? posGmv2 / posAov3 : 0;
+      var posProcRev = posGmv2 * rates.pos.processing + posTxn3 * rates.pos.txnFee;
+      var posCardCost = posGmv2 * (rates.posCardPct || 0) + posTxn3 * (rates.posCardFix || 0);
+      snrAtList += (posProcRev - posCardCost + rates.pos.sub * locations);
+    }
+    if (p.includeKiosk && rates.kiosk) {
+      snrAtList += rates.kiosk.sub;
+    }
+    // Cross-subsidy: POS+Kiosk fully eligible, 25% of OO eligible
+    var ooSnrAtList = 0, posSnrAtList = 0, kioskSnrAtList = 0;
+    if (p.includeOO && rates.oo) {
+      var _ooGmv = N(c.ooGmv);
+      var _ooAov = N(c.ooAov) || N(c.aov) || 25;
+      var _ooTxn = _ooAov > 0 ? _ooGmv / _ooAov : 0;
+      ooSnrAtList = _ooGmv * rates.oo.processing
+                  - (_ooGmv * (rates.ooCardPct || 0) + _ooTxn * (rates.ooCardFix || 0))
+                  + rates.oo.sub;
+    }
+    if (p.includePOS && rates.pos) {
+      var _posGmv = N(c.posGmv);
+      var _posAov = N(c.aov) || 15;
+      var _posTxn = _posAov > 0 ? _posGmv / _posAov : 0;
+      posSnrAtList = _posGmv * rates.pos.processing + _posTxn * rates.pos.txnFee
+                   - (_posGmv * (rates.posCardPct || 0) + _posTxn * (rates.posCardFix || 0))
+                   + rates.pos.sub * locations;
+    }
+    if (p.includeKiosk && rates.kiosk) {
+      kioskSnrAtList = rates.kiosk.sub;
+    }
+    var eligibleSnrAtList = posSnrAtList + kioskSnrAtList + ooSnrAtList * GUARDRAILS.ooSnrCrossSubsidy;
+    var eligibleOpMarginAtList = eligibleSnrAtList * GUARDRAILS.opMarginFactor;
+    var hardwarePaybackEnvelopeAtList = Math.max(0, eligibleOpMarginAtList * GUARDRAILS.paybackTargetMonths);
+
+    // Maximum hardware discount the rep can give while staying inside the
+    // 3-month payback target — this is the absolute ceiling. We also cap
+    // it at 100% of list (can't give more than the hardware costs).
+    var maxHwDiscount = Math.min(listHardware, Math.round(hardwarePaybackEnvelopeAtList));
+    // Standard play: 20% off list. Use the smaller of "20%" and "ceiling".
+    var stdHwDiscount = Math.min(maxHwDiscount, Math.round(listHardware * 0.20));
+
+    // Subscription headroom — how much could you drop the bundled sub
+    // and still hit the SNR floor (£350/mo per site)? Total floor =
+    // floor × locations; available headroom = current SNR-at-list - floor.
+    var snrAtListPerSite = snrAtList / locations;
+    var snrHeadroomPerSite = Math.max(0, snrAtListPerSite - GUARDRAILS.snrFloorMonthly);
+    var maxSubDiscount = Math.round(snrHeadroomPerSite * locations);
+    // Don't recommend dropping the sub by more than 50% of list — past
+    // that, recurring revenue erodes too far for a healthy deal.
+    var subSafetyCap = Math.round(listSubTotal * 0.50);
+    maxSubDiscount = Math.min(maxSubDiscount, subSafetyCap);
+
+    // POS processing rate headroom — how far below list can we go and
+    // still keep at least 0.3pp margin above the Stripe POS card cost?
+    var rateHeadroomPP = 0;
+    var ratePosListPct = 0;
+    var ratePosFloorPct = 0;
+    if (p.includePOS && rates.pos) {
+      ratePosListPct = rates.pos.processing * 100;
+      ratePosFloorPct = (rates.posCardPct || 0) * 100 + 0.3;
+      rateHeadroomPP = Math.max(0, ratePosListPct - ratePosFloorPct);
     }
 
-    // Sense-check: would the recommendation breach SNR floor?
-    if (v.snrPerSite < GUARDRAILS.snrFloorMonthly) {
-      rec.warnings.push('Even at this recommendation, SNR per site is below the £' + GUARDRAILS.snrFloorMonthly + '/mo floor — review pricing before sending.');
-    }
-
-    return rec;
+    return {
+      state: state,
+      currentTotal: currentTotal,
+      listMonthly: listMonthly,
+      listSub: listSubTotal,
+      listHardware: listHardware,
+      delta: delta,
+      // levers
+      maxHwDiscount: maxHwDiscount,
+      stdHwDiscount: stdHwDiscount,
+      maxSubDiscount: maxSubDiscount,
+      ratePosListPct: ratePosListPct,
+      ratePosFloorPct: ratePosFloorPct,
+      rateHeadroomPP: rateHeadroomPP,
+      // for context
+      kioskOnly: kioskOnly,
+      locations: locations
+    };
   }
+
+  function renderOfferPanel(o) {
+    var panel = $('offerPanel');
+    var pill  = $('offerStatePill');
+    var title = $('offerTitle');
+    var summary = $('offerSummary');
+    var nums  = $('offerNumbers');
+    var levers = $('offerLevers');
+    var suggested = $('offerSuggested');
+
+    panel.classList.remove('idle','headroom','match','tight');
+
+    // Idle states
+    if (o.state === 'idle') {
+      panel.classList.add('idle');
+      pill.textContent = 'Awaiting inputs';
+      title.textContent = o.awaitingCurrent
+        ? 'Need their current commercial reality'
+        : 'Fill in Step 2 to unlock the prescription';
+      summary.innerHTML = o.awaitingCurrent
+        ? 'You\'ve picked a product but Step 2 is empty. Type in what they pay today (GMV, AOV, current rates) and this panel will tell you how much you can offer.'
+        : 'Pick a product (Online Ordering / POS / Kiosk) above and fill in what they pay today — this panel will then tell you how much room you have to discount before the deal stops working.';
+      nums.style.display = 'none';
+      levers.style.display = 'none';
+      suggested.style.display = 'none';
+      return;
+    }
+
+    panel.classList.add(o.state);
+    nums.style.display = '';
+    levers.style.display = '';
+    suggested.style.display = '';
+
+    // Headline numbers
+    $('offerCurrentVal').textContent = fmtMoney(o.currentTotal) + '/mo';
+    $('offerListVal').textContent    = fmtMoney(o.listMonthly) + '/mo';
+    var deltaVal = $('offerDeltaVal');
+    var deltaLbl = $('offerDeltaLabel');
+    deltaVal.classList.remove('positive','negative');
+    if (o.kioskOnly) {
+      deltaLbl.textContent = 'Comparison';
+      deltaVal.textContent = 'Kiosk-only — no displacement';
+    } else if (o.delta > 0) {
+      deltaLbl.textContent = 'Headroom (you can discount)';
+      deltaVal.textContent = '+' + fmtMoney(o.delta) + '/mo';
+      deltaVal.classList.add('positive');
+    } else if (o.delta < 0) {
+      deltaLbl.textContent = 'Gap (Flipdish is more expensive)';
+      deltaVal.textContent = fmtMoney(o.delta) + '/mo';
+      deltaVal.classList.add('negative');
+    } else {
+      deltaLbl.textContent = 'Gap';
+      deltaVal.textContent = fmtMoney(0) + '/mo';
+    }
+
+    // Title + summary by state
+    if (o.state === 'headroom') {
+      pill.textContent = 'You have room';
+      title.textContent = 'Plenty of room to discount';
+      summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — already <strong>' + fmtMoney(o.delta) + '/mo cheaper</strong> for them. You can lead with list rates and use the levers below as fallback if they push back on hardware or sub.';
+    } else if (o.state === 'tight') {
+      pill.textContent = 'Tight at list';
+      title.textContent = 'Flipdish is more expensive than what they pay today';
+      summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — that\'s <strong>' + fmtMoney(-o.delta) + '/mo MORE expensive</strong> before any hardware. Discounting won\'t close that gap without breaking the deal. Reduce hardware scope, push back on price (sell platform value, not cost replacement), or qualify out.';
+    } else {
+      pill.textContent = 'Match-only';
+      title.textContent = o.kioskOnly
+        ? 'Kiosk-only deal — no current cost to displace'
+        : 'You\'re roughly matching at list';
+      summary.innerHTML = o.kioskOnly
+        ? 'Kiosk is incremental — there\'s nothing to displace because they don\'t have kiosks today. Sell on incremental revenue (basket lift, queue reduction). Hardware discount is your main lever.'
+        : 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today; Flipdish at list is <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — within ~10%. Don\'t lead with a discount. Sell on platform value (kiosk, AI, FMM, OO direct-to-customer). The standard 20%-off-hardware sweetener still fits inside the payback envelope if you need it.';
+    }
+
+    // Lever cards
+    // 1. Bundled subscription
+    $('offerSubVal').textContent = fmtMoney(o.listSub) + '/mo';
+    if (o.state === 'tight' || o.maxSubDiscount <= 0) {
+      $('offerSubDetail').textContent = 'No room to discount the sub — recurring revenue is already at the SNR floor.';
+    } else {
+      $('offerSubDetail').textContent = 'Can drop by up to ' + fmtMoney(o.maxSubDiscount) + '/mo before the SNR floor (' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site) bites.';
+    }
+
+    // 2. Hardware
+    $('offerHwVal').textContent = fmtMoney(o.listHardware);
+    if (o.listHardware === 0) {
+      $('offerHwDetail').textContent = 'No hardware in scope.';
+    } else if (o.maxHwDiscount <= 0) {
+      $('offerHwDetail').textContent = 'No room — the deal already has no margin to absorb a hardware discount inside the 3-month payback target.';
+    } else {
+      var stdPct = Math.round((o.stdHwDiscount / o.listHardware) * 100);
+      var maxPct = Math.round((o.maxHwDiscount / o.listHardware) * 100);
+      var stdLine = 'Standard play: ' + fmtMoney(o.stdHwDiscount) + ' off (' + stdPct + '% — ' + fmtMoney(o.listHardware - o.stdHwDiscount) + ' to customer).';
+      var maxLine = ' Max before payback breaches 3 months: ' + fmtMoney(o.maxHwDiscount) + ' off (' + maxPct + '%).';
+      $('offerHwDetail').textContent = stdLine + maxLine;
+    }
+
+    // 3. Processing rate (POS)
+    if (o.ratePosListPct > 0) {
+      $('offerRateVal').textContent = o.ratePosListPct.toFixed(2) + '%';
+      $('offerRateDetail').textContent = o.rateHeadroomPP > 0
+        ? 'POS list is ' + o.ratePosListPct.toFixed(2) + '%. Floor is ' + o.ratePosFloorPct.toFixed(2) + '% (Stripe + 0.3pp margin). Up to ' + o.rateHeadroomPP.toFixed(2) + 'pp of room — but per-percent revenue impact is small; use as last resort.'
+        : 'POS list is already at the floor — no room.';
+    } else {
+      $('offerRateVal').textContent = '—';
+      $('offerRateDetail').textContent = 'No POS in scope (or POS not sold in this market).';
+    }
+
+    // Suggested opening offer
+    if (o.state === 'tight') {
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Type list rates into Step 4 below — don\'t pre-discount. If they push back, your only safe lever is hardware (max ' + fmtMoney(o.maxHwDiscount) + ' off). Anything more breaks the payback target.';
+    } else if (o.state === 'headroom') {
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Sub <strong>' + fmtMoney(o.listSub) + '/mo</strong>, hardware <strong>' + fmtMoney(o.listHardware) + '</strong>, processing at list. You\'re already cheaper than what they pay today — keep discounts in your back pocket as a closing lever.';
+    } else {
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Sub <strong>' + fmtMoney(o.listSub) + '/mo</strong>, hardware <strong>' + fmtMoney(o.listHardware - o.stdHwDiscount) + '</strong> (' + fmtMoney(o.stdHwDiscount) + ' off as the standard sweetener), processing at list. Sell platform value rather than price.';
+    }
+  }
+
 
   // (renderRecommendation + applyRecommendation removed in v7 along
   //  with the panel itself.)
@@ -1670,23 +2033,35 @@
     detPb.textContent  = pbMonths == null ? '—' : (pbMonths.toFixed(1) + ' months');
     detHw.textContent  = fmtMoney(Math.max(0, paybackEnv));
 
+    // v8: be honest about whether the rep has actually discounted hardware
+    // before telling them to "reduce the hardware discount". If hardware
+    // is at/above list, the message explains that the deal economics
+    // don't support this scope at all (small operator, etc).
+    var hwDiscountedFromList = alreadyDiscounted > 0;
+
     if (paybackBust) {
       panel.classList.add('bust');
       pill.textContent = 'Hardware payback too long';
-      msg.innerHTML = 'At the proposed hardware price, payback is <strong>' + pbMonths.toFixed(1) + ' months</strong> (target ≤ 3). <strong>Reduce the hardware discount</strong> or push for more recurring revenue (sub or processing rate).';
+      if (hwDiscountedFromList) {
+        msg.innerHTML = 'You\'ve discounted hardware by <strong>' + fmtMoney(alreadyDiscounted) + '</strong> off list. At that price, payback is <strong>' + pbMonths.toFixed(1) + ' months</strong> (target ≤ 3). <strong>Pull the hardware discount back</strong> — Step 3 above showed your safe ceiling.';
+      } else {
+        msg.innerHTML = 'Even at full list hardware (' + fmtMoney(hwProposed) + '), payback is <strong>' + pbMonths.toFixed(1) + ' months</strong> — past the 3-month target. The deal is too small to support this hardware bundle. <strong>Reduce hardware scope</strong> (starter kit only, fewer kiosks) or push for higher recurring revenue. Step 3 above flagged this as a tight deal.';
+      }
     } else if (below) {
       panel.classList.add('bust');
       pill.textContent = 'Below margin floor';
-      msg.innerHTML = 'Recurring revenue per site is <strong>' + fmtMoney(snr) + '/mo</strong>, below the <strong>' + fmtMoney(floor) + '</strong> floor. <strong>Tighten the subscription or processing rate</strong> to bring it back up.';
+      msg.innerHTML = 'Recurring revenue per site is <strong>' + fmtMoney(snr) + '/mo</strong>, below the <strong>' + fmtMoney(floor) + '</strong> floor. <strong>Raise the bundled subscription or the processing rate</strong> to bring it back up.';
     } else if (snr < floor * 1.2 || (pbMonths != null && pbMonths > 2)) {
       panel.classList.add('warn');
       pill.textContent = 'Tight';
       msg.innerHTML = 'You\'re earning <strong>' + fmtMoney(snr) + '/mo per site</strong> after costs. Margin is workable but not roomy — push discounts further only if you really need to.';
     } else {
       pill.textContent = 'Healthy';
-      var headroomStr = headroom > 0
-        ? ' You\'ve got <strong>' + fmtMoney(headroom) + '</strong> more hardware discount available before payback breaches the 3-month target.'
-        : '';
+      var headroomStr = (headroom > 0 && hwDiscountedFromList)
+        ? ' You\'ve discounted hardware by <strong>' + fmtMoney(alreadyDiscounted) + '</strong>; <strong>' + fmtMoney(headroom) + '</strong> more remains before payback breaches 3 months.'
+        : (headroom > 0
+           ? ' Hardware is at list — you have up to <strong>' + fmtMoney(headroom) + '</strong> of discount room before payback breaches 3 months.'
+           : '');
       msg.innerHTML = 'You\'re earning <strong>' + fmtMoney(snr) + '/mo per site</strong> after costs.' + headroomStr;
     }
   }
