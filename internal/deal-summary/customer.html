@@ -506,7 +506,7 @@
     }
     result.fdMonthlySub   = totalSub;
     result.hardwareOneOff = totalHw;
-    result.contractMonths = Math.max(1, Math.round(parseFloat(f.contractMonths)) || 36);
+    result.contractMonths = 12;  // Flipdish standard 12-month contract
 
     result.netMonthly = result.ooSavings + result.posSavings - result.fdMonthlySub;
 

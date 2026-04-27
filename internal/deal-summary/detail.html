@@ -622,7 +622,7 @@
       <input type="checkbox" id="includeOO"> Online Ordering
     </label>
     <label class="scope-toggle" data-toggle="includePOS">
-      <input type="checkbox" id="includePOS"> POS / In-store
+      <input type="checkbox" id="includePOS"> POS
     </label>
     <label class="scope-toggle" data-toggle="includeKiosk">
       <input type="checkbox" id="includeKiosk"> Kiosk
@@ -658,7 +658,7 @@
 
   <!-- POS current -->
   <div class="card" id="card-currentPOS" style="display:none;">
-    <h3>POS / In-store — today</h3>
+    <h3>POS — today</h3>
     <div class="grid3">
       <div class="field">
         <label>Current POS provider</label>
@@ -774,19 +774,12 @@
     </div>
   </div>
 
-  <!-- Deal terms (always shown) — replaces the old Bundle card.
-       Bundle was an all-in roll-up that created ambiguity; per-product
-       subs and hardware now live on each product's own card, so this
-       card just captures the contract length. -->
-  <div class="card">
-    <h3>Deal terms</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>Contract term (months) <span class="hint">(drives the total contract value figure in Step 4)</span></label>
-        <input id="fdContractMonths" type="number" min="1" step="1" value="36">
-      </div>
-    </div>
-  </div>
+  <!-- Deal terms card removed — Flipdish only offers 12-month contracts
+       and the field never gets changed in practice. CONTRACT_MONTHS is
+       a constant in the JS now. If a multi-year exception ever comes up,
+       surface it then; no point asking reps to fill a field that's
+       always 12. -->
+
 
   <!-- Live commercial check — verdict on whatever's currently typed in
        the proposal cards above. Updates live as the rep edits. Sits at
@@ -855,7 +848,7 @@
       <div class="formula" id="ooSavingsFormula">Enable Online Ordering to see this.</div>
     </div>
     <div class="stream" id="stream-posSavings">
-      <h4>POS / in-store savings</h4>
+      <h4>POS savings</h4>
       <div class="stream-sub">Lower processing + per-txn + subscription + hardware costs vs their current POS setup.</div>
       <div class="stream-value off" id="posSavingsValue">—</div>
       <div class="formula" id="posSavingsFormula">Enable POS to see this.</div>
@@ -958,6 +951,10 @@
     snrFloorMonthly:     350,    // per site — soft warning when crossed
     ooSnrCrossSubsidy:   0.25    // 25% of monthly OO SNR offsets hardware payback (option b)
   };
+  // Flipdish only offers 12-month contracts; this is a constant rather
+  // than a per-deal field. If a multi-year exception ever comes up, the
+  // calc has one place to update.
+  var CONTRACT_MONTHS = 12;
 
   // ---------- URL + id helpers ----------
   function getQueryParam(key) {
@@ -1017,9 +1014,8 @@
         // POS
         posSub: '', posRate: '', posTransFee: '', posHardware: '',
         // Kiosk
-        kioskCount: '', kioskSubPerUnit: '', kioskHwListPerUnit: '',
-        // Deal terms
-        contractMonths: 36
+        kioskCount: '', kioskSubPerUnit: '', kioskHwListPerUnit: ''
+        // (contractMonths removed — see CONTRACT_MONTHS constant above)
       },
       createdAt: Date.now(),
       updatedAt: Date.now()
@@ -1095,7 +1091,7 @@
     migrated.flipdish.ooProcessingRate = f.ooProcessingRate || f.ooCommissionRate || f.ooRate || '';
     migrated.flipdish.posRate          = f.posRate || '';
     migrated.flipdish.posTransFee      = f.posTransFee || '';
-    migrated.flipdish.contractMonths   = f.contractMonths || 36;
+    // contractMonths intentionally not migrated — see CONTRACT_MONTHS const
     // Per-product subs and hardware: leave blank, let prefill fill from
     // list rates after the migrate completes.
     migrated.flipdish.ooSub      = '';
@@ -1151,7 +1147,6 @@
     $('fdKioskCount').value          = f.kioskCount || '';
     $('fdKioskSubPerUnit').value     = f.kioskSubPerUnit || '';
     $('fdKioskHwListPerUnit').value  = f.kioskHwListPerUnit || '';
-    $('fdContractMonths').value      = f.contractMonths || 36;
 
     setCountry(prospect.country || 'UK', /*skipSave*/true);
     applyScopeVisibility();
@@ -1200,9 +1195,8 @@
       // Kiosk
       kioskCount:         val('fdKioskCount'),
       kioskSubPerUnit:    val('fdKioskSubPerUnit'),
-      kioskHwListPerUnit: val('fdKioskHwListPerUnit'),
-      // Deal terms
-      contractMonths:     Math.max(1, Math.round(num('fdContractMonths')) || 36)
+      kioskHwListPerUnit: val('fdKioskHwListPerUnit')
+      // (contractMonths is the CONTRACT_MONTHS constant — not stored)
     };
     prospect.updatedAt = Date.now();
   }
@@ -1449,7 +1443,7 @@
     }
     result.fdMonthlySub   = totalMonthlySub;
     result.hardwareOneOff = totalHardware;
-    result.contractMonths = Math.max(1, Math.round(N(f.contractMonths)) || 36);
+    result.contractMonths = CONTRACT_MONTHS;  // always 12 — Flipdish doesn't vary contract length
 
     // -------- Net monthly (customer perspective) --------
     // OO/POS savings already account for the customer's current sub being
@@ -1991,8 +1985,7 @@
       'curPosProvider','curCashierCount','curPosGmv','curAov','curPosRate','curPosTransFee','curPosSub','curPosHardwareMonthly',
       'fdOOSub','fdOOProcessingRate',
       'fdPosSub','fdPosRate','fdPosTransFee','fdPosHardware',
-      'fdKioskCount','fdKioskSubPerUnit','fdKioskHwListPerUnit',
-      'fdContractMonths'
+      'fdKioskCount','fdKioskSubPerUnit','fdKioskHwListPerUnit'
     ];
     allInputIds.forEach(function (id) {
       var el = $(id);
