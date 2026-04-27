@@ -409,16 +409,18 @@
     <span class="text">Their current commercial reality <span class="sub">What the customer processes and pays today</span></span>
   </div>
 
-  <!-- Scope toggles — which levers are we playing with in this deal -->
+  <!-- Scope toggles — which levers are we playing with in this deal.
+       Note: the Deal Room compares Flipdish against the customer's current
+       cost on the two recurring streams where we displace a direct
+       competitor (online ordering, in-store). Value-generation products
+       like Phone AI, Kiosk, FMM, QROP live in their own standalone
+       calculators and roll up into the bundle subscription below. -->
   <div class="scope-row" id="scopeToggles">
     <label class="scope-toggle" data-toggle="includeOO">
       <input type="checkbox" id="includeOO"> Online Ordering
     </label>
     <label class="scope-toggle" data-toggle="includePOS">
       <input type="checkbox" id="includePOS"> POS / In-store
-    </label>
-    <label class="scope-toggle" data-toggle="includePhoneAI">
-      <input type="checkbox" id="includePhoneAI"> Phone AI
     </label>
   </div>
 
@@ -492,32 +494,6 @@
     </div>
   </div>
 
-  <!-- Phone AI current -->
-  <div class="card" id="card-currentPhone" style="display:none;">
-    <h3>Phone volume — today</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>Phone orders per day</label>
-        <input id="curPhoneOrders" type="number" min="0" step="1" placeholder="e.g. 15">
-      </div>
-      <div class="field">
-        <label>% of calls missed today</label>
-        <input id="curPhoneMissed" type="number" min="0" max="100" step="0.5" placeholder="e.g. 5">
-      </div>
-      <div class="field">
-        <label>Avg call length (minutes)</label>
-        <input id="curPhoneCallLen" type="number" min="0" step="0.5" placeholder="e.g. 4">
-      </div>
-      <div class="field">
-        <label>Phone AOV <span class="hint">(defaults to POS AOV if blank)</span></label>
-        <input id="curPhoneAov" type="number" min="0" step="0.5" placeholder="leave blank = POS AOV">
-      </div>
-      <div class="field">
-        <label>Cashier hourly wage</label>
-        <input id="curHourlyWage" type="number" min="0" step="0.5" placeholder="e.g. 12">
-      </div>
-    </div>
-  </div>
 
   <!-- ===================== STEP 3 — FLIPDISH PROPOSAL ===================== -->
   <div class="step">
@@ -559,20 +535,6 @@
     </div>
   </div>
 
-  <!-- Phone AI proposal -->
-  <div class="card" id="card-proposalPhone" style="display:none;">
-    <h3>Phone AI — Flipdish proposal</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>Phone AI monthly subscription</label>
-        <input id="fdPhoneAiSub" type="number" min="0" step="1" placeholder="e.g. 99">
-      </div>
-      <div class="field">
-        <label>Phone AI commission %</label>
-        <input id="fdPhoneAiComm" type="number" min="0" step="0.5" value="5">
-      </div>
-    </div>
-  </div>
 
   <!-- Bundle (always shown) -->
   <div class="card">
@@ -630,18 +592,6 @@
       <div class="stream-value off" id="posSavingsValue">—</div>
       <div class="formula" id="posSavingsFormula">Enable POS to see this.</div>
     </div>
-    <div class="stream" id="stream-phoneNew">
-      <h4>Phone AI — captured revenue</h4>
-      <div class="stream-sub">Missed calls are now answered and turned into orders (net of Phone AI commission).</div>
-      <div class="stream-value off" id="phoneNewValue">—</div>
-      <div class="formula" id="phoneNewFormula">Enable Phone AI to see this.</div>
-    </div>
-    <div class="stream" id="stream-phoneLabour">
-      <h4>Phone AI — staff time returned</h4>
-      <div class="stream-sub">Every phone minute back is a minute on the floor.</div>
-      <div class="stream-value off" id="phoneLabourValue">—</div>
-      <div class="formula" id="phoneLabourFormula">Enable Phone AI to see this.</div>
-    </div>
   </div>
 
   <div class="narrative" id="narrativeBox">
@@ -687,8 +637,6 @@
   var STORAGE_KEY = 'flipdishProspects';
   var CCY  = { UK: '£', IE: '€', US: '$', ES: '€' };
   var LOC  = { UK: 'United Kingdom', IE: 'Ireland', US: 'United States', ES: 'Spain' };
-  var PHONE_COMMISSION_DEFAULT = 5;  // %
-  var DAYS_PER_MONTH = 30;
 
   // ---------- URL + id helpers ----------
   function getQueryParam(key) {
@@ -727,33 +675,29 @@
       locations: 1,
       contactName: '',
       ownerName: '',
-      // (notes field dropped — was unused by the calc and the customer page)
-      // Which levers are in play?
+      // Which levers are in play? Deal Room compares cost-replacement on the
+      // two recurring streams; value-generation products (Phone AI, Kiosk,
+      // FMM, etc.) live in their own standalone calcs and roll up into
+      // flipdish.monthlySub here.
       includeOO: false,
       includePOS: false,
-      includePhoneAI: false,
       // Current reality — the customer's full cost picture today
       current: {
-        // Direct ordering (replaces marketplace-style commission % framing)
+        // Direct ordering (compared against Foodhub, Mealzo, OrderYoyo, etc.)
         ooProvider: '', ooGmv: '', ooAov: '', ooSub: '',
         ooProcessingRate: '', ooTransFee: '',
-        // In-store (POS + Kiosk) — now includes monthly hardware cost
+        // In-store (POS + Kiosk) — includes monthly hardware cost
         posProvider: '', cashierCount: '', posGmv: '', aov: '',
-        posRate: '', posTransFee: '', posSub: '', posHardwareMonthly: '',
-        // Phone (unchanged)
-        phoneOrdersPerDay: '', phoneMissedPct: '', phoneCallLenMin: '',
-        phoneAov: '', hourlyWage: ''
+        posRate: '', posTransFee: '', posSub: '', posHardwareMonthly: ''
       },
       // Flipdish proposal (from SFDC)
       flipdish: {
         // Direct ordering — three options so the rep can model either
         // a sub+processing+txn deal OR a commission-only deal
         ooProcessingRate: '', ooTransFee: '', ooCommissionRate: '',
-        // POS (unchanged)
+        // POS
         posRate: '', posTransFee: '',
-        // Phone (unchanged)
-        phoneAiSub: '', phoneAiCommPct: PHONE_COMMISSION_DEFAULT,
-        // Bundle
+        // Bundle (folds in any add-on product subs — Phone AI, Kiosk, etc.)
         monthlySub: '', hardwareOneOff: '', contractMonths: 36
       },
       createdAt: Date.now(),
@@ -796,7 +740,6 @@
     migrated.updatedAt = p.updatedAt || Date.now();
     migrated.includeOO = !!p.includeOO;
     migrated.includePOS = !!p.includePOS;
-    migrated.includePhoneAI = !!p.includePhoneAI;
     var c = p.current || {};
     var f = p.flipdish || {};
     // OO — keep provider + revenue, drop marketplace commission
@@ -815,19 +758,13 @@
       var gm = parseFloat(c.posGmv), tx = parseFloat(c.posTransactions);
       if (!isNaN(gm) && !isNaN(tx) && tx > 0) migrated.current.aov = (gm / tx).toFixed(2);
     }
-    // Phone — passthrough
-    migrated.current.phoneOrdersPerDay = c.phoneOrdersPerDay || '';
-    migrated.current.phoneMissedPct    = c.phoneMissedPct || '';
-    migrated.current.phoneCallLenMin   = c.phoneCallLenMin || '';
-    migrated.current.phoneAov          = c.phoneAov || '';
-    migrated.current.hourlyWage        = c.hourlyWage || '';
+    // Phone fields are no longer migrated — Phone AI lives in its own
+    // standalone calc, and its monthly sub rolls up into bundle.monthlySub.
     // Flipdish proposal — old fdOORate was the commission %, so move it
     // into the new ooCommissionRate slot
     migrated.flipdish.ooCommissionRate = f.ooRate || '';
     migrated.flipdish.posRate          = f.posRate || '';
     migrated.flipdish.posTransFee      = f.posTransFee || '';
-    migrated.flipdish.phoneAiSub       = f.phoneAiSub || '';
-    migrated.flipdish.phoneAiCommPct   = (f.phoneAiCommPct != null) ? f.phoneAiCommPct : PHONE_COMMISSION_DEFAULT;
     migrated.flipdish.monthlySub       = f.monthlySub || '';
     migrated.flipdish.hardwareOneOff   = f.hardwareOneOff || '';
     migrated.flipdish.contractMonths   = f.contractMonths || 36;
@@ -857,7 +794,6 @@
 
     $('includeOO').checked = !!prospect.includeOO;
     $('includePOS').checked = !!prospect.includePOS;
-    $('includePhoneAI').checked = !!prospect.includePhoneAI;
 
     var c = prospect.current || {};
     // OO — direct ordering provider comparison
@@ -876,12 +812,6 @@
     $('curPosTransFee').value         = c.posTransFee || '';
     $('curPosSub').value              = c.posSub || '';
     $('curPosHardwareMonthly').value  = c.posHardwareMonthly || '';
-    // Phone
-    $('curPhoneOrders').value  = c.phoneOrdersPerDay || '';
-    $('curPhoneMissed').value  = c.phoneMissedPct || '';
-    $('curPhoneCallLen').value = c.phoneCallLenMin || '';
-    $('curPhoneAov').value     = c.phoneAov || '';
-    $('curHourlyWage').value   = c.hourlyWage || '';
 
     var f = prospect.flipdish || {};
     $('fdOOProcessingRate').value  = f.ooProcessingRate || '';
@@ -889,8 +819,6 @@
     $('fdOOCommissionRate').value   = f.ooCommissionRate || '';
     $('fdPosRate').value     = f.posRate || '';
     $('fdPosTransFee').value = f.posTransFee || '';
-    $('fdPhoneAiSub').value  = f.phoneAiSub || '';
-    $('fdPhoneAiComm').value = (f.phoneAiCommPct != null) ? f.phoneAiCommPct : PHONE_COMMISSION_DEFAULT;
     $('fdMonthlySub').value      = f.monthlySub || '';
     $('fdHardwareOneOff').value  = f.hardwareOneOff || '';
     $('fdContractMonths').value  = f.contractMonths || 36;
@@ -910,7 +838,6 @@
 
     prospect.includeOO = $('includeOO').checked;
     prospect.includePOS = $('includePOS').checked;
-    prospect.includePhoneAI = $('includePhoneAI').checked;
 
     prospect.current = {
       // OO — direct ordering provider
@@ -928,13 +855,7 @@
       posRate:            val('curPosRate'),
       posTransFee:        val('curPosTransFee'),
       posSub:             val('curPosSub'),
-      posHardwareMonthly: val('curPosHardwareMonthly'),
-      // Phone
-      phoneOrdersPerDay: val('curPhoneOrders'),
-      phoneMissedPct:    val('curPhoneMissed'),
-      phoneCallLenMin:   val('curPhoneCallLen'),
-      phoneAov:          val('curPhoneAov'),
-      hourlyWage:        val('curHourlyWage')
+      posHardwareMonthly: val('curPosHardwareMonthly')
     };
     prospect.flipdish = {
       ooProcessingRate: val('fdOOProcessingRate'),
@@ -942,8 +863,6 @@
       ooCommissionRate: val('fdOOCommissionRate'),
       posRate:          val('fdPosRate'),
       posTransFee:      val('fdPosTransFee'),
-      phoneAiSub:       val('fdPhoneAiSub'),
-      phoneAiCommPct:   val('fdPhoneAiComm'),
       monthlySub:       val('fdMonthlySub'),
       hardwareOneOff:   val('fdHardwareOneOff'),
       contractMonths:   Math.max(1, Math.round(num('fdContractMonths')) || 36)
@@ -953,12 +872,10 @@
 
   // ---------- Scope visibility ----------
   function applyScopeVisibility() {
-    $('card-currentOO').style.display     = $('includeOO').checked       ? '' : 'none';
-    $('card-currentPOS').style.display    = $('includePOS').checked      ? '' : 'none';
-    $('card-currentPhone').style.display  = $('includePhoneAI').checked  ? '' : 'none';
-    $('card-proposalOO').style.display    = $('includeOO').checked       ? '' : 'none';
-    $('card-proposalPOS').style.display   = $('includePOS').checked      ? '' : 'none';
-    $('card-proposalPhone').style.display = $('includePhoneAI').checked  ? '' : 'none';
+    $('card-currentOO').style.display   = $('includeOO').checked  ? '' : 'none';
+    $('card-currentPOS').style.display  = $('includePOS').checked ? '' : 'none';
+    $('card-proposalOO').style.display  = $('includeOO').checked  ? '' : 'none';
+    $('card-proposalPOS').style.display = $('includePOS').checked ? '' : 'none';
     // Pill highlight
     document.querySelectorAll('.scope-toggle').forEach(function (el) {
       var id = el.dataset.toggle;
@@ -994,12 +911,8 @@
   // Returns an object with all the numbers the renderer needs.
   function computeValueStory(p) {
     var result = {
-      ooSavings: 0,          // monthly
-      posSavings: 0,         // monthly
-      phoneNewRevenue: 0,    // monthly (net of Phone AI commission)
-      phoneLabourSaving: 0,  // monthly
-      phoneAiCost: 0,        // monthly (subscription)
-      phoneAiCommissionCost: 0, // monthly (commission on orders)
+      ooSavings: 0,    // monthly
+      posSavings: 0,   // monthly
       fdMonthlySub: 0,
       hardwareOneOff: 0,
       contractMonths: 36,
@@ -1064,49 +977,19 @@
       };
     }
 
-    // -------- Phone AI --------
-    if (p.includePhoneAI) {
-      var orders = N(c.phoneOrdersPerDay);
-      var missed = Math.min(100, Math.max(0, N(c.phoneMissedPct)));
-      var callLen = N(c.phoneCallLenMin);
-      var phoneAov = N(c.phoneAov) > 0 ? N(c.phoneAov) : N(c.aov);  // fallback to POS AOV
-      var wage = N(c.hourlyWage);
-      var monthlyOrders = orders * DAYS_PER_MONTH;
-      var missedRevenueGross = monthlyOrders * (missed / 100) * phoneAov;
-      // Commission is on ALL orders flowing through Phone AI, not just missed
-      var phoneCommPct = N(f.phoneAiCommPct) / 100;
-      var commCostAllOrders = monthlyOrders * phoneAov * phoneCommPct;
-      // The *new revenue* the restaurant sees is the gross missed-capture minus the commission on the captured portion
-      // But simpler: restaurant captures the missed-order revenue less 5% commission on those specific orders
-      var missedRevenueNet = missedRevenueGross * (1 - phoneCommPct);
-      var labour = monthlyOrders * (callLen / 60) * wage;
-      result.phoneNewRevenue = missedRevenueNet;
-      result.phoneLabourSaving = labour;
-      result.phoneAiCost = N(f.phoneAiSub);
-      result.phoneAiCommissionCost = commCostAllOrders - (missedRevenueGross * phoneCommPct);  // commission on non-missed orders (previously-answered) — this is the new out-of-pocket
-      result.detail.phone = {
-        orders: monthlyOrders, missedPct: missed, aov: phoneAov, wage: wage,
-        callLen: callLen, commPct: N(f.phoneAiCommPct),
-        missedRevenueGross: missedRevenueGross, missedRevenueNet: missedRevenueNet, labour: labour,
-        commissionOnPreviouslyAnswered: commCostAllOrders - (missedRevenueGross * phoneCommPct)
-      };
-    }
-
     // -------- Bundle --------
     result.fdMonthlySub = N(f.monthlySub);
     result.hardwareOneOff = N(f.hardwareOneOff);
     result.contractMonths = Math.max(1, Math.round(N(f.contractMonths)) || 36);
 
     // -------- Net monthly --------
-    // Savings + New revenue − Flipdish monthly sub − Phone AI sub − Phone AI commission on previously-answered
+    // Net = (OO savings + POS savings) − Flipdish bundle subscription
+    // Bundle sub captures any add-on product subs (Phone AI, Kiosk, FMM,
+    // QROP, etc.) the rep has rolled into the all-in number from SFDC.
     result.netMonthly =
         result.ooSavings
       + result.posSavings
-      + result.phoneNewRevenue
-      + result.phoneLabourSaving
-      - result.fdMonthlySub
-      - result.phoneAiCost
-      - result.phoneAiCommissionCost;
+      - result.fdMonthlySub;
 
     result.annualValue = (result.netMonthly * 12) - result.hardwareOneOff;
     result.contractValue = (result.netMonthly * result.contractMonths) - result.hardwareOneOff;
@@ -1117,9 +1000,9 @@
   // ---------- Narrative generator ----------
   function narrativeFor(p, v) {
     var out = [];
-    var hasAnything = (p.includeOO || p.includePOS || p.includePhoneAI);
+    var hasAnything = (p.includeOO || p.includePOS);
     if (!hasAnything) {
-      return '<p>Pick at least one lever above (Online Ordering, POS, or Phone AI) to see the value story.</p>';
+      return '<p>Pick at least one lever above (Online Ordering or POS) to see the value story.</p>';
     }
     var name = p.name || 'this customer';
     var ccy = CCY[p.country];
@@ -1153,23 +1036,8 @@
       }
     }
 
-    if (p.includePhoneAI && v.detail.phone) {
-      var pp = v.detail.phone;
-      if (pp.orders > 0) {
-        if (pp.missedPct > 0) {
-          lines.push('Phone AI picks up the <strong>' + pp.missedPct + '%</strong> of calls they currently miss — captures roughly <strong>' + fmtMoney(v.phoneNewRevenue) + '/mo</strong> in new revenue (net of the 5% commission).');
-        }
-        if (pp.callLen > 0 && pp.wage > 0) {
-          lines.push('Their team gets <strong>' + fmtMoney(v.phoneLabourSaving) + '/mo</strong> of staff time back — the hours that used to go on the phone now go to the floor.');
-        }
-      }
-    }
-
     if (v.fdMonthlySub > 0) {
       lines.push('Flipdish monthly subscription (from SFDC quote): <strong>' + fmtMoney(v.fdMonthlySub) + '/mo</strong>.');
-    }
-    if (v.phoneAiCost > 0) {
-      lines.push('Phone AI subscription: <strong>' + fmtMoney(v.phoneAiCost) + '/mo</strong>.');
     }
     if (v.hardwareOneOff > 0) {
       lines.push('One-off hardware (net of subsidy): <strong>' + fmtMoney(v.hardwareOneOff) + '</strong>.');
@@ -1184,7 +1052,7 @@
     if (v.netMonthly > 0) {
       closing = '<strong>Net monthly delta: ' + fmtMoney(v.netMonthly) + '</strong>. Annual (Year 1, after hardware one-off): <strong>' + fmtMoney(v.annualValue) + '</strong>. Over the ' + v.contractMonths + '-month contract: <strong>' + fmtMoney(v.contractValue) + '</strong>.';
     } else if (v.netMonthly === 0) {
-      closing = 'Net monthly delta is <strong>break-even</strong>. Worth looking at the rates in Step 3 or adding the Phone AI lever if they have phone volume.';
+      closing = 'Net monthly delta is <strong>break-even</strong>. Worth tightening the proposed rates in Step 3 or sense-checking the current cost figures.';
     } else {
       closing = 'On these numbers the customer ends up paying <strong>' + fmtMoney(-v.netMonthly) + '/mo more</strong> with Flipdish. That usually means the proposed rates in Step 3 need tightening, or the current setup has hidden costs not yet captured.';
     }
@@ -1220,14 +1088,6 @@
     renderStream('posSavings', prospect.includePOS, v.posSavings,
       v.detail.pos
         ? fmtMoney(v.detail.pos.curTotal) + '/mo (today) − ' + fmtMoney(v.detail.pos.newTotal) + '/mo (Flipdish)'
-        : '—');
-    renderStream('phoneNew', prospect.includePhoneAI, v.phoneNewRevenue,
-      v.detail.phone
-        ? (v.detail.phone.orders.toLocaleString() + ' orders/mo × ' + v.detail.phone.missedPct + '% missed × ' + fmtMoney(v.detail.phone.aov) + ' AOV × 95%')
-        : '—');
-    renderStream('phoneLabour', prospect.includePhoneAI, v.phoneLabourSaving,
-      v.detail.phone
-        ? (v.detail.phone.orders.toLocaleString() + ' calls/mo × ' + v.detail.phone.callLen + ' min ÷ 60 × ' + fmtMoney(v.detail.phone.wage) + '/hr')
         : '—');
 
     // Narrative
@@ -1326,7 +1186,7 @@
       btn.addEventListener('click', function () { setCountry(btn.dataset.country); });
     });
     // Scope toggles
-    ['includeOO','includePOS','includePhoneAI'].forEach(function (id) {
+    ['includeOO','includePOS'].forEach(function (id) {
       $(id).addEventListener('change', function () {
         applyScopeVisibility();
         scheduleSave();
@@ -1339,9 +1199,8 @@
       'prospectName','locations','contactName','ownerName',
       'curOOProvider','curOOGmv','curOOAov','curOOSub','curOOProcessingRate','curOOTransFee',
       'curPosProvider','curCashierCount','curPosGmv','curAov','curPosRate','curPosTransFee','curPosSub','curPosHardwareMonthly',
-      'curPhoneOrders','curPhoneMissed','curPhoneCallLen','curPhoneAov','curHourlyWage',
       'fdOOProcessingRate','fdOOTransFee','fdOOCommissionRate',
-      'fdPosRate','fdPosTransFee','fdPhoneAiSub','fdPhoneAiComm',
+      'fdPosRate','fdPosTransFee',
       'fdMonthlySub','fdHardwareOneOff','fdContractMonths'
     ];
     allInputIds.forEach(function (id) {
@@ -1364,7 +1223,7 @@
     recompute();
     isInitializing = false;
     // If this is a brand-new prospect, don't auto-save an empty record
-    if (prospect.name || prospect.includeOO || prospect.includePOS || prospect.includePhoneAI) {
+    if (prospect.name || prospect.includeOO || prospect.includePOS) {
       doSave();
     } else {
       updateSaveStamp();

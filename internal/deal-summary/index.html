@@ -348,14 +348,12 @@
         Number(f.ooCommissionRate)  > 0 ||
         Number(f.ooTransFee)        > 0 ||
         Number(f.posRate)           > 0 ||
-        Number(f.phoneAiSub)        > 0 ||
         Number(f.ooSub)             > 0 ||  // legacy v1
         Number(f.posSub)            > 0;    // legacy v1
     if (hasProposal) return { key: 'ready', label: 'Proposal ready' };
     var hasCurrent =
-        Number(c.ooGmv)             > 0 ||
-        Number(c.posGmv)            > 0 ||
-        Number(c.phoneOrdersPerDay) > 0;
+        Number(c.ooGmv)  > 0 ||
+        Number(c.posGmv) > 0;
     if (hasCurrent) return { key: 'discovery', label: 'Discovery captured' };
     return { key: 'draft', label: 'Just started' };
   }
@@ -395,20 +393,6 @@
       var fdPOS  = (gmv * (N(f.posRate) / 100))
                  + (txn * N(f.posTransFee));
       monthly += (curPOS - fdPOS);
-    }
-    if (p.includePhoneAI) {
-      var orders   = N(c.phoneOrdersPerDay) * 30;
-      var missed   = Math.min(100, Math.max(0, N(c.phoneMissedPct))) / 100;
-      var phoneAov = N(c.phoneAov) > 0 ? N(c.phoneAov) : N(c.aov);
-      var phoneCommPct = N(f.phoneAiCommPct) / 100;
-      var newRev   = orders * missed * phoneAov * (1 - phoneCommPct);
-      var labour   = orders * (N(c.phoneCallLenMin) / 60) * N(c.hourlyWage);
-      monthly += newRev + labour;
-      monthly -= N(f.phoneAiSub);
-      // Commission on previously-answered orders becomes a new cost
-      var commAll      = orders * phoneAov * phoneCommPct;
-      var commOnMissed = orders * missed * phoneAov * phoneCommPct;
-      monthly -= (commAll - commOnMissed);
     }
     // Subtract the Flipdish monthly bundle sub from the gross savings so
     // the headline shown on the list = net monthly × 12 (matches Deal Room).

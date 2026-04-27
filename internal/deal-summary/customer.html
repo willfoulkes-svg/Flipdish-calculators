@@ -326,8 +326,6 @@
   var STORAGE_KEY = 'flipdishProspects';
   var CCY  = { UK: '£', IE: '€', US: '$', ES: '€' };
   var LOC  = { UK: 'United Kingdom', IE: 'Ireland', US: 'United States', ES: 'Spain' };
-  var PHONE_COMMISSION_DEFAULT = 5;  // %
-  var DAYS_PER_MONTH = 30;
 
   // ---------- URL + storage ----------
   function getQueryParam(key) {
@@ -366,8 +364,6 @@
   function computeValueStory(p) {
     var result = {
       ooSavings: 0, posSavings: 0,
-      phoneNewRevenue: 0, phoneLabourSaving: 0,
-      phoneAiCost: 0, phoneAiCommissionCost: 0,
       fdMonthlySub: 0, hardwareOneOff: 0, contractMonths: 36,
       detail: {}
     };
@@ -416,38 +412,11 @@
         provider: c.posProvider || '', cashierCount: N(c.cashierCount)
       };
     }
-    if (p.includePhoneAI) {
-      var orders = N(c.phoneOrdersPerDay);
-      var missed = Math.min(100, Math.max(0, N(c.phoneMissedPct)));
-      var callLen = N(c.phoneCallLenMin);
-      var phoneAov = N(c.phoneAov) > 0 ? N(c.phoneAov) : N(c.aov);
-      var wage = N(c.hourlyWage);
-      var monthlyOrders = orders * DAYS_PER_MONTH;
-      var missedRevenueGross = monthlyOrders * (missed / 100) * phoneAov;
-      var phoneCommPct = N(f.phoneAiCommPct) / 100;
-      var commCostAllOrders = monthlyOrders * phoneAov * phoneCommPct;
-      var missedRevenueNet = missedRevenueGross * (1 - phoneCommPct);
-      var labour = monthlyOrders * (callLen / 60) * wage;
-      result.phoneNewRevenue = missedRevenueNet;
-      result.phoneLabourSaving = labour;
-      result.phoneAiCost = N(f.phoneAiSub);
-      result.phoneAiCommissionCost = commCostAllOrders - (missedRevenueGross * phoneCommPct);
-      result.detail.phone = {
-        orders: monthlyOrders, missedPct: missed, aov: phoneAov, wage: wage,
-        callLen: callLen, commPct: N(f.phoneAiCommPct),
-        missedRevenueGross: missedRevenueGross, missedRevenueNet: missedRevenueNet,
-        labour: labour,
-        commissionOnPreviouslyAnswered: commCostAllOrders - (missedRevenueGross * phoneCommPct)
-      };
-    }
     result.fdMonthlySub = parseFloat(f.monthlySub) || 0;
     result.hardwareOneOff = parseFloat(f.hardwareOneOff) || 0;
     result.contractMonths = Math.max(1, Math.round(parseFloat(f.contractMonths)) || 36);
 
-    result.netMonthly =
-        result.ooSavings + result.posSavings
-      + result.phoneNewRevenue + result.phoneLabourSaving
-      - result.fdMonthlySub - result.phoneAiCost - result.phoneAiCommissionCost;
+    result.netMonthly = result.ooSavings + result.posSavings - result.fdMonthlySub;
 
     result.annualValue = (result.netMonthly * 12) - result.hardwareOneOff;
     result.contractValue = (result.netMonthly * result.contractMonths) - result.hardwareOneOff;
@@ -503,37 +472,9 @@
       '</div>';
   }
 
-  function phoneNewRevHtml(v, country) {
-    var d = v.detail.phone;
-    if (!d || d.orders <= 0) return '';
-    var lines = [];
-    if (d.missedPct > 0 && v.phoneNewRevenue > 0) {
-      lines.push(
-        '<div class="new-rev">' +
-          '<h4>Phone AI — revenue we recover</h4>' +
-          '<p class="desc">Today, ' + d.missedPct + '% of your phone calls go unanswered. Phone AI picks them up and turns them into orders.</p>' +
-          '<div class="big">+' + fmtMoney(v.phoneNewRevenue, country) + '/mo <span style="font-size:14px;font-weight:400;opacity:.85">new revenue captured</span></div>' +
-          '<p class="explain">Based on ' + d.orders.toLocaleString() + ' phone orders/month at ' + fmtMoney(d.aov, country) + ' AOV, net of the ' + d.commPct + '% Phone AI commission. Flipdish only takes commission on phone orders — the rest of your business is unaffected.</p>' +
-        '</div>'
-      );
-    }
-    if (d.callLen > 0 && d.wage > 0 && v.phoneLabourSaving > 0) {
-      lines.push(
-        '<div class="new-rev">' +
-          '<h4>Phone AI — staff time returned</h4>' +
-          '<p class="desc">Every minute your team was on the phone is a minute on the floor.</p>' +
-          '<div class="big">+' + fmtMoney(v.phoneLabourSaving, country) + '/mo <span style="font-size:14px;font-weight:400;opacity:.85">staff time freed up</span></div>' +
-          '<p class="explain">' + d.orders.toLocaleString() + ' calls/month × ' + d.callLen + ' min each × ' + fmtMoney(d.wage, country) + '/hr wage = hours back with your customers.</p>' +
-        '</div>'
-      );
-    }
-    return lines.join('');
-  }
-
   function investmentHtml(v, country) {
     var rows = [];
     if (v.fdMonthlySub > 0) rows.push({ k: 'Flipdish monthly subscription', v: fmtMoney(v.fdMonthlySub, country) + '/mo' });
-    if (v.phoneAiCost > 0)  rows.push({ k: 'Phone AI monthly subscription', v: fmtMoney(v.phoneAiCost, country) + '/mo' });
     if (v.hardwareOneOff > 0) rows.push({ k: 'Hardware (one-off, net of any subsidy)', v: fmtMoney(v.hardwareOneOff, country) });
     if (!rows.length) return '';
     return '<div class="invest">' +
@@ -577,7 +518,7 @@
     var country = prospect.country || 'UK';
     var v = computeValueStory(prospect);
 
-    var hasAnything = prospect.includeOO || prospect.includePOS || prospect.includePhoneAI;
+    var hasAnything = prospect.includeOO || prospect.includePOS;
 
     // Build the header
     var headerHtml = '' +
@@ -595,19 +536,19 @@
 
     if (!hasAnything) {
       document.getElementById('mainContent').innerHTML = headerHtml +
-        '<div class="empty"><strong>No levers selected yet.</strong><p style="margin:6px 0 0;">This deal hasn\'t had Online Ordering, POS or Phone AI switched on in the Deal Room yet, so there\'s nothing to show here.</p></div>';
+        '<div class="empty"><strong>No levers selected yet.</strong><p style="margin:6px 0 0;">This deal hasn\'t had Online Ordering or POS switched on in the Deal Room yet, so there\'s nothing to show here.</p></div>';
       return;
     }
 
     // Hero
     var heroClass = (v.netMonthly > 0) ? 'hero' : 'hero no-value';
-    var monthlyLabel = v.netMonthly >= 0 ? 'What you save + earn / month' : 'Net monthly delta';
+    var monthlyLabel = v.netMonthly >= 0 ? 'What you save / month' : 'Net monthly delta';
     var heroHtml = '' +
       '<div class="' + heroClass + '">' +
         '<div class="cell">' +
           '<div class="label">' + monthlyLabel + '</div>' +
           '<div class="big">' + fmtMoney(v.netMonthly, country) + '</div>' +
-          '<div class="sub">After Flipdish subscription &amp; any Phone AI commission</div>' +
+          '<div class="sub">After the Flipdish monthly subscription</div>' +
         '</div>' +
         '<div class="cell">' +
           '<div class="label">Year 1 value</div>' +
@@ -635,15 +576,6 @@
     if (savingsTiles.length) {
       savingsHtml = '<h2 class="section-title"><span class="dot"></span>Where the savings come from</h2>' +
         '<div class="compare-grid">' + savingsTiles.join('') + '</div>';
-    }
-
-    // New revenue (Phone AI)
-    var newRevHtml = '';
-    if (prospect.includePhoneAI) {
-      var phoneHtml = phoneNewRevHtml(v, country);
-      if (phoneHtml) {
-        newRevHtml = '<h2 class="section-title"><span class="dot"></span>New revenue &amp; time returned</h2>' + phoneHtml;
-      }
     }
 
     // Investment
@@ -676,7 +608,7 @@
       '</div>';
 
     document.getElementById('mainContent').innerHTML =
-      headerHtml + heroHtml + savingsHtml + newRevHtml + investSectionHtml + bottomLineHtml + finePrint + actionsHtml;
+      headerHtml + heroHtml + savingsHtml + investSectionHtml + bottomLineHtml + finePrint + actionsHtml;
 
     var printBtn = document.getElementById('printBtn');
     if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
