@@ -20,11 +20,23 @@
     --soft-blue: #E8F1FB;
     --success: #1D9F5A;
 
-    /* Product family accents */
+    /* ------------------------------------------------------------------
+     * Product family accents
+     * ------------------------------------------------------------------
+     * Every calculator tile gets one of these colours via data-family.
+     * Rule: if the tool covers a single Flipdish product, use that
+     * product's accent. If it covers more than one product, use cross.
+     *
+     *   --fam-oo      blue    Online Ordering tools
+     *   --fam-pos     teal    POS tools
+     *   --fam-kiosk   purple  Kiosk tools
+     *   --fam-phone   pink    Phone AI tools
+     *   --fam-cross   orange  Multi-product tools (e.g. POS + Kiosk,
+     *                         OO + POS, renewal across all products)
+     * ------------------------------------------------------------------ */
     --fam-oo: #0074D9;        --fam-oo-soft: #E6F1FB;
     --fam-pos: #0D9488;       --fam-pos-soft: #DCF5F3;
     --fam-kiosk: #7C3AED;     --fam-kiosk-soft: #EDE7FE;
-    --fam-combined: #059669;  --fam-combined-soft: #DCF0E5;
     --fam-cross: #D97706;     --fam-cross-soft: #FDECD3;
     --fam-phone: #DB2777;     --fam-phone-soft: #FCE0EC;
 
@@ -219,7 +231,6 @@
   .tile[data-family="oo"]       { --fam: var(--fam-oo);       --fam-soft: var(--fam-oo-soft); }
   .tile[data-family="pos"]      { --fam: var(--fam-pos);      --fam-soft: var(--fam-pos-soft); }
   .tile[data-family="kiosk"]    { --fam: var(--fam-kiosk);    --fam-soft: var(--fam-kiosk-soft); }
-  .tile[data-family="combined"] { --fam: var(--fam-combined); --fam-soft: var(--fam-combined-soft); }
   .tile[data-family="cross"]    { --fam: var(--fam-cross);    --fam-soft: var(--fam-cross-soft); }
   .tile[data-family="phone"]    { --fam: var(--fam-phone);    --fam-soft: var(--fam-phone-soft); }
 
@@ -478,8 +489,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Flipdish vs Marketplaces</h3>
-        <p class="tile-desc">Flipdish direct ordering vs third-party marketplaces. Shows monthly and annual savings for restaurants that handle their own delivery.</p>
+        <h3 class="tile-title">Flipdish vs marketplaces</h3>
+        <p class="tile-desc">Compare a restaurant's take-home on Flipdish direct ordering against the third-party marketplaces, on the same monthly order volume. For restaurants that handle their own delivery.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -492,8 +503,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Flipdish + Uber Direct vs Marketplaces</h3>
-        <p class="tile-desc">Flipdish + Uber Direct vs marketplace delivery. Shows what the restaurant takes home and what the customer pays. UK, Ireland, US.</p>
+        <h3 class="tile-title">Flipdish + Uber Direct vs marketplaces</h3>
+        <p class="tile-desc">Compare Flipdish ordering with Uber Direct delivery against the marketplaces. Shows what the restaurant earns and what the end customer pays. UK, Ireland and US.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -506,8 +517,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17.5" r="3.5"/><circle cx="19" cy="17.5" r="3.5"/><path d="M12 17.5h-4l-3-6h7l3 6"/><path d="M19 17.5l-3-9h-4"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Flipdish + Fox Delivery vs Marketplaces</h3>
-        <p class="tile-desc">Flipdish + Fox Delivery vs marketplaces. Restaurant and end-customer cost savings for the Ireland market.</p>
+        <h3 class="tile-title">Flipdish + Fox Delivery vs marketplaces</h3>
+        <p class="tile-desc">Compare Flipdish ordering with Fox Delivery against the marketplaces, for the Ireland market. Shows restaurant savings and end-customer cost on the same orders.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -520,8 +531,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M9 21h6"/><path d="M12 17v4"/><circle cx="12" cy="10" r="2"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Self-service Kiosk value</h3>
-        <p class="tile-desc">Self-service ordering kiosks. Calculate labour savings or revenue uplift, with hardware payback baked in.</p>
+        <h3 class="tile-title">Self-service kiosk value</h3>
+        <p class="tile-desc">Quantify the labour savings or revenue uplift from in-store self-service kiosks, with hardware payback factored in.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -534,8 +545,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Phone AI: Missed call value</h3>
-        <p class="tile-desc">Automated phone ordering — value of capturing missed calls and freeing staff from the phone during peak service.</p>
+        <h3 class="tile-title">Phone AI — missed call value</h3>
+        <p class="tile-desc">Show the revenue captured from missed phone orders and the staff time freed up during peak service when phone ordering is automated.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -568,7 +579,7 @@
           </div>
         </div>
         <h3 class="tile-title">Price an Online Ordering deal</h3>
-        <p class="tile-desc">Two pricing tools in one: Total Fee Calculator and Sub vs Commission-Only comparison. UK, Ireland, USA, Spain.</p>
+        <p class="tile-desc">Build a Flipdish Online Ordering price for a prospect. Calculates total fees and compares subscription vs commission-only pricing. UK, Ireland, USA and Spain.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -582,7 +593,7 @@
           </div>
         </div>
         <h3 class="tile-title">Price a POS deal</h3>
-        <p class="tile-desc">Monthly Software Net Revenue from a POS deal. Shows what Flipdish actually keeps after card processing cost.</p>
+        <p class="tile-desc">Calculate the monthly Software Net Revenue from a POS deal — what Flipdish keeps once card-processing costs are netted off.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -595,8 +606,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8l-8 8"/><circle cx="9" cy="9" r="1.5"/><circle cx="15" cy="15" r="1.5"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Max discount: Hardware</h3>
-        <p class="tile-desc">One calculator, three deal types. Pick POS only, Kiosk only, or POS + Kiosk — max discount, minimum sales price, and payback verdict. CCEP/CCH rules applied automatically.</p>
+        <h3 class="tile-title">Hardware discount approval</h3>
+        <p class="tile-desc">Work out the maximum hardware discount you can offer on a POS, Kiosk or POS + Kiosk deal. Returns the max discount, minimum sales price and a payback verdict, with CCEP / CCH subsidy rules applied.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -609,8 +620,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Which lever earns more: OO or POS?</h3>
-        <p class="tile-desc">Customer on both OO and POS. Which lever (OO commission vs POS processing) earns more per +0.1% — plus a full sensitivity matrix.</p>
+        <h3 class="tile-title">OO vs POS — net fee sensitivity</h3>
+        <p class="tile-desc">For customers on both Online Ordering and POS, work out which lever (OO commission or POS processing rate) earns Flipdish more per 0.1% point. Includes a full sensitivity matrix.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
@@ -623,8 +634,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
           </div>
         </div>
-        <h3 class="tile-title">Renewal: impact of new pricing</h3>
-        <p class="tile-desc">Renewal tool. Enter current vs proposed pricing across POS, OO and Kiosk. Shows per-product and grand-total monthly + annual SNR change.</p>
+        <h3 class="tile-title">Renewal pricing impact</h3>
+        <p class="tile-desc">Compare a customer's current pricing against a proposed renewal across POS, Online Ordering and Kiosk. Shows per-product and total monthly and annual SNR change.</p>
         <span class="tile-cta">Open calculator
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </span>
