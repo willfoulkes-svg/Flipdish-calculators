@@ -907,7 +907,7 @@
     <div>
       <div class="label">Annual value (Year 1)</div>
       <div class="big" id="heroYear1">—</div>
-      <div class="sub">Includes the hardware one-off</div>
+      <div class="sub" id="heroYear1Sub">Across 12 months</div>
     </div>
     <div>
       <div class="label">Contract value</div>
@@ -1683,11 +1683,18 @@
     var v = computeValueStory(prospect);
     var ccy = CCY[prospect.country];
 
-    // Hero
+    // Hero — scope-aware subtitle wording. Drop the "hardware one-off"
+    // language when no hardware in scope (Will: OO-only deals shouldn't
+    // mention hardware at all).
     setText('heroMonthly',  fmtMoney(v.netMonthly) + '/mo');
     setText('heroYear1',    fmtMoney(v.annualValue));
     setText('heroContract', fmtMoney(v.contractValue));
-    setText('heroContractSub', 'Across ' + v.contractMonths + ' months (net of hardware one-off)');
+    var hwInScope = (v.hardwareOneOff || 0) > 0
+                  || (prospect.includePOS) || (prospect.includeKiosk);
+    setText('heroYear1Sub',
+      hwInScope ? 'Includes the hardware one-off' : 'Across 12 months');
+    setText('heroContractSub',
+      'Across ' + v.contractMonths + ' months' + (hwInScope ? ' (net of hardware one-off)' : ''));
 
     var hero = $('valueHero');
     hero.classList.toggle('no-value', !(v.netMonthly > 0));
@@ -2179,15 +2186,17 @@
     }
   }
 
+  // v8.2.2 — full scope-awareness for Step 5 savings cards. When a
+  // product is OFF in Step 1, hide the entire card (not just dim the
+  // value). Dimming led to OO-only deals showing a ghost POS card with
+  // an em-dash that confused reps. Will: "I toggled for just Online
+  // Ordering it's showing POS and Hardware etc."
   function renderStream(id, enabled, value, formula) {
+    var card = $('stream-' + id);
     var valEl = $(id + 'Value');
     var fEl   = $(id + 'Formula');
-    if (!enabled) {
-      valEl.classList.add('off');
-      valEl.textContent = '—';
-      fEl.textContent = 'Enable the relevant lever above to see this.';
-      return;
-    }
+    if (card) card.style.display = enabled ? '' : 'none';
+    if (!enabled) return;
     valEl.classList.remove('off');
     valEl.textContent = fmtMoney(value) + '/mo';
     fEl.textContent = formula;
