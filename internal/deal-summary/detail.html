@@ -535,8 +535,49 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 0;
   }
+
+  /* v8.13: Recommended Deal split into two zones with different goals.
+     Recurring zone = fees + sub (minimise damage). Hardware zone = one-off
+     (3-month payback hard cap). */
+  .rec-zone {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 9px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
+  }
+  .rec-zone-head {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 9px;
+  }
+  .rec-zone-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.95);
+    flex: 0 0 auto;
+  }
+  .rec-zone-icon svg { width: 13px; height: 13px; }
+  .rec-zone-title {
+    font-size: 13px; font-weight: 700; color: #fff;
+    letter-spacing: -0.005em;
+  }
+  .rec-zone-title .rec-zone-sub {
+    font-weight: 400; color: rgba(255, 255, 255, 0.7);
+    font-size: 12.5px;
+  }
+  .rec-zone-goal {
+    margin-left: auto;
+    font-size: 11px; font-weight: 500;
+    color: rgba(255, 255, 255, 0.72);
+    font-style: italic;
+  }
+  /* Hardware zone gets a subtle amber accent on the goal text — it's
+     a HARD cap, not a soft optimisation */
+  #recZoneHardware .rec-zone-goal { color: #FFE5A1; font-style: normal; font-weight: 600; }
   .rec-line {
     background: rgba(255,255,255,0.10);
     border-radius: 9px;
@@ -1264,13 +1305,39 @@
       </div>
     </div>
 
-    <!-- Recommended deal — concrete proposal numbers + Apply button (v8.4) -->
+    <!-- Recommended deal (v8.13) — split into two zones with separate
+         goals: recurring give (fees + sub) wants to MINIMISE recurring
+         revenue damage; one-off give (hardware) has a HARD cap at
+         3-month payback. Each zone has its own grid; either zone can
+         be hidden if there's nothing to recommend in that lane. -->
     <div class="rec-deal" id="recDeal" style="display:none;">
       <div class="rec-deal-head">
         <h3 class="rec-deal-title">Recommended deal</h3>
         <button type="button" class="rec-apply-btn" id="recApplyBtn">Apply to proposal →</button>
       </div>
-      <div class="rec-deal-grid" id="recDealGrid"></div>
+
+      <div class="rec-zone" id="recZoneRecurring" style="display:none;">
+        <div class="rec-zone-head">
+          <span class="rec-zone-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 12 13 12"/></svg>
+          </span>
+          <span class="rec-zone-title">Recurring give <span class="rec-zone-sub">— fees & subscription</span></span>
+          <span class="rec-zone-goal">Goal: minimise damage to recurring revenue</span>
+        </div>
+        <div class="rec-deal-grid" id="recDealGridRecurring"></div>
+      </div>
+
+      <div class="rec-zone" id="recZoneHardware" style="display:none;">
+        <div class="rec-zone-head">
+          <span class="rec-zone-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="18" x2="12" y2="21"/></svg>
+          </span>
+          <span class="rec-zone-title">One-off give <span class="rec-zone-sub">— hardware</span></span>
+          <span class="rec-zone-goal">Hard cap: 3-month payback</span>
+        </div>
+        <div class="rec-deal-grid" id="recDealGridHardware"></div>
+      </div>
+
       <div class="rec-deal-impact" id="recDealImpact"></div>
       <div class="rec-deal-narrative" id="recDealNarrative"></div>
     </div>
@@ -2361,11 +2428,15 @@
     }
     panel.style.display = '';
 
-    // Build the quote grid — one rec-line per in-scope lever
-    var grid = $('recDealGrid');
-    grid.innerHTML = '';
+    // v8.13: Build TWO grids — recurring (sub + rates + per-txn) and
+    // hardware (one-off). Empty zones are hidden so the rep doesn't
+    // see an empty header for a lever class that has nothing to say.
+    var gridRec = $('recDealGridRecurring');
+    var gridHw  = $('recDealGridHardware');
+    if (gridRec) gridRec.innerHTML = '';
+    if (gridHw)  gridHw.innerHTML  = '';
 
-    function addLine(key, label, value, change) {
+    function addLine(grid, key, label, value, change) {
       var line = document.createElement('div');
       line.className = 'rec-line';
       var keyEl = document.createElement('span'); keyEl.className = 'rec-key'; keyEl.textContent = label;
@@ -2381,29 +2452,42 @@
       grid.appendChild(line);
     }
 
+    // ---- Recurring zone: bundled sub + rate levers ----
+    var hasRecurring = false;
     var subChange = (rec.changes || []).find(function (c) { return c.key === 'sub'; });
-    addLine('sub', 'Bundled sub',
+    addLine(gridRec, 'sub', 'Bundled sub',
       fmtMoney(rec.sub || 0) + '/mo',
       subChange ? { text: subChange.deltaText } : { text: 'at list', muted: true });
+    hasRecurring = true;
 
     if (p.includeOO && rec.ooRate != null) {
       var ooChange = (rec.changes || []).find(function (c) { return c.key === 'ooRate'; });
-      addLine('ooRate', 'OO processing %',
+      addLine(gridRec, 'ooRate', 'OO processing %',
         rec.ooRate.toFixed(2) + '%',
         ooChange ? { text: ooChange.deltaText } : { text: 'at list', muted: true });
+      hasRecurring = true;
     }
     if (p.includePOS && rec.posRate != null) {
       var posChange = (rec.changes || []).find(function (c) { return c.key === 'posRate'; });
-      addLine('posRate', 'POS processing %',
+      addLine(gridRec, 'posRate', 'POS processing %',
         rec.posRate.toFixed(2) + '%',
         posChange ? { text: posChange.deltaText } : { text: 'at list', muted: true });
+      hasRecurring = true;
     }
+
+    // ---- Hardware zone: one-off only ----
+    var hasHardware = false;
     if (o.hwInScope) {
       var hwChange = (rec.changes || []).find(function (c) { return c.key === 'hardware'; });
-      addLine('hardware', 'Hardware',
+      addLine(gridHw, 'hardware', 'Hardware',
         fmtMoney(rec.hardware || 0),
         hwChange ? { text: hwChange.deltaText } : { text: 'at list', muted: true });
+      hasHardware = true;
     }
+
+    // Show/hide whole zones depending on what's relevant
+    if ($('recZoneRecurring')) $('recZoneRecurring').style.display = hasRecurring ? '' : 'none';
+    if ($('recZoneHardware'))  $('recZoneHardware').style.display  = hasHardware  ? '' : 'none';
 
     // Impact line
     var impact = $('recDealImpact');
