@@ -1918,14 +1918,17 @@
     }
 
     // ---- State diagnosis ----
-    // headroom : Flipdish proposal is already cheaper than current spend
+    // headroom : Flipdish proposal is at-or-cheaper than customer current
+    //            (delta ≥ 0). NO tolerance band — £1 more expensive = not
+    //            headroom. Will: "how could we be cheaper when we're £24
+    //            pm more expensive" (v8.2 bug).
     // match    : gap exists AND at least one single lever can close it
-    // tight    : gap can't be closed by any single lever (multi-lever or scope reduction)
+    // tight    : gap can't be closed by any single lever (multi-lever or
+    //            scope reduction needed)
     var state;
-    var nearZero = Math.max(15, customerTotal * 0.05);
     if (kioskOnly) {
       state = 'match';
-    } else if (delta >= -nearZero) {
+    } else if (delta >= 0) {
       state = 'headroom';
     } else {
       var anyLeverCanClose = levers.some(function (l) { return l.target != null; });
@@ -2030,9 +2033,16 @@
 
     // Title + summary by state
     if (o.state === 'headroom') {
-      pill.textContent = 'You\'re cheaper';
-      title.textContent = 'Your proposal already beats their current spend';
-      summary.innerHTML = 'Your Flipdish proposal of <strong>' + fmtMoney(o.proposedRecurring) + '/mo</strong> recurring is <strong>' + fmtMoney(o.delta) + '/mo cheaper</strong> than what they pay today (' + fmtMoney(o.customerTotal) + '/mo). You can lead with this. The levers below show how much further you could push if needed — but you don\'t need to.';
+      if (o.delta > 0) {
+        pill.textContent = 'You\'re cheaper';
+        title.textContent = 'Your proposal already beats their current spend';
+        summary.innerHTML = 'Your Flipdish proposal of <strong>' + fmtMoney(o.proposedRecurring) + '/mo</strong> recurring is <strong>' + fmtMoney(o.delta) + '/mo cheaper</strong> than what they pay today (' + fmtMoney(o.customerTotal) + '/mo). You can lead with this. The levers below show how much further you could push if needed — but you don\'t need to.';
+      } else {
+        // delta === 0: exact match
+        pill.textContent = 'Exact match';
+        title.textContent = 'Your proposal exactly matches their current spend';
+        summary.innerHTML = 'Your Flipdish proposal of <strong>' + fmtMoney(o.proposedRecurring) + '/mo</strong> recurring is identical to what they pay today (' + fmtMoney(o.customerTotal) + '/mo). The levers below show how much you could push further if you wanted — but the deal already lines up.';
+      }
     } else if (o.state === 'tight') {
       pill.textContent = 'Won\'t close';
       title.textContent = 'No single lever closes the gap';
