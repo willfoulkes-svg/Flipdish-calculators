@@ -369,6 +369,17 @@
   .lever-detail {
     font-size: 12.5px; color: var(--muted); line-height: 1.45;
   }
+  .lever-detail .cost-note {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.6);
+    border-left: 3px solid var(--flipdish-blue);
+    border-radius: 4px;
+    color: var(--flipdish-dark);
+    font-size: 12px;
+  }
+  .lever-detail .cost-note strong { color: var(--flipdish-blue-dark); }
   .offer-suggested {
     background: rgba(255,255,255,0.7);
     border-radius: 10px;
@@ -892,48 +903,11 @@
     </div>
   </div>
 
-  <!-- ===================== STEP 5 — VALUE STORY ===================== -->
-  <div class="step">
-    <span class="num">5</span>
-    <span class="text">The value story <span class="sub">What this deal is worth to the customer · auto-calculated</span></span>
-  </div>
-
-  <div class="value-hero" id="valueHero">
-    <div>
-      <div class="label">Net monthly value</div>
-      <div class="big" id="heroMonthly">—</div>
-      <div class="sub" id="heroMonthlySub">Savings + new revenue − Flipdish subscription</div>
-    </div>
-    <div>
-      <div class="label">Annual value (Year 1)</div>
-      <div class="big" id="heroYear1">—</div>
-      <div class="sub" id="heroYear1Sub">Across 12 months</div>
-    </div>
-    <div>
-      <div class="label">Contract value</div>
-      <div class="big" id="heroContract">—</div>
-      <div class="sub" id="heroContractSub">Across the contract term</div>
-    </div>
-  </div>
-
-  <div class="breakdown">
-    <div class="stream" id="stream-ooSavings">
-      <h4>Direct ordering savings</h4>
-      <div class="stream-sub">Lower sub + processing + per-transaction fees vs their current direct ordering provider.</div>
-      <div class="stream-value off" id="ooSavingsValue">—</div>
-      <div class="formula" id="ooSavingsFormula">Enable Online Ordering to see this.</div>
-    </div>
-    <div class="stream" id="stream-posSavings">
-      <h4>POS savings</h4>
-      <div class="stream-sub">Lower processing + per-transaction + subscription + hardware costs vs their current POS setup.</div>
-      <div class="stream-value off" id="posSavingsValue">—</div>
-      <div class="formula" id="posSavingsFormula">Enable POS to see this.</div>
-    </div>
-  </div>
-
-  <div class="narrative" id="narrativeBox">
-    <p>Fill in Step 2 (what they pay today) and Step 3 (what you're proposing) — the story will write itself here.</p>
-  </div>
+  <!-- Step 5 (Value Story) deleted — Will: "I don't think the value story
+       serves any purpose on this page really, it feels like that should
+       be on the customer facing page". customer.html already renders
+       the full customer-facing value story when the rep clicks Open
+       customer page. -->
 
   <!-- ===================== ACTIONS ===================== -->
   <div class="action-row">
@@ -1681,44 +1655,17 @@
     // full 400ms debounce window.
     if (!isInitializing) collect();
     var v = computeValueStory(prospect);
-    var ccy = CCY[prospect.country];
 
-    // Hero — scope-aware subtitle wording. Drop the "hardware one-off"
-    // language when no hardware in scope (Will: OO-only deals shouldn't
-    // mention hardware at all).
-    setText('heroMonthly',  fmtMoney(v.netMonthly) + '/mo');
-    setText('heroYear1',    fmtMoney(v.annualValue));
-    setText('heroContract', fmtMoney(v.contractValue));
-    var hwInScope = (v.hardwareOneOff || 0) > 0
-                  || (prospect.includePOS) || (prospect.includeKiosk);
-    setText('heroYear1Sub',
-      hwInScope ? 'Includes the hardware one-off' : 'Across 12 months');
-    setText('heroContractSub',
-      'Across ' + v.contractMonths + ' months' + (hwInScope ? ' (net of hardware one-off)' : ''));
-
-    var hero = $('valueHero');
-    hero.classList.toggle('no-value', !(v.netMonthly > 0));
-
-    // Streams
-    renderStream('ooSavings', prospect.includeOO, v.ooSavings,
-      v.detail.oo
-        ? fmtMoney(v.detail.oo.curTotal) + '/mo (today) − ' + fmtMoney(v.detail.oo.fdTotal) + '/mo (Flipdish)'
-        : '—');
-    renderStream('posSavings', prospect.includePOS, v.posSavings,
-      v.detail.pos
-        ? fmtMoney(v.detail.pos.curTotal) + '/mo (today) − ' + fmtMoney(v.detail.pos.newTotal) + '/mo (Flipdish)'
-        : '—');
-
-    // "How does this stack up?" panel (Step 4, v8.2) — sits BELOW the
-    // rep's proposal. Compares what they typed vs the customer's current
-    // spend, scope-aware (only shows levers in active scope), and gives
-    // concrete "to match, set sub to £X" prescriptions. Live Check is
-    // folded into the bottom of the same panel.
+    // Step 5 (Value Story hero / streams / narrative) removed in v8.3 —
+    // customer-facing version lives on customer.html. This page is now
+    // purely a deal-builder workspace.
+    //
+    // "How does this stack up?" panel (Step 4) — sits below the rep's
+    // proposal. Compares what they typed vs the customer's current spend,
+    // scope-aware, with concrete "to match" + "cost to Flipdish"
+    // prescriptions. Live Check folded in at the bottom.
     renderOfferPanel(computeOfferPanel(prospect, v));
     renderLiveCheck(v);
-
-    // Narrative
-    $('narrativeBox').innerHTML = narrativeFor(prospect, v);
   }
 
   // ---------- "How does this stack up?" engine (v8.2) ----------
@@ -1816,24 +1763,46 @@
     // achievable, else null).
     var levers = [];
 
+    // ---- Per-lever "cost to Flipdish" framing (v8.3) ----
+    // Will: "recommend which lever to pull where we can offer a bespoke
+    // discount, but in reality it won't lose Flipdish much money."
+    //
+    // For a £G/mo gap, EVERY lever that closes it costs Flipdish ~£G × 12
+    // in nominal revenue. But strategic cost differs:
+    //   · Sub      — pure recurring revenue loss. High renewal-precedent risk.
+    //                Rank: WORST.
+    //   · Rate / per-txn — recurring revenue loss with rate precedent.
+    //                      Rank: MEDIUM.
+    //   · Hardware — one-off, recovered in ≤3 months from op margin.
+    //                No rate-precedent risk. Customer perceives big £ off.
+    //                Rank: BEST.
+    // Each lever carries a `costRank` (lower = cheaper for Flipdish) and
+    // a `costNote` rendered at the bottom of its card.
+    var contractCost = function (amount) { return amount * CONTRACT_MONTHS; };
+
     // BUNDLED SUB — always present if any product is in scope
     var subTarget = null;
     if (gap > 0 && gap <= maxSubDiscount) {
       subTarget = Math.max(0, fdSub - gap);
     }
     var subDetail;
+    var subCostNote = null;
     if (gap > 0 && subTarget != null) {
-      subDetail = 'To match their current spend with this lever alone: <strong>drop the sub to ' + fmtMoney(subTarget) + '/mo</strong> (' + fmtMoney(fdSub - subTarget) + ' off your current proposal). Floor is ' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site of recurring revenue.';
+      subDetail = 'To match: <strong>drop the sub to ' + fmtMoney(subTarget) + '/mo</strong> (' + fmtMoney(fdSub - subTarget) + ' off your proposal). Floor is ' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site.';
+      subCostNote = '<strong>Cost to Flipdish: ' + fmtMoney(contractCost(gap)) + ' over 12 months</strong> · pure recurring revenue loss · sets renewal precedent.';
     } else if (gap > 0) {
       subDetail = 'Sub alone can\'t close the ' + fmtMoney(gap) + '/mo gap — only ' + fmtMoney(maxSubDiscount) + '/mo of headroom before the SNR floor.';
     } else if (maxSubDiscount > 0) {
-      subDetail = 'You\'ve got ' + fmtMoney(maxSubDiscount) + '/mo of headroom before the SNR floor (' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site). Use sparingly — recurring revenue is the most precious lever.';
+      subDetail = 'Up to ' + fmtMoney(maxSubDiscount) + '/mo of room before SNR floor (' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site). Most expensive lever — use last.';
     } else {
-      subDetail = 'No room — recurring revenue is already at the SNR floor.';
+      subDetail = 'No room — recurring revenue already at the SNR floor.';
     }
     levers.push({
       key: 'sub', label: 'Bundled subscription',
-      valueLabel: fmtMoney(fdSub) + '/mo', detail: subDetail, target: subTarget
+      valueLabel: fmtMoney(fdSub) + '/mo',
+      detail: subDetail + (subCostNote ? '<br><span class="cost-note">' + subCostNote + '</span>' : ''),
+      target: subTarget,
+      costRank: 3   // WORST — pure recurring loss + renewal precedent
     });
 
     // OO PROCESSING % — only if OO in scope
@@ -1847,9 +1816,10 @@
         var newPct = fdOOPct - ooReductionPP;
         if (newPct >= ooFloorPct) ooTarget = newPct;
       }
-      var ooDetail;
+      var ooDetail, ooCostNote = null;
       if (gap > 0 && ooTarget != null) {
-        ooDetail = 'To match their current spend with this lever alone: <strong>drop OO processing to ' + ooTarget.toFixed(2) + '%</strong> (' + (fdOOPct - ooTarget).toFixed(2) + 'pp off your proposal). Floor is ' + ooFloorPct.toFixed(2) + '% (Stripe ' + (rates.ooCardPct * 100).toFixed(2) + '% + 1pp).';
+        ooDetail = 'To match: <strong>drop OO processing to ' + ooTarget.toFixed(2) + '%</strong> (' + (fdOOPct - ooTarget).toFixed(2) + 'pp off). Floor ' + ooFloorPct.toFixed(2) + '% (Stripe + 1pp).';
+        ooCostNote = '<strong>Cost to Flipdish: ' + fmtMoney(contractCost(gap)) + ' over 12 months</strong> · recurring rate loss · sets rate precedent for renewal.';
       } else if (gap > 0) {
         ooDetail = 'OO rate alone can\'t close the gap — at the ' + ooFloorPct.toFixed(2) + '% floor that\'s ' + fmtMoney(ooMaxMonthly) + '/mo of give max.';
       } else {
@@ -1857,7 +1827,10 @@
       }
       levers.push({
         key: 'ooRate', label: 'OO processing %',
-        valueLabel: fdOOPct.toFixed(2) + '%', detail: ooDetail, target: ooTarget
+        valueLabel: fdOOPct.toFixed(2) + '%',
+        detail: ooDetail + (ooCostNote ? '<br><span class="cost-note">' + ooCostNote + '</span>' : ''),
+        target: ooTarget,
+        costRank: 2   // MEDIUM — recurring + rate precedent
       });
     }
 
@@ -1872,9 +1845,10 @@
         var newPosPct = fdPOSPct - posReductionPP;
         if (newPosPct >= posFloorPct) posTarget = newPosPct;
       }
-      var posDetail;
+      var posDetail, posCostNote = null;
       if (gap > 0 && posTarget != null) {
-        posDetail = 'To match their current spend with this lever alone: <strong>drop POS processing to ' + posTarget.toFixed(2) + '%</strong> (' + (fdPOSPct - posTarget).toFixed(2) + 'pp off your proposal). Floor is ' + posFloorPct.toFixed(2) + '% (Stripe ' + (rates.posCardPct * 100).toFixed(2) + '% + 0.3pp).';
+        posDetail = 'To match: <strong>drop POS processing to ' + posTarget.toFixed(2) + '%</strong> (' + (fdPOSPct - posTarget).toFixed(2) + 'pp off). Floor ' + posFloorPct.toFixed(2) + '% (Stripe + 0.3pp).';
+        posCostNote = '<strong>Cost to Flipdish: ' + fmtMoney(contractCost(gap)) + ' over 12 months</strong> · recurring rate loss · sets rate precedent for renewal.';
       } else if (gap > 0) {
         posDetail = 'POS rate alone can\'t close the gap — at the ' + posFloorPct.toFixed(2) + '% floor that\'s ' + fmtMoney(posMaxMonthly) + '/mo of give max.';
       } else {
@@ -1882,7 +1856,10 @@
       }
       levers.push({
         key: 'posRate', label: 'POS processing %',
-        valueLabel: fdPOSPct.toFixed(2) + '%', detail: posDetail, target: posTarget
+        valueLabel: fdPOSPct.toFixed(2) + '%',
+        detail: posDetail + (posCostNote ? '<br><span class="cost-note">' + posCostNote + '</span>' : ''),
+        target: posTarget,
+        costRank: 2   // MEDIUM
       });
 
       // POS PER-TRANSACTION FEE — small lever, no single-target match math
@@ -1890,8 +1867,9 @@
       levers.push({
         key: 'posTxn', label: 'POS per-transaction fee',
         valueLabel: fmtMoney2(fdPosTxn),
-        detail: 'List ' + fmtMoney2(posListTxn) + ' per txn. Small lever — drop to ~£0.05 if you really need it, but the per-pence revenue impact is minor compared to sub or processing %.',
-        target: null
+        detail: 'List ' + fmtMoney2(posListTxn) + ' per txn. Small recurring give. Use as a last-resort sweetener, not a closer.',
+        target: null,
+        costRank: 2
       });
     }
 
@@ -1899,28 +1877,30 @@
     var hwInScope = (p.includePOS && rates.pos) || (p.includeKiosk && rates.kiosk);
     if (hwInScope) {
       var hwTarget = null;
-      // To match the gap with hardware alone: one-off discount of (gap × 12)
-      // — that's the value the customer "saves" each month over the contract.
-      // Bound by the 3-month payback envelope.
+      var hwRequired = 0;
       if (gap > 0) {
-        var requiredHwDiscount = gap * CONTRACT_MONTHS;
-        if (requiredHwDiscount <= maxHwDiscount && requiredHwDiscount <= hardwareList) {
-          hwTarget = Math.max(0, hardwareList - requiredHwDiscount);
+        hwRequired = gap * CONTRACT_MONTHS;
+        if (hwRequired <= maxHwDiscount && hwRequired <= hardwareList) {
+          hwTarget = Math.max(0, hardwareList - hwRequired);
         }
       }
       var hwAmortisedMonthly = maxHwDiscount / CONTRACT_MONTHS;
       var hwPctOff = hardwareList > 0 ? Math.round((maxHwDiscount / hardwareList) * 100) : 0;
-      var hwDetail;
+      var hwDetail, hwCostNote = null;
       if (gap > 0 && hwTarget != null) {
-        hwDetail = 'To match across the 12-month contract with hardware alone: <strong>drop hardware to ' + fmtMoney(hwTarget) + '</strong> (' + fmtMoney(hardwareList - hwTarget) + ' off list). Inside the 3-month payback envelope.';
+        hwDetail = 'To match across the 12-month contract: <strong>drop hardware to ' + fmtMoney(hwTarget) + '</strong> (' + fmtMoney(hardwareList - hwTarget) + ' off list). Inside the 3-month payback envelope.';
+        hwCostNote = '<strong>Cost to Flipdish: ' + fmtMoney(hwRequired) + ' one-off, recovered in ~3 months</strong> from op margin · no rate precedent · cheapest lever.';
       } else if (gap > 0) {
-        hwDetail = 'Hardware alone can\'t close the gap — max ' + fmtMoney(maxHwDiscount) + ' off (≈ ' + fmtMoney(hwAmortisedMonthly) + '/mo amortised).';
+        hwDetail = 'Hardware alone can\'t close the gap — max ' + fmtMoney(maxHwDiscount) + ' off (≈ ' + fmtMoney(hwAmortisedMonthly) + '/mo amortised over 12 months).';
       } else {
-        hwDetail = 'List ' + fmtMoney(hardwareList) + '. Up to ' + fmtMoney(maxHwDiscount) + ' off (' + hwPctOff + '%) one-off, paid back inside 3 months. Worth ~' + fmtMoney(hwAmortisedMonthly) + '/mo of customer value across a 12-month contract.';
+        hwDetail = 'List ' + fmtMoney(hardwareList) + '. Up to ' + fmtMoney(maxHwDiscount) + ' off (' + hwPctOff + '%) one-off, recovered in ≤3 months. Worth ~' + fmtMoney(hwAmortisedMonthly) + '/mo of customer-perceived value across the contract.';
       }
       levers.push({
         key: 'hardware', label: 'Hardware (one-off)',
-        valueLabel: fmtMoney(proposedHardware), detail: hwDetail, target: hwTarget
+        valueLabel: fmtMoney(proposedHardware),
+        detail: hwDetail + (hwCostNote ? '<br><span class="cost-note">' + hwCostNote + '</span>' : ''),
+        target: hwTarget,
+        costRank: 1   // BEST — one-off, recovered, no rate precedent
       });
     }
 
@@ -2076,27 +2056,40 @@
       var detEl = $(dom.detail); if (detEl) detEl.innerHTML = lever.detail;
     });
 
-    // Suggested play
+    // Suggested play — rank closeable levers by costRank ascending
+    // (1 = cheapest for Flipdish: hardware. 3 = worst: sub.)
     if (o.state === 'headroom') {
-      suggested.innerHTML = '<strong>Suggested play:</strong> Hold at your current proposal. You\'re already cheaper than their incumbent — sell on platform value, not on price. If they push for a sweetener, hardware discount is the cheapest lever for Flipdish.';
-    } else if (o.state === 'tight') {
-      suggested.innerHTML = '<strong>Suggested play:</strong> Reduce scope (starter kit only, fewer tills/kiosks), push back on price as a platform investment (kiosk, AI, FMM, OO direct-to-customer), or qualify out at the small-operator scale. Single-lever match isn\'t available within the guardrails.';
+      suggested.innerHTML = '<strong>Suggested play:</strong> Hold at your current proposal. You\'re already cheaper than their incumbent — sell on platform value, not on price. If they push for a sweetener, hardware is the cheapest lever for Flipdish.';
     } else if (o.kioskOnly) {
       suggested.innerHTML = '<strong>Suggested play:</strong> Sell on incremental revenue. Use the hardware-discount lever above as a deal-closer.';
+    } else if (o.state === 'tight') {
+      // No single lever closes — recommend the cheapest PARTIAL close.
+      // Pick the lever with the most headroom / least bad cost rank that's
+      // still in scope, and tell the rep how much it gets them.
+      var hwLever = (o.levers || []).find(function (l) { return l.key === 'hardware'; });
+      var hwLine = '';
+      if (hwLever && o.maxHwDiscount > 0 && o.hardwareList > 0) {
+        var hwAmortised = o.maxHwDiscount / CONTRACT_MONTHS;
+        hwLine = ' <strong>Bespoke option:</strong> max hardware discount of ' + fmtMoney(o.maxHwDiscount) + ' (' + fmtMoney(hwAmortised) + '/mo amortised) is the cheapest way to give the customer a meaningful sweetener — one-off, recovered in 3 months, no rate precedent.';
+      }
+      suggested.innerHTML = '<strong>Suggested play:</strong> No single lever closes the ' + fmtMoney(o.gap) + '/mo gap inside the guardrails. Reduce scope (starter kit only, fewer tills/kiosks), push back on price as a platform investment, or qualify out at this scale.' + hwLine;
     } else {
-      // closeable — pick the lever with the smallest impact (preserves margin)
-      // Prefer hardware (one-off, doesn\'t erode recurring revenue) > rate > sub
-      var first = (o.levers || []).filter(function (l) { return l.target != null; });
-      var preferred = first.find(function (l) { return l.key === 'hardware'; })
-                   || first.find(function (l) { return l.key === 'posRate' || l.key === 'ooRate'; })
-                   || first[0];
+      // closeable — rank viable levers by costRank ascending
+      var viable = (o.levers || []).filter(function (l) { return l.target != null; });
+      viable.sort(function (a, b) { return (a.costRank || 99) - (b.costRank || 99); });
+      var preferred = viable[0];
       if (preferred) {
-        var leverNames = { sub: 'bundled sub', ooRate: 'OO processing %', posRate: 'POS processing %', hardware: 'hardware' };
+        var leverNames = { sub: 'bundled sub', ooRate: 'OO processing %', posRate: 'POS processing %', hardware: 'hardware (one-off)' };
         var label = leverNames[preferred.key] || preferred.label;
         var targetTxt = preferred.key === 'hardware'
           ? fmtMoney(preferred.target)
           : (preferred.key === 'sub' ? fmtMoney(preferred.target) + '/mo' : preferred.target.toFixed(2) + '%');
-        suggested.innerHTML = '<strong>Suggested play:</strong> Cheapest single-lever close is the ' + label + ' — adjust to <strong>' + targetTxt + '</strong> in Step 3 and the deal matches their current spend. The other lever cards above show alternatives if you\'d rather use a different mix.';
+        var rationale = preferred.key === 'hardware'
+          ? 'Cheapest for Flipdish — one-off, recovered in 3 months from op margin, no rate precedent.'
+          : (preferred.key === 'sub'
+             ? 'Most expensive for Flipdish — pure recurring revenue loss, sets renewal precedent. Use only if hardware/rate options are exhausted.'
+             : 'Recurring rate impact, sets a rate precedent for renewal — but cheaper than dropping the sub.');
+        suggested.innerHTML = '<strong>Suggested play:</strong> Cheapest single-lever close is the <strong>' + label + '</strong> — adjust to <strong>' + targetTxt + '</strong> in Step 3 and the deal matches their current spend. ' + rationale;
       } else {
         suggested.innerHTML = '<strong>Suggested play:</strong> See the levers above for the gap-closing options.';
       }
