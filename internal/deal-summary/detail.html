@@ -1552,9 +1552,32 @@
     var eligibleOpMargin = eligibleSnr * GUARDRAILS.opMarginFactor;
     result.paybackEnvelope = eligibleOpMargin * GUARDRAILS.paybackTargetMonths;
     result.maxHardwareDiscount = Math.max(0, result.paybackEnvelope);
+    result.eligibleOpMargin = eligibleOpMargin;
 
-    if (totalHardware > 0 && eligibleOpMargin > 0) {
-      result.paybackMonths = totalHardware / eligibleOpMargin;
+    // ---- PAYBACK FIX (v8.1) ----
+    // Payback is the time it takes Flipdish to RECOUP the hardware
+    // DISCOUNT through monthly op margin. Not the time to recover the
+    // full hardware cost — the customer paid for the hardware, Flipdish
+    // keeps that money. Only the gap between list and what the customer
+    // was actually charged is the "loss" to be paid back.
+    //
+    // hardwareList   = what Flipdish would charge at full list
+    // hardwareOneOff = what the rep is actually quoting (≤ list)
+    // discount       = list - quoted (always ≥ 0)
+    // paybackMonths  = discount / eligibleOpMargin (0 when no discount)
+    var hardwareListTotal = 0;
+    if (p.includePOS && rates.pos)   hardwareListTotal += rates.pos.hardwareStarter * locations;
+    if (p.includeKiosk && rates.kiosk) hardwareListTotal += rates.kiosk.hardware;
+    var hardwareDiscount = Math.max(0, hardwareListTotal - totalHardware);
+    result.hardwareListTotal = hardwareListTotal;
+    result.hardwareDiscount  = hardwareDiscount;
+
+    if (hardwareDiscount > 0 && eligibleOpMargin > 0) {
+      result.paybackMonths = hardwareDiscount / eligibleOpMargin;
+    } else {
+      // No discount given (or no margin to compute against) — payback is
+      // zero by definition. Flipdish has nothing to recoup.
+      result.paybackMonths = 0;
     }
 
     return result;
@@ -1749,13 +1772,14 @@
     if (p.includeKiosk && rates.kiosk) listHardware += rates.kiosk.hardware;
 
     // -------- State diagnosis --------
-    var delta = currentTotal - listMonthly;  // +ve = customer pays more today (headroom)
-    var threshold = Math.max(20, listMonthly * 0.10);  // 10% band, min £20
-    var state;
-    if (kioskOnly)              state = 'match';   // no displacement to compare
-    else if (delta >  threshold) state = 'headroom';
-    else if (delta < -threshold) state = 'tight';
-    else                         state = 'match';
+    // delta > 0  → customer pays MORE today → Flipdish at list is already
+    //              cheaper → no work needed (headroom).
+    // delta ≤ 0  → Flipdish at list is more expensive than current → the
+    //              rep needs to find £delta/mo of "give" to match. The
+    //              question is whether the levers can supply that much.
+    //              If yes → "match" (closeable). If no → "tight".
+    var delta = currentTotal - listMonthly;
+    var gap = Math.max(0, -delta);  // £/mo Flipdish needs to give back to match
 
     // -------- Lever headroom calculations (at LIST rates as baseline) --------
     // Compute SNR at list to find the absolute ceiling for hardware discount.
@@ -1827,10 +1851,36 @@
     var rateHeadroomPP = 0;
     var ratePosListPct = 0;
     var ratePosFloorPct = 0;
+    var rateMonthlyValue = 0;  // £/mo saving the rate-floor gives the customer
     if (p.includePOS && rates.pos) {
       ratePosListPct = rates.pos.processing * 100;
       ratePosFloorPct = (rates.posCardPct || 0) * 100 + 0.3;
       rateHeadroomPP = Math.max(0, ratePosListPct - ratePosFloorPct);
+      rateMonthlyValue = (rateHeadroomPP / 100) * N(c.posGmv);
+    }
+
+    // -------- Total lever power (£/mo of "give" the rep can offer) --------
+    // Sub discount = recurring £/mo straight reduction in customer bill.
+    // Hardware discount = one-off; amortise over the contract length to
+    //                     compare against a recurring monthly gap.
+    // Rate discount    = recurring £/mo (rateHeadroomPP × monthly POS GMV).
+    var hwAmortisedMonthly = maxHwDiscount / CONTRACT_MONTHS;
+    var totalLeverPower = maxSubDiscount + hwAmortisedMonthly + rateMonthlyValue;
+
+    // -------- Final state diagnosis --------
+    var state;
+    var threshold = Math.max(15, listMonthly * 0.05);  // tiny-gap band
+    if (kioskOnly) {
+      state = 'match';                              // no current displacement
+    } else if (delta >= -threshold) {
+      // Customer paying same or more today → Flipdish already cheap. Headroom.
+      state = 'headroom';
+    } else if (gap <= totalLeverPower) {
+      // Gap exists but the levers can close it within commercial guardrails.
+      state = 'match';                              // "closeable" semantically
+    } else {
+      // Gap is bigger than the levers can give. Reduce scope or qualify out.
+      state = 'tight';
     }
 
     return {
@@ -1840,13 +1890,17 @@
       listSub: listSubTotal,
       listHardware: listHardware,
       delta: delta,
+      gap: gap,
       // levers
       maxHwDiscount: maxHwDiscount,
       stdHwDiscount: stdHwDiscount,
+      hwAmortisedMonthly: hwAmortisedMonthly,
       maxSubDiscount: maxSubDiscount,
       ratePosListPct: ratePosListPct,
       ratePosFloorPct: ratePosFloorPct,
       rateHeadroomPP: rateHeadroomPP,
+      rateMonthlyValue: rateMonthlyValue,
+      totalLeverPower: totalLeverPower,
       // for context
       kioskOnly: kioskOnly,
       locations: locations
@@ -1895,12 +1949,12 @@
       deltaLbl.textContent = 'Comparison';
       deltaVal.textContent = 'Kiosk-only — no displacement';
     } else if (o.delta > 0) {
-      deltaLbl.textContent = 'Headroom (you can discount)';
+      deltaLbl.textContent = 'Already cheaper';
       deltaVal.textContent = '+' + fmtMoney(o.delta) + '/mo';
       deltaVal.classList.add('positive');
     } else if (o.delta < 0) {
-      deltaLbl.textContent = 'Gap (Flipdish is more expensive)';
-      deltaVal.textContent = fmtMoney(o.delta) + '/mo';
+      deltaLbl.textContent = 'Gap to close';
+      deltaVal.textContent = fmtMoney(-o.delta) + '/mo more';
       deltaVal.classList.add('negative');
     } else {
       deltaLbl.textContent = 'Gap';
@@ -1910,63 +1964,74 @@
     // Title + summary by state
     if (o.state === 'headroom') {
       pill.textContent = 'You have room';
-      title.textContent = 'Plenty of room to discount';
-      summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — already <strong>' + fmtMoney(o.delta) + '/mo cheaper</strong> for them. You can lead with list rates and use the levers below as fallback if they push back on hardware or sub.';
+      title.textContent = 'Plenty of room — Flipdish is already cheaper';
+      summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — already <strong>' + fmtMoney(o.delta) + '/mo cheaper</strong> for them. Lead with list rates. Keep discounts in your back pocket as a closing lever.';
     } else if (o.state === 'tight') {
-      pill.textContent = 'Tight at list';
-      title.textContent = 'Flipdish is more expensive than what they pay today';
-      summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — that\'s <strong>' + fmtMoney(-o.delta) + '/mo MORE expensive</strong> before any hardware. Discounting won\'t close that gap without breaking the deal. Reduce hardware scope, push back on price (sell platform value, not cost replacement), or qualify out.';
+      pill.textContent = 'Won\'t close';
+      title.textContent = 'The gap is bigger than the levers can close';
+      summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — a <strong>' + fmtMoney(o.gap) + '/mo gap</strong>. Even maxing every lever within guardrails (~' + fmtMoney(o.totalLeverPower) + '/mo of give) won\'t close that. <strong>Reduce hardware scope</strong> (starter kit only, fewer kiosks), <strong>push back on price</strong> (Flipdish offers value beyond cost replacement), or qualify out.';
     } else {
-      pill.textContent = 'Match-only';
-      title.textContent = o.kioskOnly
-        ? 'Kiosk-only deal — no current cost to displace'
-        : 'You\'re roughly matching at list';
-      summary.innerHTML = o.kioskOnly
-        ? 'Kiosk is incremental — there\'s nothing to displace because they don\'t have kiosks today. Sell on incremental revenue (basket lift, queue reduction). Hardware discount is your main lever.'
-        : 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today; Flipdish at list is <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — within ~10%. Don\'t lead with a discount. Sell on platform value (kiosk, AI, FMM, OO direct-to-customer). The standard 20%-off-hardware sweetener still fits inside the payback envelope if you need it.';
+      // 'match' — closeable, kiosk-only, or near-zero gap
+      if (o.kioskOnly) {
+        pill.textContent = 'Kiosk-only';
+        title.textContent = 'Kiosk-only deal — no cost displacement';
+        summary.innerHTML = 'Kiosk is incremental — there\'s nothing to displace because they don\'t have kiosks today. Sell on incremental revenue (basket lift, queue reduction). Hardware discount is your main lever.';
+      } else if (o.gap <= 0) {
+        pill.textContent = 'Roughly matching';
+        title.textContent = 'You\'re roughly matching at list';
+        summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today; Flipdish at list is <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — they\'re close. Don\'t lead with a discount. Sell platform value (kiosk, AI, FMM, OO direct-to-customer). The 20%-off-hardware sweetener still fits inside the envelope if you need it.';
+      } else {
+        pill.textContent = 'Closeable with discounts';
+        title.textContent = 'You can close the gap — but you\'ll need discounts';
+        summary.innerHTML = 'Customer pays <strong>' + fmtMoney(o.currentTotal) + '/mo</strong> today. Flipdish at full list would be <strong>' + fmtMoney(o.listMonthly) + '/mo</strong> — a <strong>' + fmtMoney(o.gap) + '/mo gap to close</strong>. The levers below add up to ~<strong>' + fmtMoney(o.totalLeverPower) + '/mo</strong> of give within guardrails — enough to close it, but not roomy. Use them carefully.';
+      }
     }
 
-    // Lever cards
+    // Lever cards — each shows list value AND how much £/mo of "give" the
+    // lever can supply (so the rep can compare against the gap).
     // 1. Bundled subscription
     $('offerSubVal').textContent = fmtMoney(o.listSub) + '/mo';
-    if (o.state === 'tight' || o.maxSubDiscount <= 0) {
-      $('offerSubDetail').textContent = 'No room to discount the sub — recurring revenue is already at the SNR floor.';
+    if (o.maxSubDiscount <= 0) {
+      $('offerSubDetail').textContent = 'No room to discount — recurring revenue is already at the SNR floor (' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site).';
     } else {
-      $('offerSubDetail').textContent = 'Can drop by up to ' + fmtMoney(o.maxSubDiscount) + '/mo before the SNR floor (' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site) bites.';
+      $('offerSubDetail').textContent = 'Can drop by up to ' + fmtMoney(o.maxSubDiscount) + '/mo (recurring) before hitting the SNR floor (' + fmtMoney(GUARDRAILS.snrFloorMonthly) + '/mo per site).';
     }
 
-    // 2. Hardware
+    // 2. Hardware (one-off)
     $('offerHwVal').textContent = fmtMoney(o.listHardware);
     if (o.listHardware === 0) {
       $('offerHwDetail').textContent = 'No hardware in scope.';
     } else if (o.maxHwDiscount <= 0) {
-      $('offerHwDetail').textContent = 'No room — the deal already has no margin to absorb a hardware discount inside the 3-month payback target.';
+      $('offerHwDetail').textContent = 'No room — the deal\'s op margin can\'t absorb any hardware discount inside the 3-month payback target.';
     } else {
-      var stdPct = Math.round((o.stdHwDiscount / o.listHardware) * 100);
       var maxPct = Math.round((o.maxHwDiscount / o.listHardware) * 100);
-      var stdLine = 'Standard play: ' + fmtMoney(o.stdHwDiscount) + ' off (' + stdPct + '% — ' + fmtMoney(o.listHardware - o.stdHwDiscount) + ' to customer).';
-      var maxLine = ' Max before payback breaches 3 months: ' + fmtMoney(o.maxHwDiscount) + ' off (' + maxPct + '%).';
-      $('offerHwDetail').textContent = stdLine + maxLine;
+      $('offerHwDetail').textContent = 'Up to ' + fmtMoney(o.maxHwDiscount) + ' off (' + maxPct + '%) one-off — payback in 3 months. Worth ~' + fmtMoney(o.hwAmortisedMonthly) + '/mo of value across a 12-month contract.';
     }
 
     // 3. Processing rate (POS)
     if (o.ratePosListPct > 0) {
       $('offerRateVal').textContent = o.ratePosListPct.toFixed(2) + '%';
       $('offerRateDetail').textContent = o.rateHeadroomPP > 0
-        ? 'POS list is ' + o.ratePosListPct.toFixed(2) + '%. Floor is ' + o.ratePosFloorPct.toFixed(2) + '% (Stripe + 0.3pp margin). Up to ' + o.rateHeadroomPP.toFixed(2) + 'pp of room — but per-percent revenue impact is small; use as last resort.'
+        ? 'List ' + o.ratePosListPct.toFixed(2) + '% → floor ' + o.ratePosFloorPct.toFixed(2) + '% (Stripe + 0.3pp). Up to ' + o.rateHeadroomPP.toFixed(2) + 'pp of room ≈ ' + fmtMoney(o.rateMonthlyValue) + '/mo recurring give.'
         : 'POS list is already at the floor — no room.';
     } else {
       $('offerRateVal').textContent = '—';
       $('offerRateDetail').textContent = 'No POS in scope (or POS not sold in this market).';
     }
 
-    // Suggested opening offer
+    // Suggested opening offer — different by state
     if (o.state === 'tight') {
-      suggested.innerHTML = '<strong>Suggested opening:</strong> Type list rates into Step 4 below — don\'t pre-discount. If they push back, your only safe lever is hardware (max ' + fmtMoney(o.maxHwDiscount) + ' off). Anything more breaks the payback target.';
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Don\'t lead with this scope. The gap of ' + fmtMoney(o.gap) + '/mo can\'t be closed within the guardrails. Reduce hardware (starter kit, fewer kiosks), push back on price as a platform investment (kiosk, AI, FMM), or qualify out at the small-operator scale.';
     } else if (o.state === 'headroom') {
-      suggested.innerHTML = '<strong>Suggested opening:</strong> Sub <strong>' + fmtMoney(o.listSub) + '/mo</strong>, hardware <strong>' + fmtMoney(o.listHardware) + '</strong>, processing at list. You\'re already cheaper than what they pay today — keep discounts in your back pocket as a closing lever.';
-    } else {
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Sub <strong>' + fmtMoney(o.listSub) + '/mo</strong>, hardware <strong>' + fmtMoney(o.listHardware) + '</strong> (no discount), processing at list. You\'re already cheaper than what they pay today — keep discounts in your back pocket as a closing lever.';
+    } else if (o.kioskOnly) {
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Sub at list. On hardware, the standard 20% off sweetener (max ' + fmtMoney(o.maxHwDiscount) + ' off) keeps the deal in the payback envelope.';
+    } else if (o.gap <= 0) {
+      // Match (within tight-band)
       suggested.innerHTML = '<strong>Suggested opening:</strong> Sub <strong>' + fmtMoney(o.listSub) + '/mo</strong>, hardware <strong>' + fmtMoney(o.listHardware - o.stdHwDiscount) + '</strong> (' + fmtMoney(o.stdHwDiscount) + ' off as the standard sweetener), processing at list. Sell platform value rather than price.';
+    } else {
+      // Closeable but with a real gap
+      suggested.innerHTML = '<strong>Suggested opening:</strong> Lead with hardware <strong>' + fmtMoney(o.listHardware - o.maxHwDiscount) + '</strong> (' + fmtMoney(o.maxHwDiscount) + ' off — max within payback) plus sub at list. That\'s ~' + fmtMoney(o.hwAmortisedMonthly) + '/mo of value to the customer; if they need more, drop the bundled sub by up to ' + fmtMoney(o.maxSubDiscount) + '/mo.';
     }
   }
 
@@ -2004,64 +2069,51 @@
     var snr = v.snrPerSite || 0;
     var op  = v.opMarginMonthly || 0;
     var paybackEnv = v.paybackEnvelope || 0;
-    var pbMonths = v.paybackMonths;
+    var pbMonths = v.paybackMonths;        // discount / opMargin — 0 when no discount
+    var hwDiscount = v.hardwareDiscount || 0;
+    var hwList     = v.hardwareListTotal || 0;
     var floor = GUARDRAILS.snrFloorMonthly;
     var below = snr < floor;
-    var paybackBust = (pbMonths != null && pbMonths > GUARDRAILS.paybackTargetMonths);
+    // Payback is "bust" only when there IS a discount AND it would take
+    // more than the target months to earn back. Hardware at list = 0
+    // months payback = nothing to bust.
+    var paybackBust = (hwDiscount > 0 && pbMonths != null && pbMonths > GUARDRAILS.paybackTargetMonths);
 
-    // "headroom" = how much more hardware discount remains before
-    // payback breaches 3 months. paybackEnv is the maximum total
-    // discount; subtract whatever's already discounted from list.
-    var hwListEstimate = (function () {
-      var rates = LIST_RATES[prospect.country] || LIST_RATES.UK;
-      var hw = 0;
-      var locations = Math.max(1, prospect.locations || 1);
-      if (prospect.includePOS && rates.pos) hw += rates.pos.hardwareStarter * locations;
-      if (prospect.includeKiosk && rates.kiosk) {
-        var kHw = parseFloat(prospect.flipdish && prospect.flipdish.kioskHardware) || rates.kiosk.hardware;
-        hw += kHw;
-      }
-      return hw;
-    })();
-    var hwProposed = v.hardwareOneOff || 0;
-    var alreadyDiscounted = Math.max(0, hwListEstimate - hwProposed);
-    var headroom = Math.max(0, paybackEnv - alreadyDiscounted);
+    // Headroom = how much MORE discount the rep can still give before
+    // payback breaches 3 months. It's the envelope minus whatever has
+    // been discounted already.
+    var headroom = Math.max(0, paybackEnv - hwDiscount);
 
     // Detail (expanded) values
     detSnr.textContent = fmtMoney(snr) + '/mo per site';
     detOp.textContent  = fmtMoney(op) + '/mo';
-    detPb.textContent  = pbMonths == null ? '—' : (pbMonths.toFixed(1) + ' months');
+    detPb.textContent  = (hwDiscount === 0)
+      ? '0 months (no hardware discount)'
+      : (pbMonths == null ? '—' : pbMonths.toFixed(1) + ' months');
     detHw.textContent  = fmtMoney(Math.max(0, paybackEnv));
-
-    // v8: be honest about whether the rep has actually discounted hardware
-    // before telling them to "reduce the hardware discount". If hardware
-    // is at/above list, the message explains that the deal economics
-    // don't support this scope at all (small operator, etc).
-    var hwDiscountedFromList = alreadyDiscounted > 0;
 
     if (paybackBust) {
       panel.classList.add('bust');
-      pill.textContent = 'Hardware payback too long';
-      if (hwDiscountedFromList) {
-        msg.innerHTML = 'You\'ve discounted hardware by <strong>' + fmtMoney(alreadyDiscounted) + '</strong> off list. At that price, payback is <strong>' + pbMonths.toFixed(1) + ' months</strong> (target ≤ 3). <strong>Pull the hardware discount back</strong> — Step 3 above showed your safe ceiling.';
-      } else {
-        msg.innerHTML = 'Even at full list hardware (' + fmtMoney(hwProposed) + '), payback is <strong>' + pbMonths.toFixed(1) + ' months</strong> — past the 3-month target. The deal is too small to support this hardware bundle. <strong>Reduce hardware scope</strong> (starter kit only, fewer kiosks) or push for higher recurring revenue. Step 3 above flagged this as a tight deal.';
-      }
+      pill.textContent = 'Hardware discount too aggressive';
+      msg.innerHTML = 'You\'ve discounted hardware by <strong>' + fmtMoney(hwDiscount) + '</strong> off list (£' + Math.round(hwList) + '). Earning that back from this deal\'s op margin would take <strong>' + pbMonths.toFixed(1) + ' months</strong> — past the 3-month target. <strong>Pull the discount back</strong> to ≤ ' + fmtMoney(paybackEnv) + ' off list, or push for more recurring revenue (sub or processing rate).';
     } else if (below) {
       panel.classList.add('bust');
       pill.textContent = 'Below margin floor';
       msg.innerHTML = 'Recurring revenue per site is <strong>' + fmtMoney(snr) + '/mo</strong>, below the <strong>' + fmtMoney(floor) + '</strong> floor. <strong>Raise the bundled subscription or the processing rate</strong> to bring it back up.';
-    } else if (snr < floor * 1.2 || (pbMonths != null && pbMonths > 2)) {
+    } else if (snr < floor * 1.2) {
       panel.classList.add('warn');
       pill.textContent = 'Tight';
-      msg.innerHTML = 'You\'re earning <strong>' + fmtMoney(snr) + '/mo per site</strong> after costs. Margin is workable but not roomy — push discounts further only if you really need to.';
+      msg.innerHTML = 'You\'re earning <strong>' + fmtMoney(snr) + '/mo per site</strong> after costs — workable but close to the floor. Push discounts further only if you really need to.';
     } else {
       pill.textContent = 'Healthy';
-      var headroomStr = (headroom > 0 && hwDiscountedFromList)
-        ? ' You\'ve discounted hardware by <strong>' + fmtMoney(alreadyDiscounted) + '</strong>; <strong>' + fmtMoney(headroom) + '</strong> more remains before payback breaches 3 months.'
-        : (headroom > 0
-           ? ' Hardware is at list — you have up to <strong>' + fmtMoney(headroom) + '</strong> of discount room before payback breaches 3 months.'
-           : '');
+      var headroomStr;
+      if (hwDiscount > 0) {
+        headroomStr = ' You\'ve discounted hardware by <strong>' + fmtMoney(hwDiscount) + '</strong> (paying back in <strong>' + pbMonths.toFixed(1) + ' months</strong>); <strong>' + fmtMoney(headroom) + '</strong> more discount available before breaching the 3-month target.';
+      } else if (headroom > 0) {
+        headroomStr = ' Hardware is at list (no discount given) — you have up to <strong>' + fmtMoney(headroom) + '</strong> of discount room before payback breaches 3 months.';
+      } else {
+        headroomStr = '';
+      }
       msg.innerHTML = 'You\'re earning <strong>' + fmtMoney(snr) + '/mo per site</strong> after costs.' + headroomStr;
     }
   }
