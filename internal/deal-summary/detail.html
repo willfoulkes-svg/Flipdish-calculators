@@ -179,14 +179,9 @@
   }
   [id^="card-current"] h3 { color: var(--peach-dark); border-bottom-color: rgba(224, 114, 61, 0.18); }
 
-  [id^="card-proposal"], #card-bundleSub {
-    background: linear-gradient(180deg, #F1F6FD 0%, #F8FAFE 100%);
-    border-left: 3px solid var(--flipdish-blue);
-  }
-  [id^="card-proposal"] h3, #card-bundleSub h3 {
-    color: var(--flipdish-blue-dark);
-    border-bottom-color: rgba(0, 116, 217, 0.18);
-  }
+  /* v8.16: card-proposal* and card-bundleSub were removed when Step 3
+     was split into Section A (fees & subs) and Section B (hardware).
+     The lever-section component now provides the cool-blue framing. */
 
   .card {
     background: var(--card);
@@ -218,34 +213,152 @@
   }
   /* v8.10: Deal Details uses .grid2 (proven 2-col helper) — no custom CSS needed */
 
-  /* v8.15: workspace grid — proposal LEFT, verdict RIGHT (sticky)
-     so the rep sees their changes ripple through in real time without
-     scrolling between Step 3 and Step 4. */
-  .workspace-grid {
+  /* v8.16: .workspace-grid removed — Step 3 is now two stacked
+     lever-sections, each with its own per-section mini-verdict. The
+     full-width "How does this stack up?" panel sits below them. */
+
+  /* v8.16: Step 3 split into TWO discount sections by lever class.
+     Section A = Fees & subs (recurring revenue impact).
+     Section B = Hardware  (3-month payback hard cap).
+     Each section is a self-contained 2-col grid: levers on the left,
+     a live mini-verdict on the right that updates with every input. */
+  .lever-section {
+    background: #fff;
+    border: 1px solid #E2E6EE;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .lever-section-head {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    padding: 13px 16px;
+    background: linear-gradient(180deg, #FAFBFC 0%, #F4F6FA 100%);
+    border-bottom: 1px solid #E2E6EE;
+  }
+  .lever-section-letter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--flipdish-blue);
+    color: #fff;
+    font: 700 13px/1 'Domine', Georgia, serif;
+    flex: 0 0 auto;
+  }
+  .lever-section-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--flipdish-blue-light);
+    color: var(--flipdish-blue);
+    flex: 0 0 auto;
+  }
+  .lever-section-icon svg { width: 14px; height: 14px; }
+  .lever-section-title {
+    font: 700 14px/1.2 'Domine', Georgia, serif;
+    color: #161A22;
+    letter-spacing: -0.005em;
+  }
+  .lever-section-title .lever-section-sub {
+    font-weight: 400;
+    color: var(--muted);
+    font-family: 'Roboto', system-ui, sans-serif;
+    font-size: 12.5px;
+  }
+  .lever-section-goal {
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+    font-weight: 500;
+  }
+  /* Section B: hard cap, not soft optimisation — bolder amber accent */
+  #sectionHardware .lever-section-goal {
+    color: #B7791F;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .lever-section-body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
-    gap: 18px;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 16px;
+    padding: 14px 16px;
     align-items: start;
-    margin-bottom: 22px;
   }
-  .workspace-grid > .proposal-col { min-width: 0; }
-  .workspace-grid > .stackup-col {
-    position: sticky;
-    top: 14px;
-    min-width: 0;
+  .lever-section-fields { min-width: 0; }
+  .lever-section-fields .field { margin-bottom: 0; }
+  .lever-section-fields .grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
-  /* Inside the narrower proposal column, the In-store + Direct ordering
-     pair stacks instead of trying to be 2-up. */
-  .workspace-grid .current-grid { grid-template-columns: 1fr; }
-  /* On narrower viewports, drop the side-by-side and stack everything */
-  @media (max-width: 1080px) {
-    .workspace-grid { grid-template-columns: 1fr; }
-    .workspace-grid > .stackup-col { position: static; }
-    .workspace-grid .current-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Stack on narrower screens */
+  @media (max-width: 980px) {
+    .lever-section-body { grid-template-columns: 1fr; }
+    .lever-section-fields .grid2 { grid-template-columns: 1fr; }
   }
-  @media (max-width: 1000px) {
-    .workspace-grid .current-grid { grid-template-columns: 1fr; }
+
+  /* Mini-verdict panel beside each section's levers */
+  .lever-verdict {
+    background: linear-gradient(180deg, #FAFBFC 0%, #F1F4F9 100%);
+    border: 1px solid #E2E6EE;
+    border-radius: 10px;
+    padding: 12px 13px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: #2C3140;
   }
+  .lever-verdict-title {
+    font: 700 12.5px/1.1 'Roboto', system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--flipdish-blue-dark);
+    margin-bottom: 9px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .lever-verdict-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 4px 0;
+    gap: 8px;
+  }
+  .lever-verdict-row .vlabel { color: var(--muted); font-size: 11.5px; }
+  .lever-verdict-row .vval {
+    font: 600 13px/1.1 'Domine', Georgia, serif;
+    color: #161A22;
+    letter-spacing: -0.005em;
+    text-align: right;
+  }
+  .lever-verdict-row.headline .vval {
+    font-size: 16px;
+    color: var(--flipdish-blue-dark);
+  }
+  .lever-verdict-row.delta .vval { font-family: 'Roboto', system-ui, sans-serif; font-size: 12.5px; }
+  .lever-verdict-row.delta .vval.up   { color: #2F8F4D; }
+  .lever-verdict-row.delta .vval.down { color: #C53030; }
+  .lever-verdict-rule {
+    height: 1px; background: #E2E6EE;
+    margin: 7px 0;
+    border: 0;
+  }
+  .lever-verdict-note {
+    margin-top: 9px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .lever-verdict-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-top: 9px;
+  }
+  .lever-verdict-pill.ok    { background: #DEF5E5; color: #1F6F3A; }
+  .lever-verdict-pill.warn  { background: #FFF1D6; color: #8A5A00; }
+  .lever-verdict-pill.bad   { background: #FBE0E0; color: #9B1C1C; }
+  .lever-verdict-pill.idle  { background: #EAEEF6; color: #5C6478; }
 
   /* v8.14: SFDC pull placeholder — sits at the top of Step 3, looks
      like a clickable card but is disabled until the API is wired. */
@@ -1195,31 +1308,26 @@
        — Will: doesn't matter for the maths/pitch. -->
 
 
-  <!-- v8.15: Step 3 (proposal) + Step 4 (how does this stack up) wrapped
-       in a 2-column workspace grid. Right column (verdict) is sticky so
-       it stays visible while the rep edits the proposal sliders/inputs
-       on the left. Will: "these sections are separated and you need to
-       scroll up and down each time to see the result of a change." -->
-  <div class="workspace-grid">
-  <div class="proposal-col">
+  <!-- v8.16: Step 3 split into TWO discount sections by lever class.
+       Section A (Fees & subs) and Section B (Hardware) each have their
+       own goal, levers and live mini-verdict. The "How does this stack
+       up?" panel sits FULL-WIDTH below both, so the rep makes per-class
+       trade-offs first then sanity-checks the whole package vs current
+       spend. Will: "the discounting needs to be split into 2 sections —
+       Hardware discounting and Fees & subs." Critical link: Section B's
+       hardware envelope shrinks/grows live with Section A's choices,
+       because lower fees = thinner op margin = smaller payback envelope. -->
 
   <!-- ===================== STEP 3 — FLIPDISH PROPOSAL ===================== -->
-  <!-- v8.2: panel order swap — proposal now sits BEFORE the "How does
-       this stack up?" panel. Reps need to type the actual SFDC quote
-       first; the diagnostic below then compares THEIR PROPOSAL (not
-       list) against the customer's current spend. -->
   <div class="step step-cool">
     <span class="num">3</span>
     <span class="step-icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     </span>
-    <span class="text">Flipdish proposal <span class="sub">Type the rates from the SFDC quote · only the cards for products you ticked above appear here</span></span>
+    <span class="text">Flipdish proposal <span class="sub">Two discount levers — fees & subs (recurring) and hardware (one-off). Each has its own goal and live verdict.</span></span>
   </div>
 
-  <!-- v8.14: SFDC pull placeholder. When the SFDC API is wired up,
-       this becomes a one-click "Pull quote from Salesforce" button
-       that populates the rate / hardware / sub fields below. For now
-       it's a "coming soon" affordance so reps know it's on the way. -->
+  <!-- SFDC pull placeholder (unchanged) -->
   <button type="button" class="card sfdc-strip" id="sfdcPullBtn" disabled>
     <span class="sfdc-icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1230,98 +1338,117 @@
     </span>
   </button>
 
-  <!-- v8.11: side-by-side proposal — In-store (POS + Kiosk hardware) on
-       the left, Direct ordering (OO) on the right. Mirrors Step 2's
-       layout so "theirs vs ours" reads as a clean visual pairing. -->
-  <div class="current-grid">
-    <!-- In-store proposal — combines POS rate/fee/hardware + Kiosk hardware
-         into one card. Individual fields show only when their product is
-         ticked. v8.12: each field is now a slider + numeric input pair. -->
-    <div class="card" id="card-proposalInstore" style="display:none;">
-      <h3>In-store — Flipdish proposal</h3>
-      <div class="grid2">
-        <div class="field" id="fdPosRateField" style="display:none;">
-          <label>POS processing %</label>
-          <div class="lever-control">
-            <input id="fdPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1.2">
-            <input type="range" class="lever-slider" data-target="fdPosRate" min="1.0" max="1.2" step="0.01" value="1.2">
-            <div class="lever-meta"><span class="lever-floor">Floor 1.00%</span><span class="lever-list">List 1.20%</span></div>
-          </div>
-        </div>
-        <div class="field" id="fdPosTransFeeField" style="display:none;">
-          <label>Per-transaction fee</label>
-          <div class="lever-control">
-            <input id="fdPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
-            <input type="range" class="lever-slider" data-target="fdPosTransFee" min="0" max="0.10" step="0.01" value="0.10">
-            <div class="lever-meta"><span class="lever-floor">£0.00</span><span class="lever-list">List £0.10</span></div>
-          </div>
-        </div>
-        <div class="field" id="fdPosHardwareField" style="display:none;">
-          <label>POS hardware <span class="hint">(one-off, total)</span></label>
-          <div class="lever-control">
-            <input id="fdPosHardware" type="number" min="0" step="50" placeholder="e.g. 799">
-            <input type="range" class="lever-slider" data-target="fdPosHardware" min="0" max="799" step="25" value="799">
-            <div class="lever-meta"><span class="lever-floor">£0 (free)</span><span class="lever-list">List £799</span></div>
-          </div>
-        </div>
-        <div class="field" id="fdKioskCountField" style="display:none;">
-          <label>Number of kiosks <span class="hint">(in this deal)</span></label>
-          <input id="fdKioskCount" type="number" min="1" step="1" placeholder="e.g. 1">
-        </div>
-        <div class="field" id="fdKioskHardwareField" style="display:none;">
-          <label>Kiosk hardware <span class="hint">(one-off, total across all kiosks)</span></label>
-          <div class="lever-control">
-            <input id="fdKioskHardware" type="number" min="0" step="50" placeholder="e.g. 1500">
-            <input type="range" class="lever-slider" data-target="fdKioskHardware" min="0" max="1500" step="50" value="1500">
-            <div class="lever-meta"><span class="lever-floor">£0 (free)</span><span class="lever-list">List £1,500</span></div>
-          </div>
-        </div>
-      </div>
+  <!-- ====== SECTION A — Fees & subs ====== -->
+  <div class="lever-section" id="sectionFees" style="display:none;">
+    <div class="lever-section-head">
+      <span class="lever-section-letter">A</span>
+      <span class="lever-section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 12 13 12"/></svg>
+      </span>
+      <span class="lever-section-title">Fees &amp; subscriptions <span class="lever-section-sub">— recurring</span></span>
+      <span class="lever-section-goal">Goal: minimise damage to recurring revenue</span>
     </div>
-
-    <!-- Direct ordering proposal — processing rate only (sub bundled below) -->
-    <div class="card" id="card-proposalOO" style="display:none;">
-      <h3>Direct ordering — Flipdish proposal</h3>
-      <div class="grid2">
-        <div class="field">
-          <label>OO processing %</label>
-          <div class="lever-control">
-            <input id="fdOOProcessingRate" type="number" min="0" step="0.05" placeholder="e.g. 5">
-            <input type="range" class="lever-slider" data-target="fdOOProcessingRate" min="1.64" max="5" step="0.05" value="5">
-            <div class="lever-meta"><span class="lever-floor">Floor 1.64%</span><span class="lever-list">List 5.00%</span></div>
+    <div class="lever-section-body">
+      <div class="lever-section-fields">
+        <div class="grid2">
+          <div class="field" id="fdPosRateField" style="display:none;">
+            <label>POS processing %</label>
+            <div class="lever-control">
+              <input id="fdPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1.2">
+              <input type="range" class="lever-slider" data-target="fdPosRate" min="1.0" max="1.2" step="0.01" value="1.2">
+              <div class="lever-meta"><span class="lever-floor">Floor 1.00%</span><span class="lever-list">List 1.20%</span></div>
+            </div>
+          </div>
+          <div class="field" id="fdPosTransFeeField" style="display:none;">
+            <label>POS per-transaction fee</label>
+            <div class="lever-control">
+              <input id="fdPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
+              <input type="range" class="lever-slider" data-target="fdPosTransFee" min="0" max="0.10" step="0.01" value="0.10">
+              <div class="lever-meta"><span class="lever-floor">£0.00</span><span class="lever-list">List £0.10</span></div>
+            </div>
+          </div>
+          <div class="field" id="fdOOProcessingRateField" style="display:none;">
+            <label>OO processing %</label>
+            <div class="lever-control">
+              <input id="fdOOProcessingRate" type="number" min="0" step="0.05" placeholder="e.g. 5">
+              <input type="range" class="lever-slider" data-target="fdOOProcessingRate" min="1.64" max="5" step="0.05" value="5">
+              <div class="lever-meta"><span class="lever-floor">Floor 1.64%</span><span class="lever-list">List 5.00%</span></div>
+            </div>
+          </div>
+          <div class="field" id="fdMonthlySubField" style="display:none;">
+            <label>Bundled sub from SFDC quote <span class="hint">(£/mo all-in across all products)</span></label>
+            <input id="fdMonthlySub" type="number" min="0" step="1" placeholder="e.g. 199">
           </div>
         </div>
       </div>
+      <aside class="lever-verdict" id="verdictFees" aria-live="polite">
+        <div class="lever-verdict-title">Recurring impact</div>
+        <div class="lever-verdict-row"><span class="vlabel">At list (no discount)</span><span class="vval" id="vFeesList">—</span></div>
+        <div class="lever-verdict-row headline"><span class="vlabel">At your proposal</span><span class="vval" id="vFeesProposal">—</span></div>
+        <div class="lever-verdict-row delta"><span class="vlabel">Recurring give-up</span><span class="vval" id="vFeesDelta">—</span></div>
+        <hr class="lever-verdict-rule">
+        <div class="lever-verdict-row"><span class="vlabel">Op margin / mo</span><span class="vval" id="vFeesOpMargin">—</span></div>
+        <span class="lever-verdict-pill idle" id="vFeesPill">Awaiting input</span>
+        <div class="lever-verdict-note">Op margin funds Section B's hardware envelope. Drop fees further → envelope shrinks.</div>
+      </aside>
     </div>
   </div>
 
-  <!-- Bundled subscription — one figure from the SFDC quote.
-       Will: don't try to reconstruct per-product subs; the rep already
-       has the bundled total from the quote tool. Single source of truth. -->
-  <div class="card" id="card-bundleSub">
-    <h3>Total monthly subscription</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>Bundled sub from SFDC quote <span class="hint">(£/mo all-in across all products on the deal)</span></label>
-        <input id="fdMonthlySub" type="number" min="0" step="1" placeholder="e.g. 199">
+  <!-- ====== SECTION B — Hardware ====== -->
+  <div class="lever-section" id="sectionHardware" style="display:none;">
+    <div class="lever-section-head">
+      <span class="lever-section-letter">B</span>
+      <span class="lever-section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="18" x2="12" y2="21"/></svg>
+      </span>
+      <span class="lever-section-title">Hardware <span class="lever-section-sub">— one-off</span></span>
+      <span class="lever-section-goal">Hard cap: 3-month payback</span>
+    </div>
+    <div class="lever-section-body">
+      <div class="lever-section-fields">
+        <div class="grid2">
+          <div class="field" id="fdPosHardwareField" style="display:none;">
+            <label>POS hardware <span class="hint">(one-off, total)</span></label>
+            <div class="lever-control">
+              <input id="fdPosHardware" type="number" min="0" step="50" placeholder="e.g. 799">
+              <input type="range" class="lever-slider" data-target="fdPosHardware" min="0" max="799" step="25" value="799">
+              <div class="lever-meta"><span class="lever-floor">£0 (free)</span><span class="lever-list">List £799</span></div>
+            </div>
+          </div>
+          <div class="field" id="fdKioskCountField" style="display:none;">
+            <label>Number of kiosks <span class="hint">(in this deal)</span></label>
+            <input id="fdKioskCount" type="number" min="1" step="1" placeholder="e.g. 1">
+          </div>
+          <div class="field" id="fdKioskHardwareField" style="display:none;">
+            <label>Kiosk hardware <span class="hint">(one-off, total across all kiosks)</span></label>
+            <div class="lever-control">
+              <input id="fdKioskHardware" type="number" min="0" step="50" placeholder="e.g. 1500">
+              <input type="range" class="lever-slider" data-target="fdKioskHardware" min="0" max="1500" step="50" value="1500">
+              <div class="lever-meta"><span class="lever-floor">£0 (free)</span><span class="lever-list">List £1,500</span></div>
+            </div>
+          </div>
+        </div>
       </div>
+      <aside class="lever-verdict" id="verdictHardware" aria-live="polite">
+        <div class="lever-verdict-title">Hardware payback</div>
+        <div class="lever-verdict-row headline"><span class="vlabel">3-month envelope</span><span class="vval" id="vHwEnvelope">—</span></div>
+        <hr class="lever-verdict-rule">
+        <div class="lever-verdict-row"><span class="vlabel">Hardware list</span><span class="vval" id="vHwList">—</span></div>
+        <div class="lever-verdict-row"><span class="vlabel">Your proposal</span><span class="vval" id="vHwProposal">—</span></div>
+        <div class="lever-verdict-row delta"><span class="vlabel">Discount given</span><span class="vval" id="vHwDiscount">—</span></div>
+        <hr class="lever-verdict-rule">
+        <div class="lever-verdict-row"><span class="vlabel">Headroom left</span><span class="vval" id="vHwHeadroom">—</span></div>
+        <div class="lever-verdict-row"><span class="vlabel">Payback at proposal</span><span class="vval" id="vHwPayback">—</span></div>
+        <span class="lever-verdict-pill idle" id="vHwPill">Awaiting input</span>
+        <div class="lever-verdict-note" id="vHwNote">Envelope is set by Section A's op margin. Tighten fees → envelope shrinks.</div>
+      </aside>
     </div>
   </div>
 
-  <!-- Deal terms card removed — Flipdish only offers 12-month contracts
-       and the field never gets changed in practice. CONTRACT_MONTHS is
-       a constant in the JS now. If a multi-year exception ever comes up,
-       surface it then; no point asking reps to fill a field that's
-       always 12. -->
-
-
-  </div><!-- /.proposal-col -->
-  <div class="stackup-col">
-
-  <!-- v8.10: Step 4 heading STAYS visible (matches the Step 3 pattern).
-       Only the offer-panel body is hidden until inputs are ready —
-       same as Step 3 where the heading shows but the per-product
-       proposal cards only appear once a product is ticked. -->
+  <!-- ===================== STEP 4 — HOW DOES THIS STACK UP? ===================== -->
+  <!-- v8.16: stack-up panel now sits full-width below the two lever
+       sections. One combined view of "your proposal vs their current
+       spend" + Recommended Deal + single Apply button. -->
   <section id="stackUpSection">
 
   <!-- ===================== STEP 4 — HOW DOES THIS STACK UP? ===================== -->
@@ -1454,8 +1581,6 @@
   </div>
 
   </section><!-- /#stackUpSection -->
-  </div><!-- /.stackup-col -->
-  </div><!-- /.workspace-grid -->
 
   <!-- Step 5 (Value Story) deleted — Will: "I don't think the value story
        serves any purpose on this page really, it feels like that should
@@ -1828,29 +1953,39 @@
 
   // ---------- Scope visibility ----------
   function applyScopeVisibility() {
-    var anyScope = $('includeOO').checked || $('includePOS').checked || $('includeKiosk').checked;
+    var ooOn    = $('includeOO').checked;
     var posOn   = $('includePOS').checked;
     var kioskOn = $('includeKiosk').checked;
-    $('card-currentOO').style.display    = $('includeOO').checked    ? '' : 'none';
+    var anyScope = ooOn || posOn || kioskOn;
+    $('card-currentOO').style.display    = ooOn  ? '' : 'none';
     $('card-currentPOS').style.display   = posOn ? '' : 'none';
-    $('card-proposalOO').style.display   = $('includeOO').checked    ? '' : 'none';
-    // v8.11: combined In-store proposal card. Visible if POS OR Kiosk
-    // ticked. Individual fields toggle independently.
-    if ($('card-proposalInstore')) $('card-proposalInstore').style.display = (posOn || kioskOn) ? '' : 'none';
-    if ($('fdPosRateField'))       $('fdPosRateField').style.display       = posOn ? '' : 'none';
-    if ($('fdPosTransFeeField'))   $('fdPosTransFeeField').style.display   = posOn ? '' : 'none';
-    if ($('fdPosHardwareField'))   $('fdPosHardwareField').style.display   = posOn ? '' : 'none';
-    if ($('fdKioskCountField'))    $('fdKioskCountField').style.display    = kioskOn ? '' : 'none';
-    if ($('fdKioskHardwareField')) $('fdKioskHardwareField').style.display = kioskOn ? '' : 'none';
-    // v8.8: Bundled-sub card only appears once the rep has at least one
-    // proposal-side input (rate or hardware). Will: "Total monthly
+
+    // v8.16: Step 3 is now split into Section A (fees & subs) and
+    // Section B (hardware). Each FIELD container toggles independently
+    // by scope; the section WRAPPER is visible iff at least one of its
+    // fields is visible.
+    if ($('fdPosRateField'))         $('fdPosRateField').style.display         = posOn ? '' : 'none';
+    if ($('fdPosTransFeeField'))     $('fdPosTransFeeField').style.display     = posOn ? '' : 'none';
+    if ($('fdOOProcessingRateField')) $('fdOOProcessingRateField').style.display = ooOn ? '' : 'none';
+    if ($('fdPosHardwareField'))     $('fdPosHardwareField').style.display     = posOn ? '' : 'none';
+    if ($('fdKioskCountField'))      $('fdKioskCountField').style.display      = kioskOn ? '' : 'none';
+    if ($('fdKioskHardwareField'))   $('fdKioskHardwareField').style.display   = kioskOn ? '' : 'none';
+
+    // Bundled-sub field — same gate as before: any scope ticked AND at
+    // least one proposal-side input filled. Will: "Total monthly
     // subscription should only appear once we've added in the rest
     // of the proposal."
     var hasProposalInput =
-        ($('includeOO').checked    && parseFloat($('fdOOProcessingRate').value) > 0)
-     || ($('includePOS').checked   && (parseFloat($('fdPosRate').value) > 0 || parseFloat($('fdPosHardware').value) > 0))
-     || ($('includeKiosk').checked && parseFloat($('fdKioskHardware').value) > 0);
-    if ($('card-bundleSub')) $('card-bundleSub').style.display = (anyScope && hasProposalInput) ? '' : 'none';
+        (ooOn    && parseFloat($('fdOOProcessingRate').value) > 0)
+     || (posOn   && (parseFloat($('fdPosRate').value) > 0 || parseFloat($('fdPosHardware').value) > 0))
+     || (kioskOn && parseFloat($('fdKioskHardware').value) > 0);
+    if ($('fdMonthlySubField')) $('fdMonthlySubField').style.display = (anyScope && hasProposalInput) ? '' : 'none';
+
+    // Section wrappers visible iff any of their child fields are visible.
+    var sectionFeesVisible = posOn || ooOn || (anyScope && hasProposalInput);
+    var sectionHardwareVisible = posOn || kioskOn;
+    if ($('sectionFees'))     $('sectionFees').style.display     = sectionFeesVisible     ? '' : 'none';
+    if ($('sectionHardware')) $('sectionHardware').style.display = sectionHardwareVisible ? '' : 'none';
 
     // Kiosk has no Step 2 current card — most customers don't have kiosks
     // today, so there's nothing to displace. Kiosk only appears in the
@@ -2293,6 +2428,138 @@
     return out.join('');
   }
 
+  // ---------- v8.16: per-section mini-verdicts ----------
+  // Section A (Fees & subs): shows recurring revenue at list vs at the
+  //   rep's current proposal, the give-up, op margin and an SNR pill.
+  // Section B (Hardware): shows the 3-month payback envelope (which is
+  //   driven by Section A's op margin), the hardware list/proposal/
+  //   discount, headroom remaining, payback months and a status pill.
+  // Section B's envelope SHRINKS or GROWS live as Section A's sliders
+  //   move — the link is critical: lower fees = thinner op margin =
+  //   smaller envelope. The note text under each pill makes that
+  //   dependency explicit for the rep.
+  function renderSectionVerdicts(p, v) {
+    if (!$('sectionFees') && !$('sectionHardware')) return;
+    var ccy = (CCY[p.country] || '£');
+    var rates = LIST_RATES[p.country] || LIST_RATES.UK;
+    var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
+    var fmt = function (n) { return ccy + Math.round(n || 0).toLocaleString('en-US'); };
+
+    // --- Section A: list-SNR vs proposal-SNR ---
+    var listSnr = 0;
+    if (p.includeOO && rates.oo && v.detail && v.detail.oo) {
+      var d = v.detail.oo;
+      var ooRev = d.gmv || 0, ooTxn = d.txn || 0;
+      var ooListProc = ooRev * rates.oo.processing;
+      var ooCardCost = (ooRev * (rates.ooCardPct || 0)) + (ooTxn * (rates.ooCardFix || 0));
+      listSnr += ooListProc - ooCardCost + rates.oo.sub;
+    }
+    if (p.includePOS && rates.pos && v.detail && v.detail.pos) {
+      var pd = v.detail.pos;
+      var posRev = pd.gmv || 0, posTxn = pd.txn || 0;
+      var posListProc = posRev * rates.pos.processing;
+      var posListTxn  = posTxn * rates.pos.txnFee;
+      var posCardCost = (posRev * (rates.posCardPct || 0)) + (posTxn * (rates.posCardFix || 0));
+      listSnr += posListProc + posListTxn - posCardCost + (rates.pos.sub * locations);
+    }
+    if (p.includeKiosk && rates.kiosk) {
+      listSnr += rates.kiosk.sub;
+    }
+    var proposalSnr = (v.snrPerSite || 0) * locations;
+    var giveUp = listSnr - proposalSnr;
+    var giveUpPct = listSnr > 0 ? Math.round((giveUp / listSnr) * 100) : 0;
+
+    if ($('vFeesList'))     $('vFeesList').textContent     = fmt(listSnr) + '/mo';
+    if ($('vFeesProposal')) $('vFeesProposal').textContent = fmt(proposalSnr) + '/mo';
+    var feesDelta = $('vFeesDelta');
+    if (feesDelta) {
+      if (proposalSnr === 0 && listSnr === 0) {
+        feesDelta.textContent = '—'; feesDelta.className = 'vval';
+      } else if (giveUp > 0.5) {
+        feesDelta.textContent = '−' + fmt(giveUp) + '/mo (' + giveUpPct + '%)';
+        feesDelta.className = 'vval down';
+      } else if (giveUp < -0.5) {
+        feesDelta.textContent = '+' + fmt(-giveUp) + '/mo (above list)';
+        feesDelta.className = 'vval up';
+      } else {
+        feesDelta.textContent = 'At list';
+        feesDelta.className = 'vval';
+      }
+    }
+    if ($('vFeesOpMargin')) $('vFeesOpMargin').textContent = fmt(v.opMarginMonthly || 0) + '/mo';
+
+    var pillA = $('vFeesPill');
+    if (pillA) {
+      var snrPerSite = v.snrPerSite || 0;
+      var floor = GUARDRAILS.snrFloorMonthly;
+      if (proposalSnr === 0) {
+        pillA.className = 'lever-verdict-pill idle';
+        pillA.textContent = 'Awaiting input';
+      } else if (snrPerSite >= floor) {
+        pillA.className = 'lever-verdict-pill ok';
+        pillA.textContent = 'Healthy SNR';
+      } else if (snrPerSite >= floor * 0.7) {
+        pillA.className = 'lever-verdict-pill warn';
+        pillA.textContent = 'Below SNR floor';
+      } else {
+        pillA.className = 'lever-verdict-pill bad';
+        pillA.textContent = 'SNR critical';
+      }
+    }
+
+    // --- Section B: hardware envelope (driven by Section A) ---
+    var envelope = v.paybackEnvelope || 0;
+    var hwList   = v.hardwareListTotal || 0;
+    var hwPos    = parseFloat(($('fdPosHardware') || {}).value) || 0;
+    var hwKiosk  = parseFloat(($('fdKioskHardware') || {}).value) || 0;
+    var hwProp   = (p.includePOS ? hwPos : 0) + (p.includeKiosk ? hwKiosk : 0);
+    var hwDisc   = Math.max(0, hwList - hwProp);
+    var headroom = envelope - hwDisc;
+
+    if ($('vHwEnvelope')) $('vHwEnvelope').textContent = fmt(envelope);
+    if ($('vHwList'))     $('vHwList').textContent     = fmt(hwList);
+    if ($('vHwProposal')) $('vHwProposal').textContent = fmt(hwProp);
+    if ($('vHwDiscount')) $('vHwDiscount').textContent = fmt(hwDisc);
+    var headroomEl = $('vHwHeadroom');
+    if (headroomEl) {
+      headroomEl.textContent = (headroom < 0 ? '−' : '') + fmt(Math.abs(headroom));
+      headroomEl.className = 'vval ' + (headroom < 0 ? 'down' : (headroom > 0 ? 'up' : ''));
+    }
+    var paybackEl = $('vHwPayback');
+    if (paybackEl) {
+      var pb = v.paybackMonths;
+      if (hwDisc === 0) paybackEl.textContent = '0 months';
+      else if (pb == null || !isFinite(pb)) paybackEl.textContent = '∞';
+      else paybackEl.textContent = pb.toFixed(1) + ' months';
+    }
+
+    var pillB = $('vHwPill');
+    var noteB = $('vHwNote');
+    if (pillB && noteB) {
+      if (hwList === 0) {
+        pillB.className = 'lever-verdict-pill idle';
+        pillB.textContent = 'No hardware in scope';
+        noteB.textContent = 'Add POS or Kiosk in Step 1 to bring hardware into scope.';
+      } else if (envelope <= 0) {
+        pillB.className = 'lever-verdict-pill bad';
+        pillB.textContent = '£0 envelope';
+        noteB.textContent = 'No room to discount hardware — Section A has eaten the op margin. Tighten fees/subs in A or push back on price.';
+      } else if (hwDisc === 0) {
+        pillB.className = 'lever-verdict-pill ok';
+        pillB.textContent = 'At list';
+        noteB.textContent = 'Envelope is set by Section A’s op margin. Drop fees further → envelope shrinks.';
+      } else if (v.paybackMonths != null && v.paybackMonths > GUARDRAILS.paybackTargetMonths) {
+        pillB.className = 'lever-verdict-pill bad';
+        pillB.textContent = 'Over payback';
+        noteB.textContent = 'Hardware discount exceeds the 3-month payback envelope. Pull the hardware slider up or reduce Section A discounts to grow the envelope.';
+      } else {
+        pillB.className = 'lever-verdict-pill ok';
+        pillB.textContent = 'Within cap';
+        noteB.textContent = 'Envelope is set by Section A’s op margin. Drop fees further → envelope shrinks.';
+      }
+    }
+  }
+
   // ---------- Render ----------
   function recompute() {
     if (!prospect) return;
@@ -2300,18 +2567,29 @@
     // Without this, streams lag behind the user's latest keystroke by the
     // full 400ms debounce window.
     if (!isInitializing) collect();
-    // v8.8: gate the bundled-sub card visibility on whether any proposal
-    // rate/hardware has been entered. (Don't re-run full applyScopeVisibility
-    // here — it triggers prefill which writes the form on stale state.)
-    if (!isInitializing && $('card-bundleSub')) {
+    // v8.16: gate the bundled-sub field + Section A wrapper on whether
+    // any proposal rate/hardware has been entered. (Don't re-run full
+    // applyScopeVisibility here — it triggers prefill which writes the
+    // form on stale state.)
+    if (!isInitializing) {
       var anyScopeNow = $('includeOO').checked || $('includePOS').checked || $('includeKiosk').checked;
       var hasProp =
           ($('includeOO').checked    && parseFloat($('fdOOProcessingRate').value) > 0)
        || ($('includePOS').checked   && (parseFloat($('fdPosRate').value) > 0 || parseFloat($('fdPosHardware').value) > 0))
        || ($('includeKiosk').checked && parseFloat($('fdKioskHardware').value) > 0);
-      $('card-bundleSub').style.display = (anyScopeNow && hasProp) ? '' : 'none';
+      if ($('fdMonthlySubField')) {
+        $('fdMonthlySubField').style.display = (anyScopeNow && hasProp) ? '' : 'none';
+      }
+      if ($('sectionFees')) {
+        var sectionFeesVisibleNow = $('includePOS').checked || $('includeOO').checked || (anyScopeNow && hasProp);
+        $('sectionFees').style.display = sectionFeesVisibleNow ? '' : 'none';
+      }
     }
     var v = computeValueStory(prospect);
+
+    // v8.16: per-section mini-verdicts. Cheap to render and gives the
+    // rep instant feedback as they drag sliders in either section.
+    renderSectionVerdicts(prospect, v);
 
     // Step 5 (Value Story hero / streams / narrative) removed in v8.3 —
     // customer-facing version lives on customer.html. This page is now
