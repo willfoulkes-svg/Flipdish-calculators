@@ -218,6 +218,48 @@
   }
   /* v8.10: Deal Details uses .grid2 (proven 2-col helper) — no custom CSS needed */
 
+  /* ---------- Lever control (v8.12): number input + slider + bounds ---------- */
+  .lever-control { display: flex; flex-direction: column; gap: 6px; }
+  .lever-control input[type="number"] {
+    /* number input keeps the standard .field input styling */
+    margin-bottom: 2px;
+  }
+  .lever-slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px;
+    background: linear-gradient(90deg, #FFE5D2 0%, var(--flipdish-blue-light) 100%);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    margin: 4px 0 2px;
+  }
+  .lever-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--flipdish-blue);
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0, 116, 217, 0.35);
+    cursor: pointer;
+    transition: transform .12s ease;
+  }
+  .lever-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .lever-slider::-webkit-slider-thumb:active { transform: scale(1.25); background: var(--flipdish-blue-dark); }
+  .lever-slider::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--flipdish-blue);
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0, 116, 217, 0.35);
+    cursor: pointer;
+  }
+  .lever-meta {
+    display: flex; justify-content: space-between;
+    font-size: 10.5px; color: var(--muted);
+    font-weight: 500; letter-spacing: 0.02em;
+  }
+  .lever-meta .lever-floor { color: var(--peach-dark); }
+  .lever-meta .lever-list { color: var(--flipdish-blue); }
+
   /* v8.8: side-by-side current — In-store left, Direct ordering right */
   .current-grid {
     display: grid;
@@ -1067,25 +1109,41 @@
   <div class="current-grid">
     <!-- In-store proposal — combines POS rate/fee/hardware + Kiosk hardware
          into one card. Individual fields show only when their product is
-         ticked. -->
+         ticked. v8.12: each field is now a slider + numeric input pair. -->
     <div class="card" id="card-proposalInstore" style="display:none;">
       <h3>In-store — Flipdish proposal</h3>
       <div class="grid2">
         <div class="field" id="fdPosRateField" style="display:none;">
           <label>POS processing %</label>
-          <input id="fdPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1.2">
+          <div class="lever-control">
+            <input id="fdPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1.2">
+            <input type="range" class="lever-slider" data-target="fdPosRate" min="1.0" max="1.2" step="0.01" value="1.2">
+            <div class="lever-meta"><span class="lever-floor">Floor 1.00%</span><span class="lever-list">List 1.20%</span></div>
+          </div>
         </div>
         <div class="field" id="fdPosTransFeeField" style="display:none;">
           <label>Per-transaction fee</label>
-          <input id="fdPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
+          <div class="lever-control">
+            <input id="fdPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
+            <input type="range" class="lever-slider" data-target="fdPosTransFee" min="0" max="0.10" step="0.01" value="0.10">
+            <div class="lever-meta"><span class="lever-floor">£0.00</span><span class="lever-list">List £0.10</span></div>
+          </div>
         </div>
         <div class="field" id="fdPosHardwareField" style="display:none;">
           <label>POS hardware <span class="hint">(one-off, total)</span></label>
-          <input id="fdPosHardware" type="number" min="0" step="50" placeholder="e.g. 799">
+          <div class="lever-control">
+            <input id="fdPosHardware" type="number" min="0" step="50" placeholder="e.g. 799">
+            <input type="range" class="lever-slider" data-target="fdPosHardware" min="0" max="799" step="25" value="799">
+            <div class="lever-meta"><span class="lever-floor">£0 (free)</span><span class="lever-list">List £799</span></div>
+          </div>
         </div>
         <div class="field" id="fdKioskHardwareField" style="display:none;">
           <label>Kiosk hardware <span class="hint">(one-off, total)</span></label>
-          <input id="fdKioskHardware" type="number" min="0" step="50" placeholder="e.g. 1500">
+          <div class="lever-control">
+            <input id="fdKioskHardware" type="number" min="0" step="50" placeholder="e.g. 1500">
+            <input type="range" class="lever-slider" data-target="fdKioskHardware" min="0" max="1500" step="50" value="1500">
+            <div class="lever-meta"><span class="lever-floor">£0 (free)</span><span class="lever-list">List £1,500</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1096,7 +1154,11 @@
       <div class="grid2">
         <div class="field">
           <label>OO processing %</label>
-          <input id="fdOOProcessingRate" type="number" min="0" step="0.1" placeholder="e.g. 5">
+          <div class="lever-control">
+            <input id="fdOOProcessingRate" type="number" min="0" step="0.05" placeholder="e.g. 5">
+            <input type="range" class="lever-slider" data-target="fdOOProcessingRate" min="1.64" max="5" step="0.05" value="5">
+            <div class="lever-meta"><span class="lever-floor">Floor 1.64%</span><span class="lever-list">List 5.00%</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1700,10 +1762,68 @@
     // POS isn't sold in US or ES — hide the toggle and force-disable any
     // existing selection so the page doesn't show a stale POS card.
     applyMarketAvailability();
+    // v8.12: refresh slider min/max + meta labels so the lever controls
+    // reflect THIS market's rates and floors.
+    updateLeverSliderBounds();
     // Pre-fill any blank Flipdish proposal fields with this market's list rates.
     if (!isInitializing) prefillProposalFromList();
     recompute();
     if (!skipSave) scheduleSave();
+  }
+
+  // v8.12 — Lever sliders. Each slider's min = guardrail floor, max = list,
+  // step appropriate to the lever. Refreshed when the country changes
+  // (different markets have different Stripe rates and hardware prices).
+  function updateLeverSliderBounds() {
+    var rates = LIST_RATES[prospect.country] || LIST_RATES.UK;
+    var locations = Math.max(1, Math.round(parseFloat(prospect.locations)) || 1);
+    var ccy = CCY[prospect.country];
+    var fmt = function (n, d) { return ccy + (d ? n.toFixed(d) : Math.round(n).toLocaleString('en-US')); };
+
+    // OO processing — floor is Stripe + 1pp
+    if (rates.oo) {
+      var ooFloor = ((rates.ooCardPct || 0) * 100 + 1.0);
+      var ooList  = rates.oo.processing * 100;
+      setSliderBounds('fdOOProcessingRate', ooFloor, ooList,
+        'Floor ' + ooFloor.toFixed(2) + '%', 'List ' + ooList.toFixed(2) + '%');
+    }
+    // POS processing — floor is Stripe + 0.3pp
+    if (rates.pos) {
+      var posFloor = ((rates.posCardPct || 0) * 100 + 0.3);
+      var posList  = rates.pos.processing * 100;
+      setSliderBounds('fdPosRate', posFloor, posList,
+        'Floor ' + posFloor.toFixed(2) + '%', 'List ' + posList.toFixed(2) + '%');
+      // Per-txn fee — 0 to list
+      setSliderBounds('fdPosTransFee', 0, rates.pos.txnFee,
+        ccy + '0.00', 'List ' + ccy + rates.pos.txnFee.toFixed(2));
+      // POS hardware — 0 to list × locations
+      var posHw = rates.pos.hardwareStarter * locations;
+      setSliderBounds('fdPosHardware', 0, posHw,
+        ccy + '0 (free)', 'List ' + fmt(posHw));
+    }
+    // Kiosk hardware — 0 to list (per kiosk count later in v8.14, for now flat)
+    if (rates.kiosk) {
+      setSliderBounds('fdKioskHardware', 0, rates.kiosk.hardware,
+        ccy + '0 (free)', 'List ' + fmt(rates.kiosk.hardware));
+    }
+  }
+  function setSliderBounds(targetId, minVal, maxVal, floorLabel, listLabel) {
+    var slider = document.querySelector('.lever-slider[data-target="' + targetId + '"]');
+    if (!slider) return;
+    slider.min = String(minVal);
+    slider.max = String(maxVal);
+    var meta = slider.parentElement && slider.parentElement.querySelector('.lever-meta');
+    if (meta) {
+      var floorEl = meta.querySelector('.lever-floor');
+      var listEl  = meta.querySelector('.lever-list');
+      if (floorEl) floorEl.textContent = floorLabel;
+      if (listEl)  listEl.textContent  = listLabel;
+    }
+    // Sync slider position to current input value if any
+    var input = $(targetId);
+    if (input && input.value && !isNaN(parseFloat(input.value))) {
+      slider.value = input.value;
+    }
   }
 
   // Show / hide product toggles based on market availability. Driven by the
@@ -2974,8 +3094,27 @@
         // If the rep typed into fdMonthlySub, treat it as manually owned
         // — pre-fill won't overwrite it any more, even if scope changes.
         if (id === 'fdMonthlySub') el.dataset.auto = '';
+        // v8.12: keep the paired slider in sync if this is a lever input
+        var pairedSlider = document.querySelector('.lever-slider[data-target="' + id + '"]');
+        if (pairedSlider && el.value && !isNaN(parseFloat(el.value))) {
+          pairedSlider.value = el.value;
+        }
         scheduleSave();
         recompute();
+      });
+    });
+
+    // v8.12: slider → input sync. Each .lever-slider drags update its
+    // paired numeric input, which then fires its own 'input' event to
+    // run recompute().
+    document.querySelectorAll('.lever-slider').forEach(function (slider) {
+      slider.addEventListener('input', function () {
+        var targetId = slider.dataset.target;
+        var input = $(targetId);
+        if (!input) return;
+        input.value = slider.value;
+        // Trigger the input's listener so save + recompute fire
+        input.dispatchEvent(new Event('input', { bubbles: true }));
       });
     });
 
