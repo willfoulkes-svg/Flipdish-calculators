@@ -1061,44 +1061,43 @@
     <span class="text">Flipdish proposal <span class="sub">Type the rates from the SFDC quote · only the cards for products you ticked above appear here</span></span>
   </div>
 
-  <!-- OO proposal — processing rate only (sub lives in the Subscription
-       card below as a single bundled figure) -->
-  <div class="card" id="card-proposalOO" style="display:none;">
-    <h3>Direct ordering — Flipdish proposal</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>OO processing %</label>
-        <input id="fdOOProcessingRate" type="number" min="0" step="0.1" placeholder="e.g. 5">
+  <!-- v8.11: side-by-side proposal — In-store (POS + Kiosk hardware) on
+       the left, Direct ordering (OO) on the right. Mirrors Step 2's
+       layout so "theirs vs ours" reads as a clean visual pairing. -->
+  <div class="current-grid">
+    <!-- In-store proposal — combines POS rate/fee/hardware + Kiosk hardware
+         into one card. Individual fields show only when their product is
+         ticked. -->
+    <div class="card" id="card-proposalInstore" style="display:none;">
+      <h3>In-store — Flipdish proposal</h3>
+      <div class="grid2">
+        <div class="field" id="fdPosRateField" style="display:none;">
+          <label>POS processing %</label>
+          <input id="fdPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1.2">
+        </div>
+        <div class="field" id="fdPosTransFeeField" style="display:none;">
+          <label>Per-transaction fee</label>
+          <input id="fdPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
+        </div>
+        <div class="field" id="fdPosHardwareField" style="display:none;">
+          <label>POS hardware <span class="hint">(one-off, total)</span></label>
+          <input id="fdPosHardware" type="number" min="0" step="50" placeholder="e.g. 799">
+        </div>
+        <div class="field" id="fdKioskHardwareField" style="display:none;">
+          <label>Kiosk hardware <span class="hint">(one-off, total)</span></label>
+          <input id="fdKioskHardware" type="number" min="0" step="50" placeholder="e.g. 1500">
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- POS proposal — processing + transaction + hardware -->
-  <div class="card" id="card-proposalPOS" style="display:none;">
-    <h3>POS — Flipdish proposal</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>POS processing %</label>
-        <input id="fdPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1.2">
-      </div>
-      <div class="field">
-        <label>Per-transaction fee</label>
-        <input id="fdPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
-      </div>
-      <div class="field">
-        <label>POS hardware (one-off, total)</label>
-        <input id="fdPosHardware" type="number" min="0" step="50" placeholder="e.g. 799">
-      </div>
-    </div>
-  </div>
-
-  <!-- Kiosk proposal — hardware only (sub bundled in below) -->
-  <div class="card" id="card-proposalKiosk" style="display:none;">
-    <h3>Kiosk — Flipdish proposal</h3>
-    <div class="grid3">
-      <div class="field">
-        <label>Kiosk hardware (one-off, total)</label>
-        <input id="fdKioskHardware" type="number" min="0" step="50" placeholder="e.g. 1500">
+    <!-- Direct ordering proposal — processing rate only (sub bundled below) -->
+    <div class="card" id="card-proposalOO" style="display:none;">
+      <h3>Direct ordering — Flipdish proposal</h3>
+      <div class="grid2">
+        <div class="field">
+          <label>OO processing %</label>
+          <input id="fdOOProcessingRate" type="number" min="0" step="0.1" placeholder="e.g. 5">
+        </div>
       </div>
     </div>
   </div>
@@ -1604,11 +1603,18 @@
   // ---------- Scope visibility ----------
   function applyScopeVisibility() {
     var anyScope = $('includeOO').checked || $('includePOS').checked || $('includeKiosk').checked;
+    var posOn   = $('includePOS').checked;
+    var kioskOn = $('includeKiosk').checked;
     $('card-currentOO').style.display    = $('includeOO').checked    ? '' : 'none';
-    $('card-currentPOS').style.display   = $('includePOS').checked   ? '' : 'none';
+    $('card-currentPOS').style.display   = posOn ? '' : 'none';
     $('card-proposalOO').style.display   = $('includeOO').checked    ? '' : 'none';
-    $('card-proposalPOS').style.display  = $('includePOS').checked   ? '' : 'none';
-    $('card-proposalKiosk').style.display = $('includeKiosk').checked ? '' : 'none';
+    // v8.11: combined In-store proposal card. Visible if POS OR Kiosk
+    // ticked. Individual fields toggle independently.
+    if ($('card-proposalInstore')) $('card-proposalInstore').style.display = (posOn || kioskOn) ? '' : 'none';
+    if ($('fdPosRateField'))       $('fdPosRateField').style.display       = posOn ? '' : 'none';
+    if ($('fdPosTransFeeField'))   $('fdPosTransFeeField').style.display   = posOn ? '' : 'none';
+    if ($('fdPosHardwareField'))   $('fdPosHardwareField').style.display   = posOn ? '' : 'none';
+    if ($('fdKioskHardwareField')) $('fdKioskHardwareField').style.display = kioskOn ? '' : 'none';
     // v8.8: Bundled-sub card only appears once the rep has at least one
     // proposal-side input (rate or hardware). Will: "Total monthly
     // subscription should only appear once we've added in the rest
