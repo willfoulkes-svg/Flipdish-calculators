@@ -89,24 +89,15 @@
     border-radius: 999px; background: var(--fam);
   }
 
-  /* ---------- Title row (prospect name + country + save stamp) ---------- */
-  .title-row {
+  /* ---------- Top row (country pills + save stamp) v8.8 ---------- */
+  /* Country toggle is the main top thing now. Prospect name moves into
+     Step 1 ("Deal Details") as a regular form field. */
+  .top-row {
     display: flex; align-items: center; justify-content: space-between;
     gap: 16px; flex-wrap: wrap;
-    padding-bottom: 14px; margin-bottom: 6px;
+    padding: 6px 0 14px;
+    margin-bottom: 6px;
     border-bottom: 1px solid var(--border);
-  }
-  .title-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 auto; }
-  .prospect-name-input {
-    font-family: 'Domine', Georgia, serif;
-    font-size: 28px; font-weight: 700; color: var(--flipdish-blue-dark);
-    background: transparent; border: 0; padding: 4px 0;
-    outline: none; letter-spacing: -0.01em;
-    width: 100%;
-  }
-  .prospect-name-input::placeholder { color: #B8C2CC; }
-  .prospect-name-input:focus {
-    box-shadow: inset 0 -2px 0 var(--flipdish-blue);
   }
   .save-stamp {
     font-size: 12px; color: var(--muted);
@@ -224,6 +215,33 @@
   }
   @media (max-width: 760px) {
     .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+  /* v8.8: side-by-side current — In-store left, Direct ordering right */
+  .current-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 1000px) { .current-grid { grid-template-columns: 1fr; } }
+  /* When only one of the two cards is visible (other has display:none),
+     the visible one fills the row — the empty grid track collapses. */
+
+  /* Marketplace context card — neutral, no warm/cool theme since it's
+     not a cost-replacement comparison */
+  .card-marketplace {
+    background: #FAFCFE;
+    border-left: 3px solid #8B7CC4;
+  }
+  .card-marketplace h3 { color: #5B4D8E; border-bottom-color: rgba(139, 124, 196, 0.18); }
+  .card-marketplace-note {
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    background: rgba(139, 124, 196, 0.08);
+    border-radius: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #4F4070;
   }
   .field { display: flex; flex-direction: column; }
   .field.full { grid-column: 1 / -1; }
@@ -584,24 +602,75 @@
     color: var(--muted); line-height: 1.5;
   }
 
-  /* ---------- Scope toggle row (which levers are in play) ---------- */
-  .scope-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-  .scope-toggle {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 14px; border: 1px solid rgba(15, 23, 42, 0.10);
-    border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 500;
-    background: white; color: var(--flipdish-dark);
+  /* ---------- Scope tiles (v8.8) — big, friendly, with icons ---------- */
+  .scope-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 720px) { .scope-row { grid-template-columns: 1fr; } }
+  .scope-tile {
+    position: relative;
+    display: flex; flex-direction: column;
+    align-items: flex-start; gap: 4px;
+    padding: 18px 18px 14px;
+    border: 1.5px solid rgba(15, 23, 42, 0.08);
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
     user-select: none;
+    transition: all .15s ease;
+  }
+  .scope-tile:hover {
+    border-color: var(--flipdish-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+  }
+  /* Hide the actual checkbox; the tile itself acts as the control */
+  .scope-tile input { position: absolute; opacity: 0; pointer-events: none; }
+  .scope-tile-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--flipdish-blue-light);
+    color: var(--flipdish-blue);
+    margin-bottom: 6px;
+  }
+  .scope-tile-icon svg { width: 22px; height: 22px; }
+  .scope-tile-label {
+    font-size: 16px; font-weight: 700;
+    color: var(--flipdish-dark);
+    letter-spacing: -0.012em;
+  }
+  .scope-tile-sub {
+    font-size: 12.5px; color: var(--muted);
+  }
+  .scope-tile-check {
+    position: absolute; top: 12px; right: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1.5px solid rgba(15, 23, 42, 0.15);
+    color: white;
     transition: all .12s ease;
   }
-  .scope-toggle:hover { border-color: var(--flipdish-blue); }
-  .scope-toggle input { accent-color: var(--flipdish-blue); cursor: pointer; margin: 0; }
-  .scope-toggle.on {
+  .scope-tile-check svg { width: 12px; height: 12px; opacity: 0; }
+  /* On state */
+  .scope-tile.on {
     border-color: var(--flipdish-blue);
     background: var(--flipdish-blue-light);
-    color: var(--flipdish-blue-dark);
-    font-weight: 600;
   }
+  .scope-tile.on .scope-tile-icon {
+    background: var(--flipdish-blue);
+    color: white;
+  }
+  .scope-tile.on .scope-tile-check {
+    background: var(--flipdish-blue);
+    border-color: var(--flipdish-blue);
+  }
+  .scope-tile.on .scope-tile-check svg { opacity: 1; }
 
   /* ---------- Value hero ---------- */
   .value-hero {
@@ -744,32 +813,34 @@
     All deals
   </a>
 
-  <span class="fam-pill">Cross-product · Deal Room</span>
-
-  <!-- ===================== TITLE ROW ===================== -->
-  <div class="title-row">
-    <div class="title-left">
-      <input id="prospectName" class="prospect-name-input" type="text"
-             placeholder="Type the prospect's business name…" autocomplete="off">
-      <span class="save-stamp" id="saveStamp"><span class="dot"></span><span id="saveStampText">—</span></span>
-    </div>
+  <!-- ===================== TOP ROW (v8.8): country first, save stamp ===================== -->
+  <!-- Will: country toggle should be the main top thing; prospect name
+       moves into Step 1 ("Deal Details"). -->
+  <div class="top-row">
     <div class="country-pills" id="countryPills">
       <button class="country-pill" data-country="UK" type="button">🇬🇧 UK</button>
       <button class="country-pill" data-country="IE" type="button">🇮🇪 IE</button>
       <button class="country-pill" data-country="US" type="button">🇺🇸 US</button>
       <button class="country-pill" data-country="ES" type="button">🇪🇸 ES</button>
     </div>
+    <span class="save-stamp" id="saveStamp"><span class="dot"></span><span id="saveStampText">—</span></span>
   </div>
 
-  <!-- ===================== STEP 1 — WHO ===================== -->
+  <!-- ===================== STEP 1 — DEAL DETAILS ===================== -->
   <div class="step">
     <span class="num">1</span>
     <span class="step-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
     </span>
-    <span class="text">Who <span class="sub">Basics for the deal record</span></span>
+    <span class="text">Deal details <span class="sub">Who you're selling to and who's selling</span></span>
   </div>
   <div class="card">
+    <div class="grid3" style="margin-bottom:14px;">
+      <div class="field" style="grid-column: 1 / -1;">
+        <label>Prospect business name</label>
+        <input id="prospectName" type="text" placeholder="e.g. Billy's Pizza" autocomplete="off">
+      </div>
+    </div>
     <div class="grid3">
       <div class="field">
         <label>Number of locations</label>
@@ -821,77 +892,131 @@
        like Phone AI, Kiosk, FMM, QROP live in their own standalone
        calculators and roll up into the bundle subscription below. -->
   <div class="scope-row" id="scopeToggles">
-    <label class="scope-toggle" data-toggle="includeOO">
-      <input type="checkbox" id="includeOO"> Online Ordering
+    <label class="scope-tile" data-toggle="includeOO">
+      <input type="checkbox" id="includeOO">
+      <span class="scope-tile-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+      </span>
+      <span class="scope-tile-label">Online Ordering</span>
+      <span class="scope-tile-sub">Web · app · QR</span>
+      <span class="scope-tile-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
     </label>
-    <label class="scope-toggle" data-toggle="includePOS">
-      <input type="checkbox" id="includePOS"> POS
+    <label class="scope-tile" data-toggle="includePOS">
+      <input type="checkbox" id="includePOS">
+      <span class="scope-tile-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><path d="M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9"/><path d="M9 21v-6h6v6"/></svg>
+      </span>
+      <span class="scope-tile-label">POS</span>
+      <span class="scope-tile-sub">Card terminal · till</span>
+      <span class="scope-tile-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
     </label>
-    <label class="scope-toggle" data-toggle="includeKiosk">
-      <input type="checkbox" id="includeKiosk"> Kiosk
+    <label class="scope-tile" data-toggle="includeKiosk">
+      <input type="checkbox" id="includeKiosk">
+      <span class="scope-tile-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="18" rx="2"/><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="10" x2="15" y2="10"/><circle cx="12" cy="16" r="1.4"/><path d="M9 22h6"/></svg>
+      </span>
+      <span class="scope-tile-label">Kiosk</span>
+      <span class="scope-tile-sub">In-store self-order</span>
+      <span class="scope-tile-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
     </label>
   </div>
 
-  <!-- OO current — direct ordering provider comparison -->
-  <div class="card" id="card-currentOO" style="display:none;">
-    <h3>Direct ordering — today <span class="hint" style="font-weight:400;font-size:13px;color:var(--muted);margin-left:8px;">(their current direct ordering platform — not marketplace channels)</span></h3>
-    <div class="grid3">
-      <div class="field">
-        <label>Current direct ordering provider</label>
-        <input id="curOOProvider" type="text" placeholder="e.g. Foodhub, Mealzo, OrderYoyo">
+  <!-- v8.8: side-by-side current — In-store left, Direct ordering right.
+       Will: very long list with too much blank space; pair them up. -->
+  <div class="current-grid">
+    <!-- In-store current (POS + Kiosk — anything in the four walls) -->
+    <div class="card" id="card-currentPOS" style="display:none;">
+      <h3>In-store — today</h3>
+      <div class="grid2">
+        <div class="field">
+          <label>Current POS provider</label>
+          <input id="curPosProvider" type="text" placeholder="e.g. Clover, Square">
+        </div>
+        <div class="field">
+          <label>Monthly POS GMV <span class="hint">(in-store sales)</span></label>
+          <input id="curPosGmv" type="number" min="0" step="100" placeholder="e.g. 20000">
+        </div>
+        <div class="field">
+          <label>Average order value (POS)</label>
+          <input id="curAov" type="number" min="0" step="0.5" placeholder="e.g. 15">
+        </div>
+        <div class="field">
+          <label>Current merchant rate % <span class="hint">(card)</span></label>
+          <input id="curPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1">
+        </div>
+        <div class="field">
+          <label>Current per-transaction fee</label>
+          <input id="curPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
+        </div>
+        <div class="field">
+          <label>Current POS monthly subscription</label>
+          <input id="curPosSub" type="number" min="0" step="1" placeholder="e.g. 99">
+        </div>
       </div>
-      <div class="field">
-        <label>Monthly online revenue <span class="hint">(via direct ordering)</span></label>
-        <input id="curOOGmv" type="number" min="0" step="100" placeholder="e.g. 20000">
-      </div>
-      <div class="field">
-        <label>Average online order value</label>
-        <input id="curOOAov" type="number" min="0" step="0.5" placeholder="e.g. 22">
-      </div>
-      <div class="field">
-        <label>Software subscription <span class="hint">(£/mo)</span></label>
-        <input id="curOOSub" type="number" min="0" step="1" placeholder="e.g. 79">
-      </div>
-      <div class="field">
-        <label>Processing fee % <span class="hint">(or commission % — same thing in OO)</span></label>
-        <input id="curOOProcessingRate" type="number" min="0" step="0.1" placeholder="e.g. 3.4">
-      </div>
-      <div class="field">
-        <label>Per-transaction fee</label>
-        <input id="curOOTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.05">
+    </div>
+
+    <!-- Direct ordering current — provider comparison -->
+    <div class="card" id="card-currentOO" style="display:none;">
+      <h3>Direct ordering — today <span class="hint" style="font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px;">(not marketplace channels)</span></h3>
+      <div class="grid2">
+        <div class="field">
+          <label>Current provider</label>
+          <input id="curOOProvider" type="text" placeholder="e.g. Foodhub, Mealzo">
+        </div>
+        <div class="field">
+          <label>Monthly online revenue <span class="hint">(direct)</span></label>
+          <input id="curOOGmv" type="number" min="0" step="100" placeholder="e.g. 2000">
+        </div>
+        <div class="field">
+          <label>Average online order value</label>
+          <input id="curOOAov" type="number" min="0" step="0.5" placeholder="e.g. 25">
+        </div>
+        <div class="field">
+          <label>Software subscription <span class="hint">(£/mo)</span></label>
+          <input id="curOOSub" type="number" min="0" step="1" placeholder="e.g. 79">
+        </div>
+        <div class="field">
+          <label>Processing fee % <span class="hint">(or commission %)</span></label>
+          <input id="curOOProcessingRate" type="number" min="0" step="0.1" placeholder="e.g. 3.4">
+        </div>
+        <div class="field">
+          <label>Per-transaction fee</label>
+          <input id="curOOTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.05">
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- In-store current — covers POS + Kiosk (anything in the four walls) -->
-  <div class="card" id="card-currentPOS" style="display:none;">
-    <h3>In-store — today</h3>
+  <!-- v8.8 — Marketplaces (Deliveroo / Uber Eats / JustEat). NOT a cost-
+       replacement comparison — Flipdish doesn't compete with marketplaces.
+       Captured here as deal context: heavy marketplace dependence is a
+       strong reason to push direct ordering, kiosk and hardware
+       investment. Informs the value pitch but doesn't change the math. -->
+  <div class="card card-marketplace" id="card-marketplaces">
+    <h3>Marketplace context <span class="hint" style="font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px;">(Deliveroo / Uber Eats / JustEat — not cost-replaced, but informs the deal)</span></h3>
     <div class="grid3">
       <div class="field">
-        <label>Current POS provider</label>
-        <input id="curPosProvider" type="text" placeholder="e.g. Clover, Square, Toast">
+        <label>Monthly marketplace revenue <span class="hint">(combined)</span></label>
+        <input id="curMarketGmv" type="number" min="0" step="100" placeholder="e.g. 10000">
       </div>
       <div class="field">
-        <label>Monthly POS GMV <span class="hint">(in-store sales)</span></label>
-        <input id="curPosGmv" type="number" min="0" step="100" placeholder="e.g. 20000">
+        <label>Marketplace commission % <span class="hint">(typical 25–35%)</span></label>
+        <input id="curMarketCommission" type="number" min="0" step="0.5" placeholder="e.g. 30">
       </div>
       <div class="field">
-        <label>Average order value (POS)</label>
-        <input id="curAov" type="number" min="0" step="0.5" placeholder="e.g. 15">
-      </div>
-      <div class="field">
-        <label>Current merchant rate % <span class="hint">(card processing)</span></label>
-        <input id="curPosRate" type="number" min="0" step="0.05" placeholder="e.g. 1">
-      </div>
-      <div class="field">
-        <label>Current per-transaction fee</label>
-        <input id="curPosTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.10">
-      </div>
-      <div class="field">
-        <label>Current POS monthly subscription</label>
-        <input id="curPosSub" type="number" min="0" step="1" placeholder="e.g. 99">
+        <label>Top platform</label>
+        <input id="curMarketPrimary" type="text" placeholder="e.g. Deliveroo">
       </div>
     </div>
+    <p class="card-marketplace-note">
+      Heavy marketplace dependence strengthens the case for direct ordering, kiosk and hardware investment — even if it doesn't move the cost-replacement maths. Use this in the value pitch.
+    </p>
   </div>
 
 
@@ -1222,7 +1347,10 @@
         ooProvider: '', ooGmv: '', ooAov: '', ooSub: '',
         ooProcessingRate: '', ooTransFee: '',
         posProvider: '', posGmv: '', aov: '',
-        posRate: '', posTransFee: '', posSub: ''
+        posRate: '', posTransFee: '', posSub: '',
+        // v8.8: marketplace context (Deliveroo/Uber Eats/JustEat) —
+        // not part of cost-replacement maths but saved with the deal.
+        marketGmv: '', marketCommission: '', marketPrimary: ''
       },
       // Flipdish proposal — per-product RATES and HARDWARE; subscription
       // is a single bundled figure (monthlySub) the rep copies from the
@@ -1369,6 +1497,10 @@
     $('curPosRate').value             = c.posRate || '';
     $('curPosTransFee').value         = c.posTransFee || '';
     $('curPosSub').value              = c.posSub || '';
+    // v8.8: Marketplace context (Deliveroo / Uber Eats / JustEat)
+    if ($('curMarketGmv'))         $('curMarketGmv').value         = c.marketGmv || '';
+    if ($('curMarketCommission'))  $('curMarketCommission').value  = c.marketCommission || '';
+    if ($('curMarketPrimary'))     $('curMarketPrimary').value     = c.marketPrimary || '';
 
     var f = prospect.flipdish || {};
     $('fdOOProcessingRate').value   = f.ooProcessingRate || '';
@@ -1411,7 +1543,12 @@
       aov:              val('curAov'),
       posRate:          val('curPosRate'),
       posTransFee:      val('curPosTransFee'),
-      posSub:           val('curPosSub')
+      posSub:           val('curPosSub'),
+      // v8.8: Marketplace context — not used in cost-replacement maths,
+      // but informs the value pitch.
+      marketGmv:        val('curMarketGmv'),
+      marketCommission: val('curMarketCommission'),
+      marketPrimary:    val('curMarketPrimary').trim()
     };
     prospect.flipdish = {
       // OO
@@ -1431,11 +1568,22 @@
 
   // ---------- Scope visibility ----------
   function applyScopeVisibility() {
+    var anyScope = $('includeOO').checked || $('includePOS').checked || $('includeKiosk').checked;
     $('card-currentOO').style.display    = $('includeOO').checked    ? '' : 'none';
     $('card-currentPOS').style.display   = $('includePOS').checked   ? '' : 'none';
     $('card-proposalOO').style.display   = $('includeOO').checked    ? '' : 'none';
     $('card-proposalPOS').style.display  = $('includePOS').checked   ? '' : 'none';
     $('card-proposalKiosk').style.display = $('includeKiosk').checked ? '' : 'none';
+    // v8.8: Bundled-sub card only appears once the rep has at least one
+    // proposal-side input (rate or hardware). Will: "Total monthly
+    // subscription should only appear once we've added in the rest
+    // of the proposal."
+    var hasProposalInput =
+        ($('includeOO').checked    && parseFloat($('fdOOProcessingRate').value) > 0)
+     || ($('includePOS').checked   && (parseFloat($('fdPosRate').value) > 0 || parseFloat($('fdPosHardware').value) > 0))
+     || ($('includeKiosk').checked && parseFloat($('fdKioskHardware').value) > 0);
+    if ($('card-bundleSub')) $('card-bundleSub').style.display = (anyScope && hasProposalInput) ? '' : 'none';
+
     // Kiosk has no Step 2 current card — most customers don't have kiosks
     // today, so there's nothing to displace. Kiosk only appears in the
     // proposal (Step 3) since it's a NEW offering Flipdish is selling.
@@ -1447,7 +1595,7 @@
     prefillProposalFromList();
 
     // Pill highlight
-    document.querySelectorAll('.scope-toggle').forEach(function (el) {
+    document.querySelectorAll('.scope-tile').forEach(function (el) {
       var id = el.dataset.toggle;
       var cb = $(id);
       if (cb) el.classList.toggle('on', cb.checked);
@@ -1523,7 +1671,7 @@
   // don't leave a stale current/proposal card visible.
   function applyMarketAvailability() {
     var rates = LIST_RATES[prospect.country] || LIST_RATES.UK;
-    var posToggle = document.querySelector('.scope-toggle[data-toggle="includePOS"]');
+    var posToggle = document.querySelector('.scope-tile[data-toggle="includePOS"]');
     if (posToggle) {
       var posAvailable = !!rates.pos;
       posToggle.style.display = posAvailable ? '' : 'none';
@@ -1826,6 +1974,9 @@
     // Without this, streams lag behind the user's latest keystroke by the
     // full 400ms debounce window.
     if (!isInitializing) collect();
+    // v8.8: re-apply scope visibility so the bundled-sub card appears
+    // as soon as the rep types a proposal-side rate or hardware value.
+    if (!isInitializing) applyScopeVisibility();
     var v = computeValueStory(prospect);
 
     // Step 5 (Value Story hero / streams / narrative) removed in v8.3 —
@@ -2434,9 +2585,10 @@
       if (card) card.style.display = 'none';
     });
 
-    // Idle states
+    // Idle states (show summary as guidance)
     if (o.state === 'idle') {
       panel.classList.add('idle');
+      summary.style.display = '';
       if (o.awaitingProposal) {
         pill.textContent = 'Awaiting proposal';
         title.textContent = 'Type your Flipdish proposal in Step 3';
@@ -2459,7 +2611,10 @@
     panel.classList.add(o.state);
     nums.style.display = '';
     leversWrap.style.display = '';
-    suggested.style.display = '';
+    // v8.8: hide the verbose summary paragraph in active states.
+    // The 3-number row + pill + title already say everything the
+    // paragraph used to. Will: "feels like a wasted line."
+    summary.style.display = 'none';
 
     // Headline numbers — comparison vs the rep's typed proposal
     $('offerCurrentVal').textContent  = fmtMoney(o.customerTotal) + '/mo';
@@ -2751,6 +2906,7 @@
       'prospectName','locations','contactName','ownerName',
       'curOOProvider','curOOGmv','curOOAov','curOOSub','curOOProcessingRate','curOOTransFee',
       'curPosProvider','curPosGmv','curAov','curPosRate','curPosTransFee','curPosSub',
+      'curMarketGmv','curMarketCommission','curMarketPrimary',
       'fdOOProcessingRate',
       'fdPosRate','fdPosTransFee','fdPosHardware',
       'fdKioskHardware',
