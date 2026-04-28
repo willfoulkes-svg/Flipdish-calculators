@@ -944,13 +944,33 @@
   .offer-panel .status-strip.embedded.bust { border-left-color: var(--red-strong); }
   .offer-panel .status-strip.embedded.idle { border-left-color: var(--muted); }
 
-  /* ---------- Document upload stub (v8.5: lighter, less prominent) ---------- */
+  /* ---------- Provider-statement drop zone (v8.16: now interactive) ---------- */
   .upload-card {
     background: #F8FAFC;
     border: 1px dashed var(--flipdish-blue-line);
     border-radius: 10px;
     padding: 13px 16px;
     margin-bottom: 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .upload-card:hover {
+    background: var(--flipdish-blue-light);
+    border-color: var(--flipdish-blue);
+  }
+  .upload-card.is-dragover {
+    background: #DDEBFB;
+    border-color: var(--flipdish-blue);
+    border-style: solid;
+  }
+  .upload-card.is-processing {
+    background: #FFF8E1;
+    border-color: #E5B100;
+    cursor: progress;
+  }
+  .upload-card.is-done {
+    background: #DEF5E5;
+    border-color: #2F8F4D;
   }
   .upload-grid {
     display: grid;
@@ -1283,9 +1303,14 @@
     <span class="text">Current commercials <span class="sub">What the customer processes and pays today</span></span>
   </div>
 
-  <!-- Document upload stub - UI in place, extraction wires up later
-       alongside the Supabase migration. -->
-  <div class="card upload-card" id="card-uploadStub">
+  <!-- v8.16: Provider-statement extraction (prototype).
+       Drop-zone takes a PDF/image. JS reads the file, calls
+       extractProviderStatement() which currently returns mocked data
+       based on filename keywords - enough to feel the full UX. Real
+       Claude API call replaces the mock once the API key + serverless
+       endpoint are wired up. -->
+  <label class="card upload-card" id="card-uploadStub" for="providerStatementInput">
+    <input type="file" id="providerStatementInput" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none;">
     <div class="upload-grid">
       <div class="upload-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -1296,11 +1321,11 @@
         </svg>
       </div>
       <div class="upload-text">
-        <div class="upload-title">Drop a current provider statement <span class="badge-soon">Coming soon</span></div>
-        <p class="upload-desc">Drop in an invoice or statement from the customer's current provider (Foodhub, Mealzo, OrderYoyo, Toast, Square, Clover or any other) and we'll read the rates and pre-fill the cards below. Until this is wired, fill in the numbers manually below - same fields, same outcome.</p>
+        <div class="upload-title" id="uploadTitle">Drop a current provider statement <span class="badge-soon" id="uploadBadge">Prototype</span></div>
+        <p class="upload-desc" id="uploadDesc">Drop in an invoice or statement from the customer's current provider (Foodhub, Mealzo, OrderYoyo, Toast, Square, Clover or any other) - we'll read the rates and pre-fill the cards below. Click anywhere on this panel or drag a file here to try.</p>
       </div>
     </div>
-  </div>
+  </label>
 
   <!-- Scope toggles - which products are in this deal. v8.16: all four
        Flipdish products that have processing or hardware levers are first-
@@ -2023,6 +2048,193 @@
       html += ' <span class="vol-tier-pct">flag for CRO review</span>';
     }
     pill.innerHTML = html;
+  }
+
+  // ============================================================
+  // v8.16: Provider-statement extraction (prototype)
+  // ============================================================
+  // Drop a PDF / image of a competitor's invoice or proposal -
+  // we extract provider name, processing rate, sub, per-txn fee
+  // etc. and pre-fill Step 2.
+  //
+  // Currently the extraction is a CLIENT-SIDE STUB that returns
+  // mocked data based on filename keywords. To go live, replace
+  // extractProviderStatement() with a fetch to a Vercel serverless
+  // function that calls the Anthropic API:
+  //   POST /api/extract-rates  (multipart/form-data, file=...)
+  //   → returns { provider, productType, ...extracted fields }
+  // The pre-fill code below stays unchanged.
+  //
+  // Mocked profiles cover the two test invoices Will provided
+  // (FeedMe Online direct-ordering contract, Square POS proposal)
+  // plus a generic fallback so any other file gives a feel for the UX.
+
+  function extractProviderStatement(file) {
+    // Returns a Promise<extractedFields>. Real impl will POST to
+    // /api/extract-rates and let Claude do the work. Mock for now.
+    return new Promise(function (resolve, reject) {
+      var name = (file.name || '').toLowerCase();
+      // Simulate a network/API call
+      setTimeout(function () {
+        if (/feed.?me|action.?prompt|dine.?india/.test(name)) {
+          resolve({
+            provider: 'FeedMe Online',
+            productType: 'oo',
+            confidence: 0.92,
+            fields: {
+              ooProvider: 'FeedMe Online',
+              ooSub: '0',
+              ooProcessingRate: '8',
+              ooTransFee: '0'
+            },
+            note: 'Customer is on the 8% commission plan (no monthly fee). Alternative tier was £60+VAT/mo + 50p per card order.'
+          });
+        } else if (/square/.test(name)) {
+          resolve({
+            provider: 'Square',
+            productType: 'pos',
+            confidence: 0.95,
+            fields: {
+              locations: '3',
+              posProvider: 'Square',
+              posRate: '0.69',
+              posTransFee: '0',
+              posSub: '296'
+            },
+            hardware: {
+              listTotal: 4938,
+              items: ['3× Square Register Kit', '3× Square Kiosk', '3× Ethernet Printer', '3× KDS']
+            },
+            note: 'Square is offering 100% off hardware (£4,938 list → £0). Software £296/mo, card processing 0.69%.'
+          });
+        } else {
+          // Generic fallback so any file gives a feel for the UX
+          resolve({
+            provider: 'Unknown provider',
+            productType: 'oo',
+            confidence: 0.4,
+            fields: {
+              ooProvider: 'Unknown - please check',
+              ooSub: '49',
+              ooProcessingRate: '5',
+              ooTransFee: '0.10'
+            },
+            note: 'Mock extraction for prototype. Real Claude API will read this file directly and return high-confidence fields from any provider format.'
+          });
+        }
+      }, 1100);
+    });
+  }
+
+  // Apply extracted fields to the form, tick the relevant scope,
+  // and surface a confirmation banner so the rep knows what was
+  // pre-filled and can edit anything that looks off.
+  function applyExtractedFields(extracted) {
+    if (!extracted || !extracted.fields) return;
+    var f = extracted.fields;
+    // Tick the scope tile that matches the product type
+    if (extracted.productType === 'oo') {
+      $('includeOO').checked = true;
+    } else if (extracted.productType === 'pos') {
+      $('includePOS').checked = true;
+    } else if (extracted.productType === 'kiosk') {
+      $('includeKiosk').checked = true;
+    } else if (extracted.productType === 'qrop') {
+      $('includeQROP').checked = true;
+    }
+    // Pre-fill any field that came back. Reps can edit afterwards.
+    Object.keys(f).forEach(function (key) {
+      var idMap = {
+        locations: 'locations',
+        ooProvider: 'curOOProvider',
+        ooSub: 'curOOSub',
+        ooProcessingRate: 'curOOProcessingRate',
+        ooTransFee: 'curOOTransFee',
+        ooGmv: 'curOOGmv',
+        ooAov: 'curOOAov',
+        posProvider: 'curPosProvider',
+        posGmv: 'curPosGmv',
+        posAov: 'curAov',
+        posRate: 'curPosRate',
+        posTransFee: 'curPosTransFee',
+        posSub: 'curPosSub'
+      };
+      var id = idMap[key];
+      if (id && $(id)) $(id).value = String(f[key]);
+    });
+    // Re-run scope visibility + recompute so verdicts update
+    applyScopeVisibility();
+    scheduleSave();
+    recompute();
+  }
+
+  function setUploadCardState(state, message) {
+    var card  = $('card-uploadStub');
+    var title = $('uploadTitle');
+    var desc  = $('uploadDesc');
+    var badge = $('uploadBadge');
+    if (!card) return;
+    card.classList.remove('is-dragover','is-processing','is-done');
+    if (state === 'idle') {
+      card.classList.add(); // none
+      if (title) title.innerHTML = 'Drop a current provider statement <span class="badge-soon" id="uploadBadge">Prototype</span>';
+      if (desc)  desc.textContent = 'Drop in an invoice or statement from the customer\'s current provider (Foodhub, Mealzo, OrderYoyo, Toast, Square, Clover or any other) - we\'ll read the rates and pre-fill the cards below. Click anywhere on this panel or drag a file here to try.';
+    } else if (state === 'processing') {
+      card.classList.add('is-processing');
+      if (title) title.textContent = 'Reading the statement…';
+      if (desc)  desc.textContent  = message || 'Extracting provider name, rates, sub and per-transaction fee. Hold on a sec.';
+    } else if (state === 'done') {
+      card.classList.add('is-done');
+      if (title) title.textContent = 'Done - rates pre-filled';
+      if (desc)  desc.innerHTML    = (message || '') + ' <span style="color:var(--muted);">Drop another to replace, or edit any field below.</span>';
+    } else if (state === 'error') {
+      card.classList.add('is-processing');
+      if (title) title.textContent = 'Extraction failed';
+      if (desc)  desc.textContent  = message || 'Something went wrong reading the file. Fill the fields manually below.';
+    }
+  }
+
+  function handleProviderStatementFile(file) {
+    if (!file) return;
+    setUploadCardState('processing');
+    extractProviderStatement(file)
+      .then(function (extracted) {
+        applyExtractedFields(extracted);
+        var summary = 'Extracted from <strong>' + (file.name || 'file') + '</strong>: provider <strong>' +
+          (extracted.provider || 'unknown') + '</strong>' +
+          (extracted.note ? '. ' + extracted.note : '.');
+        setUploadCardState('done', summary);
+      })
+      .catch(function (err) {
+        setUploadCardState('error', err && err.message ? err.message : null);
+      });
+  }
+
+  function wireProviderStatementUpload() {
+    var card  = $('card-uploadStub');
+    var input = $('providerStatementInput');
+    if (!card || !input) return;
+    // Hidden input handles file picker (label-for already wires the click).
+    input.addEventListener('change', function () {
+      if (input.files && input.files[0]) handleProviderStatementFile(input.files[0]);
+    });
+    // Drag & drop
+    ['dragenter','dragover'].forEach(function (evt) {
+      card.addEventListener(evt, function (e) {
+        e.preventDefault(); e.stopPropagation();
+        card.classList.add('is-dragover');
+      });
+    });
+    ['dragleave','drop'].forEach(function (evt) {
+      card.addEventListener(evt, function (e) {
+        e.preventDefault(); e.stopPropagation();
+        if (evt === 'dragleave') card.classList.remove('is-dragover');
+      });
+    });
+    card.addEventListener('drop', function (e) {
+      var dt = e.dataTransfer;
+      if (dt && dt.files && dt.files[0]) handleProviderStatementFile(dt.files[0]);
+    });
   }
 
   // v8.16: page title reflects the prospect business name once typed.
@@ -4009,9 +4221,8 @@
     $('printBtn').addEventListener('click', printInternal);
     $('copyLinkBtn').addEventListener('click', copyLink);
     $('deleteBtn').addEventListener('click', deleteDeal);
-    // v8.16: Defensible discount stack panel + Live Check both removed.
-    // Section A and Section B verdicts cover deal health and the rep
-    // is now the one driving the discount choice via the sliders.
+    // v8.16: provider-statement drop zone (prototype, mocked extraction)
+    wireProviderStatementUpload();
   }
 
   // ---------- Init ----------
