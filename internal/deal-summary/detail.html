@@ -678,6 +678,26 @@
     prospect.flipdish.posHardware     = $('fdPosHardware').value;
     prospect.flipdish.kioskHardware   = $('fdKioskHardware').value;
     prospect.flipdish.monthlySub      = $('fdMonthlySub').value;
+
+    // ---- Back-compat shim for customer.html and index.html ----
+    // Those pages were built against schemas 1–8 and read per-line
+    // breakdown fields (c.ooSub, c.ooProcessingRate, c.ooTransFee,
+    // f.ooProcessingRate). v9 simplifies the customer-side input to just
+    // a bill total + revenue, so we denormalise: write the bill total
+    // into c.*Sub and zero the rate/per-txn fields. The legacy formula
+    //   curOO = ooGmv × rate + ooTxn × txnFee + sub
+    // then evaluates to     0 +       0      + bill = bill, which is
+    // correct. Flipdish-side: copy f.ooRate into f.ooProcessingRate so
+    // both names point at the same number.
+    prospect.current.ooSub             = prospect.current.ooBill || '';
+    prospect.current.ooProcessingRate  = '0';
+    prospect.current.ooTransFee        = '0';
+    prospect.current.posSub            = prospect.current.posBill || '';
+    prospect.current.posRate           = '0';
+    prospect.current.posTransFee       = '0';
+    prospect.current.aov               = prospect.current.posAov || '';   // index.html falls back to c.aov
+    prospect.flipdish.ooProcessingRate = prospect.flipdish.ooRate || '';
+
     prospect.updatedAt = Date.now();
   }
 
