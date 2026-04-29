@@ -281,6 +281,199 @@
   }
   .scope-note strong { color: var(--flipdish-blue-dark); }
 
+  /* ---------- Fees comparison grid ---------- */
+  .fees-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: white;
+  }
+  .fees-head {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 12px;
+    background: #F5F8FB;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .fees-head.fees-rival { color: var(--rival); background: var(--rival-soft); }
+  .fees-head.fees-flip  { color: var(--flipdish-blue); background: var(--flipdish-blue-light); }
+  .fees-row {
+    display: contents;
+  }
+  .fees-row > .fees-key,
+  .fees-row > .fees-cell {
+    padding: 8px 10px;
+    border-bottom: 1px solid #EEF2F6;
+    display: flex;
+    align-items: center;
+  }
+  .fees-row:last-child > .fees-key,
+  .fees-row:last-child > .fees-cell {
+    border-bottom: none;
+  }
+  .fees-key {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--flipdish-dark);
+    background: #FAFCFE;
+  }
+  .fees-cell input {
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    padding: 7px 9px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--flipdish-dark);
+    width: 100%;
+  }
+  .fees-cell input:focus {
+    outline: 2px solid var(--flipdish-blue); outline-offset: -1px;
+  }
+  .auto-tier-hint {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    margin: 4px 0 12px;
+    line-height: 1.45;
+  }
+
+  /* VAT collapsed block — tucked below the inputs */
+  details.vat-block {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #FAFCFE;
+    padding: 0 14px;
+  }
+  details.vat-block > summary {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  details.vat-block > summary::-webkit-details-marker { display: none; }
+  details.vat-block > summary::before {
+    content: "+ ";
+    color: var(--flipdish-blue);
+    font-weight: 700;
+  }
+  details.vat-block[open] > summary::before { content: "- "; }
+  .vat-block-body { padding: 4px 0 12px; }
+
+  .vat-toggle {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px;
+    background: var(--flipdish-blue-light);
+    border: 1px solid var(--flipdish-blue-line);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--flipdish-blue-dark);
+    cursor: pointer;
+    line-height: 1.45;
+    margin: 0;
+  }
+  .vat-toggle input[type="checkbox"] {
+    margin: 2px 0 0 0;
+    width: 16px; height: 16px;
+    accent-color: var(--flipdish-blue);
+    cursor: pointer;
+  }
+  .vat-toggle .hint { display: block; margin-top: 2px; }
+
+  .vat-info {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+    line-height: 1.5;
+  }
+
+  details.working {
+    margin-top: 14px;
+  }
+  details.working > summary {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); padding: 8px 0;
+    list-style: none; cursor: pointer;
+  }
+  details.working > summary::-webkit-details-marker { display: none; }
+  details.working > summary::before {
+    content: "+ ";
+    color: var(--flipdish-blue);
+    font-weight: 700;
+  }
+  details.working[open] > summary::before { content: "- "; }
+  details.working > summary:hover { color: var(--flipdish-blue); }
+
+  /* Tier reference (collapsed at bottom) */
+  details.tier-ref {
+    margin-top: 22px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px 18px;
+  }
+  details.tier-ref > summary {
+    font-size: 13px; font-weight: 600;
+    color: var(--flipdish-blue-dark);
+    padding: 12px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  details.tier-ref > summary::-webkit-details-marker { display: none; }
+  details.tier-ref > summary::before {
+    content: "+ ";
+    color: var(--flipdish-blue);
+    font-weight: 700;
+  }
+  details.tier-ref[open] > summary::before { content: "- "; }
+  .tier-ref-body { padding: 4px 0 16px; }
+  .tier-ref-note {
+    font-size: 12px; color: var(--muted);
+    margin: 0 0 14px;
+  }
+  .tier-ref-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  @media (max-width: 600px) { .tier-ref-grid { grid-template-columns: 1fr; } }
+  .tier-ref-head {
+    font-size: 11px; font-weight: 700;
+    color: var(--rival);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .tier-table th, .tier-table td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid #EEF2F6;
+  }
+  .tier-table th {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .tier-table td:last-child {
+    font-weight: 600;
+    color: var(--rival);
+    text-align: right;
+  }
+
   /* Mobile */
   @media (max-width: 640px) {
     body { padding: 16px 12px 32px; }
@@ -299,6 +492,12 @@
     .meta { font-size: 11px; width: 100%; }
     .input-row label { flex-wrap: wrap; }
     .input-row input, .input-row select { font-size: 16px; }
+  }
+  @media (max-width: 640px) {
+    .fees-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+    .fees-head, .fees-key { font-size: 11px; padding: 8px 8px; }
+    .fees-row > .fees-key, .fees-row > .fees-cell { padding: 6px 8px; }
+    .fees-cell input { font-size: 14px; padding: 6px 8px; }
   }
   @media (max-width: 480px) {
     .detail-grid { grid-template-columns: 1fr; }
@@ -352,7 +551,6 @@
     <div class="country-buttons" id="countryButtons">
       <button class="country-btn" data-country="UK">United Kingdom</button>
       <button class="country-btn" data-country="IE">Ireland</button>
-      <button class="country-btn" data-country="US">United States</button>
     </div>
   </div>
 
@@ -360,53 +558,46 @@
 
     <!-- INPUTS -->
     <div class="card">
-      <h2>Restaurant numbers <span class="legend">editable</span></h2>
+      <h2>Restaurant numbers</h2>
 
       <div class="input-row">
         <label>Monthly direct ordering GMV <span class="hint">order value before any fees</span></label>
-        <input id="gmv" type="number" value="20000">
+        <input id="gmv" type="number" placeholder="e.g. 2000">
       </div>
 
       <div class="input-row">
         <label>Average order value (AOV) <span class="hint">used to work out order counts</span></label>
-        <input id="aov" type="number" value="25">
+        <input id="aov" type="number" placeholder="e.g. 25">
       </div>
 
-      <details open>
-        <summary>OrderYoyo pricing</summary>
+      <div class="fees-grid">
+        <div class="fees-head">Fee</div>
+        <div class="fees-head fees-rival">OrderYoyo</div>
+        <div class="fees-head fees-flip">Flipdish</div>
 
-        <div class="input-row" style="margin-top:10px;">
-          <label>OrderYoyo commission % <span class="hint">taken on every order</span></label>
-          <input id="oyoRate" type="number" value="7" step="0.1">
+        <div class="fees-row">
+          <div class="fees-key">Commission / processing %</div>
+          <div class="fees-cell"><input id="oyoRate" type="number" step="0.1" placeholder="auto"></div>
+          <div class="fees-cell"><input id="fdFee" type="number" step="0.1" value="5"></div>
         </div>
 
-        <div class="input-row">
-          <label>OrderYoyo monthly fee <span class="hint">leave 0 if commission only</span></label>
-          <input id="oyoSub" type="number" value="0">
+        <div class="fees-row">
+          <div class="fees-key">Monthly subscription</div>
+          <div class="fees-cell"><input id="oyoSub" type="number" placeholder="e.g. 0"></div>
+          <div class="fees-cell"><input id="fdSub" type="number" placeholder="e.g. 99"></div>
         </div>
+      </div>
 
-        <div class="input-row">
-          <label>VAT on commission <span class="hint">marketplace-style VAT, where applicable</span></label>
-          <input id="oyoVat" type="number" value="0" step="0.5">
-        </div>
-      </details>
+      <p class="auto-tier-hint" id="autoTierHint">Type a GMV to auto-pick OrderYoyo's tier rate.</p>
 
-      <details open>
-        <summary>Flipdish pricing</summary>
-
-        <div class="input-row" style="margin-top:10px;">
-          <label>Flipdish processing % <span class="hint">on online card volume</span></label>
-          <input id="fdFee" type="number" value="2.5" step="0.1">
-        </div>
-
-        <div class="input-row">
-          <label>Flipdish per-order transaction fee <span class="hint">flat, per order</span></label>
-          <input id="fdTxn" type="number" value="0.20" step="0.05">
-        </div>
-
-        <div class="input-row">
-          <label>Flipdish Online Ordering subscription <span class="hint">monthly, fixed</span></label>
-          <input id="fdSub" type="number" value="99">
+      <details class="vat-block">
+        <summary>VAT and reclaim</summary>
+        <div class="vat-block-body">
+          <label class="vat-toggle">
+            <input id="vatReclaim" type="checkbox">
+            <span>Restaurant is VAT-registered <span class="hint">tick to show net cost (VAT reclaimed)</span></span>
+          </label>
+          <p class="vat-info" id="vatInfo">-</p>
         </div>
       </details>
 
@@ -448,38 +639,69 @@
         </div>
       </div>
 
-      <div class="breakdown">
-        <strong>How we got there</strong>
+      <details class="working">
+        <summary>Show the maths</summary>
+        <div class="breakdown">
+          <div class="breakdown-section">
+            <div class="breakdown-title">Same monthly orders</div>
+            <div class="breakdown-row"><span>Monthly GMV</span><span id="b-gmv">-</span></div>
+            <div class="breakdown-row"><span>Monthly orders</span><span id="b-orders">-</span></div>
+          </div>
 
-        <div class="breakdown-section">
-          <div class="breakdown-title">Same monthly orders</div>
-          <div class="breakdown-row"><span>Monthly GMV</span><span id="b-gmv">-</span></div>
-          <div class="breakdown-row"><span>Monthly orders</span><span id="b-orders">-</span></div>
-        </div>
+          <div class="breakdown-section">
+            <div class="breakdown-title">With OrderYoyo</div>
+            <div class="breakdown-row"><span id="b-oyo-rate-label">Commission</span><span id="b-oyo-rate">-</span></div>
+            <div class="breakdown-row" id="b-oyo-sub-row"><span>Monthly fee</span><span id="b-oyo-sub">-</span></div>
+            <div class="breakdown-row" id="b-oyo-vat-row"><span id="b-oyo-vat-label">VAT</span><span id="b-oyo-vat">-</span></div>
+            <div class="breakdown-row total"><span>Restaurant keeps</span><span id="b-oyo-keep">-</span></div>
+          </div>
 
-        <div class="breakdown-section">
-          <div class="breakdown-title">With OrderYoyo</div>
-          <div class="breakdown-row"><span id="b-oyo-rate-label">Commission</span><span id="b-oyo-rate">-</span></div>
-          <div class="breakdown-row"><span>Monthly fee</span><span id="b-oyo-sub">-</span></div>
-          <div class="breakdown-row total"><span>Restaurant keeps</span><span id="b-oyo-keep">-</span></div>
-        </div>
+          <div class="breakdown-section">
+            <div class="breakdown-title">With Flipdish</div>
+            <div class="breakdown-row"><span id="b-fd-fee-label">Processing</span><span id="b-fd-fee">-</span></div>
+            <div class="breakdown-row"><span>Subscription</span><span id="b-fd-sub">-</span></div>
+            <div class="breakdown-row" id="b-fd-vat-row"><span id="b-fd-vat-label">VAT</span><span id="b-fd-vat">-</span></div>
+            <div class="breakdown-row total"><span>Restaurant keeps</span><span id="b-fd-keep">-</span></div>
+          </div>
 
-        <div class="breakdown-section">
-          <div class="breakdown-title">With Flipdish</div>
-          <div class="breakdown-row"><span id="b-fd-fee-label">Processing</span><span id="b-fd-fee">-</span></div>
-          <div class="breakdown-row"><span id="b-fd-txn-label">Per-order fee</span><span id="b-fd-txn">-</span></div>
-          <div class="breakdown-row"><span>Subscription</span><span id="b-fd-sub">-</span></div>
-          <div class="breakdown-row total"><span>Restaurant keeps</span><span id="b-fd-keep">-</span></div>
+          <div class="breakdown-section result">
+            <div class="breakdown-row total headline"><span>Monthly difference</span><span id="b-monthly">-</span></div>
+            <div class="breakdown-row total headline"><span>Annual difference</span><span id="b-annual">-</span></div>
+          </div>
         </div>
-
-        <div class="breakdown-section result">
-          <div class="breakdown-row total headline"><span>Monthly difference</span><span id="b-monthly">-</span></div>
-          <div class="breakdown-row total headline"><span>Annual difference</span><span id="b-annual">-</span></div>
-        </div>
-      </div>
+      </details>
     </div>
 
   </div>
+
+  <details class="tier-ref">
+    <summary>OrderYoyo commission tiers (reference)</summary>
+    <div class="tier-ref-body">
+      <p class="tier-ref-note">OrderYoyo uses a stepped tier model. Whichever band the restaurant's monthly GMV falls into is the rate applied to the whole month — not blended across bands.</p>
+      <div class="tier-ref-grid">
+        <div class="tier-ref-col">
+          <div class="tier-ref-head">United Kingdom</div>
+          <table class="tier-table">
+            <tr><th>Monthly GMV</th><th>Rate</th></tr>
+            <tr><td>£0 - £700</td><td>9.5%</td></tr>
+            <tr><td>£701 - £1,200</td><td>8.5%</td></tr>
+            <tr><td>£1,201 - £2,200</td><td>7.0%</td></tr>
+            <tr><td>£2,201+</td><td>6.0%</td></tr>
+          </table>
+        </div>
+        <div class="tier-ref-col">
+          <div class="tier-ref-head">Ireland</div>
+          <table class="tier-table">
+            <tr><th>Monthly GMV</th><th>Rate</th></tr>
+            <tr><td>€0 - €1,000</td><td>9.5%</td></tr>
+            <tr><td>€1,001 - €2,500</td><td>8.5%</td></tr>
+            <tr><td>€2,501 - €4,500</td><td>6.0%</td></tr>
+            <tr><td>€4,501+</td><td>5.0%</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </details>
 
   <footer>
     Flipdish vs OrderYoyo Value Calculator. Live calculation, nothing is saved.
@@ -488,123 +710,184 @@
 </div>
 
 <script>
-  // ---------- defaults by market ----------
-  // OrderYoyo headline commission varies by plan (Direct vs Plus vs Pro).
-  // Sensible "Direct plan" defaults used here. Rep can override per deal.
-  const defaultsByMarket = {
-    UK: { oyoRate: 7,  oyoSub: 0, oyoVat: 0,  fdFee: 2.5, fdTxn: 0.20, fdSub: 99, currency: "£" },
-    IE: { oyoRate: 7,  oyoSub: 0, oyoVat: 0,  fdFee: 2.5, fdTxn: 0.20, fdSub: 99, currency: "€" },
-    US: { oyoRate: 7,  oyoSub: 0, oyoVat: 0,  fdFee: 2.9, fdTxn: 0.30, fdSub: 99, currency: "$" }
+  // ---------- OrderYoyo tiered commission (stepped, whole-amount) ----------
+  // Whichever band the monthly GMV falls into is applied to the WHOLE month.
+  // No blending across bands.
+  const OYO_TIERS = {
+    UK: [
+      { upTo: 700,      rate: 9.5 },
+      { upTo: 1200,     rate: 8.5 },
+      { upTo: 2200,     rate: 7.0 },
+      { upTo: Infinity, rate: 6.0 }
+    ],
+    IE: [
+      { upTo: 1000,     rate: 9.5 },
+      { upTo: 2500,     rate: 8.5 },
+      { upTo: 4500,     rate: 6.0 },
+      { upTo: Infinity, rate: 5.0 }
+    ]
   };
 
-  let currency = "£";
+  function pickOyoRate(gmv, country) {
+    const tiers = OYO_TIERS[country] || OYO_TIERS.UK;
+    for (const t of tiers) {
+      if (gmv <= t.upTo) return t.rate;
+    }
+    return tiers[tiers.length - 1].rate;
+  }
+
+  // ---------- Per-market defaults ----------
+  // Flipdish UK = 0% VAT (Flipdish is Irish-registered, so no UK VAT charged)
+  // Flipdish IE = 23%; OrderYoyo UK = 20%; OrderYoyo IE = 23%
+  const MARKET = {
+    UK: { fdFee: 5, fdSub: 99, oyoSub: 0, fdVat: 0,  oyoVat: 20, currency: "£" },
+    IE: { fdFee: 5, fdSub: 99, oyoSub: 0, fdVat: 23, oyoVat: 23, currency: "€" }
+  };
+
+  let activeCountry = 'UK';
 
   // ---------- helpers ----------
   const $ = id => document.getElementById(id);
   const num = id => parseFloat($(id).value) || 0;
+  const cur = () => MARKET[activeCountry].currency;
   const fmtMoney = n => {
     if (!isFinite(n)) return '-';
     const sign = n < 0 ? '-' : '';
     const abs = Math.abs(n);
-    return sign + currency + abs.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  };
-  const fmtMoney2 = n => {
-    if (!isFinite(n)) return '-';
-    const sign = n < 0 ? '-' : '';
-    const abs = Math.abs(n);
-    return sign + currency + abs.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    return sign + cur() + abs.toLocaleString(undefined, { maximumFractionDigits: 0 });
   };
   const fmtPct = n => (n).toFixed(1) + '%';
   const fmtOrders = n => n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   // ---------- country selector ----------
-  let activeCountry = 'UK';
   function setCountry(code) {
     activeCountry = code;
     document.querySelectorAll('.country-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.country === code);
     });
-    const m = defaultsByMarket[code];
-    $('oyoRate').value = m.oyoRate;
-    $('oyoSub').value  = m.oyoSub;
-    $('oyoVat').value  = m.oyoVat;
-    $('fdFee').value   = m.fdFee;
-    $('fdTxn').value   = m.fdTxn;
-    $('fdSub').value   = m.fdSub;
-    currency = m.currency;
+    // FD processing resets to 5 (list rate) on country switch.
+    // OY commission resets — auto-tier from current GMV if any, else blank.
+    $('fdFee').value = MARKET[code].fdFee;
+    autoTierFromGmv();
     calc();
   }
   document.querySelectorAll('.country-btn').forEach(btn => {
     btn.addEventListener('click', () => setCountry(btn.dataset.country));
   });
 
+  // ---------- auto-tier on GMV change ----------
+  function autoTierFromGmv() {
+    const gmv = num('gmv');
+    if (gmv > 0) {
+      $('oyoRate').value = pickOyoRate(gmv, activeCountry);
+    } else {
+      $('oyoRate').value = '';
+    }
+  }
+  $('gmv').addEventListener('input', autoTierFromGmv);
+
   // ---------- live recalculation ----------
   document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
 
   function calc() {
-    currency = defaultsByMarket[activeCountry].currency;
+    const m = MARKET[activeCountry];
 
-    // Inputs
-    const gmv     = num('gmv');
-    const aov     = num('aov');
-    const oyoRate = num('oyoRate');
-    const oyoSub  = num('oyoSub');
-    const oyoVat  = num('oyoVat');
-    const fdFee   = num('fdFee');
-    const fdTxn   = num('fdTxn');
-    const fdSub   = num('fdSub');
+    // Inputs (blank fields treated as 0 by num())
+    const gmv        = num('gmv');
+    const aov        = num('aov');
+    const oyoRate    = num('oyoRate');
+    const fdFee      = num('fdFee');
+    const oyoSub     = num('oyoSub');
+    const fdSub      = num('fdSub');
+    const vatReclaim = $('vatReclaim').checked;
+
+    // VAT actually applied (0 if restaurant can reclaim it)
+    const fdVat  = vatReclaim ? 0 : m.fdVat;
+    const oyoVat = vatReclaim ? 0 : m.oyoVat;
 
     const orders = aov > 0 ? gmv / aov : 0;
 
-    // ---- OrderYoyo cost ----
-    const oyoEffectiveRate = (oyoRate / 100) * (1 + oyoVat / 100);
-    const oyoCommission    = gmv * oyoEffectiveRate;
-    const oyoCost          = oyoCommission + oyoSub;
+    // ---- OrderYoyo cost (commission + sub, both VAT-able) ----
+    const oyoCommissionNet = gmv * (oyoRate / 100);
+    const oyoVatAmount     = (oyoCommissionNet + oyoSub) * (oyoVat / 100);
+    const oyoCost          = oyoCommissionNet + oyoSub + oyoVatAmount;
     const oyoKeep          = gmv - oyoCost;
 
-    // ---- Flipdish cost ----
-    const fdProcessing = gmv * (fdFee / 100);
-    const fdTxnTotal   = orders * fdTxn;
-    const fdCost       = fdProcessing + fdTxnTotal + fdSub;
-    const fdKeep       = gmv - fdCost;
+    // ---- Flipdish cost (processing + sub, both VAT-able) ----
+    const fdProcessingNet = gmv * (fdFee / 100);
+    const fdVatAmount     = (fdProcessingNet + fdSub) * (fdVat / 100);
+    const fdCost          = fdProcessingNet + fdSub + fdVatAmount;
+    const fdKeep          = gmv - fdCost;
 
     // ---- Difference ----
     const monthlyDiff = fdKeep - oyoKeep;
     const annualDiff  = monthlyDiff * 12;
 
-    // ---- Render headline ----
-    $('heroBig').textContent = fmtMoney(annualDiff) + '/yr';
+    // ---- Hero ----
+    $('heroBig').textContent = gmv > 0 ? fmtMoney(annualDiff) + '/yr' : '-';
+    $('heroSub').textContent = vatReclaim
+      ? 'Net of VAT (restaurant reclaims) - same orders, both providers'
+      : 'VAT included - same orders, both providers';
 
     // ---- vs cards ----
-    $('oyoKeep').textContent = fmtMoney(oyoKeep);
-    $('fdKeep').textContent  = fmtMoney(fdKeep);
+    $('oyoKeep').textContent = gmv > 0 ? fmtMoney(oyoKeep) : '-';
+    $('fdKeep').textContent  = gmv > 0 ? fmtMoney(fdKeep) : '-';
 
     // ---- detail grid ----
-    $('kDiff').textContent     = fmtMoney(monthlyDiff) + '/mo';
-    $('kOyoCost').textContent  = fmtMoney(oyoCost) + '/mo';
-    $('kFdCost').textContent   = fmtMoney(fdCost) + '/mo';
+    $('kDiff').textContent    = gmv > 0 ? fmtMoney(monthlyDiff) + '/mo' : '-';
+    $('kOyoCost').textContent = gmv > 0 ? fmtMoney(oyoCost) + '/mo' : '-';
+    $('kFdCost').textContent  = gmv > 0 ? fmtMoney(fdCost) + '/mo' : '-';
+
+    // ---- Auto-tier hint ----
+    if (gmv > 0) {
+      $('autoTierHint').textContent = `OrderYoyo tier at ${cur()}${gmv.toLocaleString()} GMV = ${fmtPct(pickOyoRate(gmv, activeCountry))}. Edit to override.`;
+    } else {
+      $('autoTierHint').textContent = 'Type a GMV to auto-pick OrderYoyo tier rate.';
+    }
+
+    // ---- VAT info line ----
+    $('vatInfo').textContent = vatReclaim
+      ? `Reclaim mode: VAT removed from both sides for a true net-cost view.`
+      : `${activeCountry === 'UK' ? 'United Kingdom' : 'Ireland'}: OrderYoyo charges ${m.oyoVat}% VAT, Flipdish charges ${m.fdVat}% VAT${activeCountry === 'UK' ? ' (Flipdish is Irish-registered)' : ''}.`;
 
     // ---- breakdown ----
     $('b-gmv').textContent    = fmtMoney(gmv) + '/mo';
     $('b-orders').textContent = fmtOrders(orders);
 
-    const oyoRateLabel = oyoVat > 0
-      ? `Commission (${fmtPct(oyoRate)} + ${fmtPct(oyoVat)} VAT = ${fmtPct(oyoEffectiveRate * 100)})`
-      : `Commission (${fmtPct(oyoRate)})`;
-    $('b-oyo-rate-label').textContent = oyoRateLabel;
-    $('b-oyo-rate').textContent = '-' + fmtMoney(oyoCommission);
-    $('b-oyo-sub').textContent  = '-' + fmtMoney(oyoSub);
+    $('b-oyo-rate-label').textContent = `Commission (${fmtPct(oyoRate)})`;
+    $('b-oyo-rate').textContent       = '-' + fmtMoney(oyoCommissionNet);
+
+    if (oyoSub > 0) {
+      $('b-oyo-sub-row').style.display = '';
+      $('b-oyo-sub').textContent = '-' + fmtMoney(oyoSub);
+    } else {
+      $('b-oyo-sub-row').style.display = 'none';
+    }
+
+    if (oyoVat > 0 && (oyoCommissionNet + oyoSub) > 0) {
+      $('b-oyo-vat-row').style.display = '';
+      $('b-oyo-vat-label').textContent = `VAT (${fmtPct(oyoVat)})`;
+      $('b-oyo-vat').textContent = '-' + fmtMoney(oyoVatAmount);
+    } else {
+      $('b-oyo-vat-row').style.display = 'none';
+    }
     $('b-oyo-keep').textContent = fmtMoney(oyoKeep) + '/mo';
 
     $('b-fd-fee-label').textContent = `Processing (${fmtPct(fdFee)})`;
-    $('b-fd-fee').textContent       = '-' + fmtMoney(fdProcessing);
-    $('b-fd-txn-label').textContent = `Per-order fee (${fmtMoney2(fdTxn)} x ${fmtOrders(orders)})`;
-    $('b-fd-txn').textContent       = '-' + fmtMoney(fdTxnTotal);
+    $('b-fd-fee').textContent       = '-' + fmtMoney(fdProcessingNet);
     $('b-fd-sub').textContent       = '-' + fmtMoney(fdSub);
-    $('b-fd-keep').textContent      = fmtMoney(fdKeep) + '/mo';
 
-    $('b-monthly').textContent = fmtMoney(monthlyDiff) + '/mo';
-    $('b-annual').textContent  = fmtMoney(annualDiff) + '/yr';
+    if (fdVat > 0 && (fdProcessingNet + fdSub) > 0) {
+      $('b-fd-vat-row').style.display = '';
+      $('b-fd-vat-label').textContent = `VAT (${fmtPct(fdVat)})`;
+      $('b-fd-vat').textContent = '-' + fmtMoney(fdVatAmount);
+    } else {
+      $('b-fd-vat-row').style.display = 'none';
+    }
+    $('b-fd-keep').textContent = fmtMoney(fdKeep) + '/mo';
+
+    $('b-monthly').textContent = gmv > 0 ? fmtMoney(monthlyDiff) + '/mo' : '-';
+    $('b-annual').textContent  = gmv > 0 ? fmtMoney(annualDiff) + '/yr' : '-';
   }
 
   setCountry('UK');
