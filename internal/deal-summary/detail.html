@@ -481,6 +481,21 @@
     line-height: 1.4;
     font-style: italic;
   }
+  /* v8.17: sub-headings inside the verdict panel - tells the rep at a
+     glance which numbers are for the customer and which are internal. */
+  .lever-verdict-group {
+    margin: 4px 0;
+  }
+  .lever-verdict-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 6px 0 4px;
+    padding-bottom: 3px;
+    border-bottom: 1px dotted var(--border);
+  }
   .lever-verdict-pill {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 3px 9px;
@@ -1860,13 +1875,27 @@
       </div>
       <aside class="lever-verdict" id="verdictFees" aria-live="polite">
         <div class="lever-verdict-title">Recurring impact</div>
-        <div class="lever-verdict-row" id="vFeesCurrentRow" style="display:none;"><span class="vlabel">What they pay today</span><span class="vval" id="vFeesCurrent">-</span></div>
-        <div class="lever-verdict-row"><span class="vlabel">Flipdish list price</span><span class="vval" id="vFeesList">-</span></div>
-        <div class="lever-verdict-row headline"><span class="vlabel">Your proposal</span><span class="vval" id="vFeesProposal">-</span></div>
-        <div class="lever-verdict-row delta" id="vFeesVsCurrentRow" style="display:none;"><span class="vlabel" id="vFeesVsCurrentLabel">Cheaper than today</span><span class="vval" id="vFeesVsCurrent">-</span></div>
-        <div class="lever-verdict-row delta"><span class="vlabel">Discount given</span><span class="vval" id="vFeesDelta">-</span></div>
+
+        <!-- v8.17: split into two stories - what the rep pitches to the
+             customer (customer-facing numbers) vs what they'll defend
+             internally (Flipdish list, discount given, op margin).
+             Same IDs and same data, just visually grouped. -->
+        <div class="lever-verdict-group">
+          <div class="lever-verdict-group-label">What you pitch to the customer</div>
+          <div class="lever-verdict-row" id="vFeesCurrentRow" style="display:none;"><span class="vlabel">What they pay today</span><span class="vval" id="vFeesCurrent">-</span></div>
+          <div class="lever-verdict-row headline"><span class="vlabel">Your proposal</span><span class="vval" id="vFeesProposal">-</span></div>
+          <div class="lever-verdict-row delta" id="vFeesVsCurrentRow" style="display:none;"><span class="vlabel" id="vFeesVsCurrentLabel">Cheaper than today</span><span class="vval" id="vFeesVsCurrent">-</span></div>
+        </div>
+
         <hr class="lever-verdict-rule">
-        <div class="lever-verdict-row"><span class="vlabel">Op margin / mo</span><span class="vval" id="vFeesOpMargin">-</span></div>
+
+        <div class="lever-verdict-group">
+          <div class="lever-verdict-group-label">What you'll defend internally</div>
+          <div class="lever-verdict-row"><span class="vlabel">Flipdish list price</span><span class="vval" id="vFeesList">-</span></div>
+          <div class="lever-verdict-row delta"><span class="vlabel">Discount given</span><span class="vval" id="vFeesDelta">-</span></div>
+          <div class="lever-verdict-row"><span class="vlabel">Op margin / mo</span><span class="vval" id="vFeesOpMargin">-</span></div>
+        </div>
+
         <span class="lever-verdict-pill idle" id="vFeesPill">Awaiting input</span>
         <div class="lever-verdict-action" id="vFeesAction" style="display:none;"></div>
         <div class="lever-verdict-note">Op margin is the monthly profit Flipdish keeps after card-processing costs. Discount fees harder and you also shrink the room available to discount hardware in Section B.</div>
