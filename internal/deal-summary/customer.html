@@ -53,11 +53,69 @@
 
   .wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
 
+  /* v8.17: value rail beneath the package summary - four short
+     "what you get" bullets so the customer has something concrete
+     to anchor on when the price-comparison table reads tighter than
+     the incumbent. Tasteful, not a sales sermon. */
+  .value-rail {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-top: 14px;
+  }
+  @media (max-width: 600px) { .value-rail { grid-template-columns: 1fr; } }
+  .value-rail-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px;
+    background: var(--flipdish-blue-light);
+    border: 1px solid var(--flipdish-blue-line);
+    border-radius: 10px;
+  }
+  .value-rail-icon {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--flipdish-blue);
+    flex-shrink: 0;
+    background: white;
+    border-radius: 8px;
+  }
+  .value-rail-icon svg { width: 16px; height: 16px; }
+  .value-rail-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--flipdish-blue-dark);
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .value-rail-text {
+    font-size: 12px; line-height: 1.5; color: #2D4358;
+  }
+
   /* ---------- Header ---------- */
   .doc-header {
     margin-bottom: 28px;
     padding-bottom: 20px;
     border-bottom: 2px solid var(--flipdish-blue-line);
+  }
+  /* v8.17: clarity banner under the header - "this is a discussion
+     summary, not a contract". Subtle amber tape so it reads as advisory,
+     not alarming. */
+  .doc-banner {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 11px 14px;
+    margin: 0 0 24px;
+    background: #FFF8E5;
+    border: 1px solid #F5DA8C;
+    border-left: 4px solid #C99300;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #5C4400;
+  }
+  .doc-banner svg {
+    width: 18px; height: 18px; flex-shrink: 0;
+    color: #C99300; margin-top: 1px;
+  }
+  @media print {
+    .doc-banner { background: white; border-color: #aaa; color: #444; }
+    .doc-banner svg { display: none; }
   }
   .doc-kicker {
     font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
@@ -498,6 +556,57 @@
         provider: c.posProvider || ''
       };
     }
+    // v8.17: Kiosk - either an incremental new product OR a displacement
+    // of an existing kiosk vendor (Mealzo, Foodics, etc.). If the rep
+    // ticked "already has a kiosk setup" in detail.html, capture the
+    // incumbent sub so we can show a side-by-side tile and compute
+    // genuine savings.
+    if (p.includeKiosk) {
+      var kioskGmv = N(c.kioskGmv);
+      var kioskAov = N(c.kioskAov) > 0 ? N(c.kioskAov) : N(c.aov);
+      var kioskTxn = kioskAov > 0 ? (kioskGmv / kioskAov) : 0;
+      var kioskRate = N(f.kioskRate) / 100;
+      var kioskTransFee = N(f.kioskTransFee);
+      var fdKioskTotal = (kioskGmv * kioskRate) + (kioskTxn * kioskTransFee);
+      var hasKioskIncumbent = !!c.kioskHasIncumbent;
+      var curKioskSub = hasKioskIncumbent ? N(c.kioskCurrentSub) : 0;
+      result.kioskSavings = curKioskSub - fdKioskTotal;
+      result.detail.kiosk = {
+        gmv: kioskGmv, txn: kioskTxn, aov: kioskAov,
+        ratePct: N(f.kioskRate), transFee: kioskTransFee,
+        fdTotal: fdKioskTotal,
+        hasIncumbent: hasKioskIncumbent,
+        provider: (c.kioskCurrentProvider || '').trim(),
+        curSub: curKioskSub,
+        curGmv: N(c.kioskCurrentGmv),
+        curTotal: curKioskSub
+      };
+    }
+
+    // v8.17: QROP - same shape as Kiosk. Incumbent block reveals if
+    // the rep ticked "already has a QR ordering setup".
+    if (p.includeQROP) {
+      var qropGmv = N(c.qropGmv);
+      var qropAov = N(c.qropAov) > 0 ? N(c.qropAov) : N(c.aov);
+      var qropTxn = qropAov > 0 ? (qropGmv / qropAov) : 0;
+      var qropRate = N(f.qropRate) / 100;
+      var qropTransFee = N(f.qropTransFee);
+      var fdQropTotal = (qropGmv * qropRate) + (qropTxn * qropTransFee);
+      var hasQropIncumbent = !!c.qropHasIncumbent;
+      var curQropSub = hasQropIncumbent ? N(c.qropCurrentSub) : 0;
+      result.qropSavings = curQropSub - fdQropTotal;
+      result.detail.qrop = {
+        gmv: qropGmv, txn: qropTxn, aov: qropAov,
+        ratePct: N(f.qropRate), transFee: qropTransFee,
+        fdTotal: fdQropTotal,
+        hasIncumbent: hasQropIncumbent,
+        provider: (c.qropCurrentProvider || '').trim(),
+        curSub: curQropSub,
+        curGmv: N(c.qropCurrentGmv),
+        curTotal: curQropSub
+      };
+    }
+
     // v7: bundled monthlySub (single SFDC figure) + per-product hardware
     var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
     var totalSub = N(f.monthlySub);
@@ -508,7 +617,15 @@
     result.hardwareOneOff = totalHw;
     result.contractMonths = 12;  // Flipdish standard 12-month contract
 
-    result.netMonthly = result.ooSavings + result.posSavings - result.fdMonthlySub;
+    // v8.17: net monthly difference = sum of per-product savings minus
+    // bundled sub. Each *Savings figure already nets the incumbent (if any)
+    // against the Flipdish cost for that product, so the math is uniform
+    // across OO, POS, Kiosk, and QROP.
+    result.netMonthly = (result.ooSavings    || 0)
+                      + (result.posSavings   || 0)
+                      + (result.kioskSavings || 0)
+                      + (result.qropSavings  || 0)
+                      - result.fdMonthlySub;
 
     result.annualValue = (result.netMonthly * 12) - result.hardwareOneOff;
     result.contractValue = (result.netMonthly * result.contractMonths) - result.hardwareOneOff;
@@ -566,6 +683,40 @@
       '</div>';
   }
 
+  // v8.17: Kiosk side-by-side - only renders if the rep ticked
+  // "already has a kiosk setup". Otherwise kiosk is incremental and
+  // shouldn't appear in the comparison section.
+  function kioskCompareHtml(v, country) {
+    var d = v.detail.kiosk;
+    if (!d || !d.hasIncumbent) return '';
+    var providerLabel = d.provider ? escapeHtml(d.provider) : 'Your current kiosk provider';
+    return '' +
+      '<div class="compare">' +
+        '<div class="compare-title">Kiosk</div>' +
+        '<div class="row"><span class="k">Projected monthly kiosk revenue</span><span class="v">' + fmtMoney(d.gmv, country) + '</span></div>' +
+        '<div class="row"><span class="k">' + providerLabel + ' - all-in monthly</span><span class="v">-' + fmtMoney(d.curTotal, country) + '</span></div>' +
+        '<div class="row"><span class="k">Flipdish - all-in monthly</span><span class="v">-' + fmtMoney(d.fdTotal, country) + '</span></div>' +
+        '<div class="total-row"><span>Monthly difference</span><span class="v">' + fmtMoney(v.kioskSavings, country) + '</span></div>' +
+        deltaCallout(v.kioskSavings, country) +
+      '</div>';
+  }
+
+  // v8.17: QROP side-by-side - same rules as Kiosk (only if incumbent).
+  function qropCompareHtml(v, country) {
+    var d = v.detail.qrop;
+    if (!d || !d.hasIncumbent) return '';
+    var providerLabel = d.provider ? escapeHtml(d.provider) : 'Your current QR ordering provider';
+    return '' +
+      '<div class="compare">' +
+        '<div class="compare-title">QR ordering</div>' +
+        '<div class="row"><span class="k">Projected monthly QR revenue</span><span class="v">' + fmtMoney(d.gmv, country) + '</span></div>' +
+        '<div class="row"><span class="k">' + providerLabel + ' - all-in monthly</span><span class="v">-' + fmtMoney(d.curTotal, country) + '</span></div>' +
+        '<div class="row"><span class="k">Flipdish - all-in monthly</span><span class="v">-' + fmtMoney(d.fdTotal, country) + '</span></div>' +
+        '<div class="total-row"><span>Monthly difference</span><span class="v">' + fmtMoney(v.qropSavings, country) + '</span></div>' +
+        deltaCallout(v.qropSavings, country) +
+      '</div>';
+  }
+
   // ---------- Discount stack (the hype) ----------
   // For each lever the customer is buying, show "list price → your price"
   // with the saving in £ and as a % off list. This reframes the deal as
@@ -586,12 +737,22 @@
       return Math.round((list - you) / list * 100);
     }
     function rowHtml(label, listText, youText, saveText, savePct) {
+      // v8.17: if saveText is blank (rate-row case), only show the
+      // "X% off list" so customers don't have to learn what "pp" means.
+      var saveCell;
+      if (saveText) {
+        saveCell = saveText + (savePct != null ? ' &nbsp;<small>(' + savePct + '% off list)</small>' : '');
+      } else if (savePct != null) {
+        saveCell = savePct + '% off list';
+      } else {
+        saveCell = '-';
+      }
       return '' +
         '<div class="stack-row">' +
           '<div class="stack-label">' + escapeHtml(label) + '</div>' +
           '<div class="stack-cell list"><span class="stack-cell-label">List price</span><span class="stack-cell-value">' + listText + '</span></div>' +
           '<div class="stack-cell yours"><span class="stack-cell-label">Your price</span><span class="stack-cell-value">' + youText + '</span></div>' +
-          '<div class="stack-cell save"><span class="stack-cell-label">Your discount</span><span class="stack-cell-value">' + saveText + (savePct != null ? ' &nbsp;<small>(' + savePct + '% off list)</small>' : '') + '</span></div>' +
+          '<div class="stack-cell save"><span class="stack-cell-label">Your discount</span><span class="stack-cell-value">' + saveCell + '</span></div>' +
         '</div>';
     }
 
@@ -604,7 +765,7 @@
           'Online ordering - processing %',
           ooListPct + '%',
           ooYouPct + '%',
-          (ooListPct - ooYouPct).toFixed(1) + 'pp',
+          '',
           pct(ooListPct, ooYouPct)
         ));
       }
@@ -619,7 +780,7 @@
           'POS - processing rate',
           posListPct + '%',
           posYouPct + '%',
-          (posListPct - posYouPct).toFixed(2) + 'pp',
+          '',
           pct(posListPct, posYouPct)
         ));
       }
@@ -646,7 +807,7 @@
           'Kiosk - processing rate',
           kioskListPct + '%',
           kioskYouPct + '%',
-          (kioskListPct - kioskYouPct).toFixed(2) + 'pp',
+          '',
           pct(kioskListPct, kioskYouPct)
         ));
       }
@@ -672,7 +833,7 @@
           'QROP - processing rate',
           qropListPct + '%',
           qropYouPct + '%',
-          (qropListPct - qropYouPct).toFixed(2) + 'pp',
+          '',
           pct(qropListPct, qropYouPct)
         ));
       }
@@ -775,10 +936,66 @@
       '</div>';
   }
 
+  // v8.17: Value rail - four short reasons the recurring number isn't
+  // just "what we charge." Gives the customer something to anchor on
+  // when the price-comparison table shows Flipdish slightly higher than
+  // the incumbent (which is the truth on raw rate, before platform value).
+  function valueRailHtml(prospect) {
+    var bullets = [];
+    bullets.push({
+      icon: 'database',
+      title: 'Your customer database',
+      body: "Every order builds a list of customers that's yours - not the marketplace's. You can market to them, run loyalty, win them back."
+    });
+    if (prospect.includeOO) {
+      bullets.push({
+        icon: 'speaker',
+        title: 'Marketing &amp; loyalty built in',
+        body: 'Push notifications, email campaigns, win-back flows and a loyalty programme are part of the platform - no separate vendor required.'
+      });
+    }
+    if (prospect.includeKiosk || prospect.includePOS || prospect.includeQROP) {
+      bullets.push({
+        icon: 'link',
+        title: 'One platform, one menu',
+        body: 'Online, in-store and at-table all run on the same product, the same menu and the same reporting. Update once, change everywhere.'
+      });
+    }
+    bullets.push({
+      icon: 'shield',
+      title: '12-month standard contract',
+      body: "Pricing in this proposal applies for the contract term. The Salesforce order form is the source of truth for length, terms and any change windows."
+    });
+
+    function iconSvg(name) {
+      var icons = {
+        database: '<path d="M4 6c0 1.7 3.6 3 8 3s8-1.3 8-3-3.6-3-8-3-8 1.3-8 3z"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+        speaker: '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/>',
+        link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+        shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+      };
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (icons[name] || '') + '</svg>';
+    }
+
+    return '' +
+      '<div class="value-rail">' +
+        bullets.map(function (b) {
+          return '' +
+            '<div class="value-rail-item">' +
+              '<div class="value-rail-icon">' + iconSvg(b.icon) + '</div>' +
+              '<div class="value-rail-body">' +
+                '<div class="value-rail-title">' + b.title + '</div>' +
+                '<div class="value-rail-text">' + b.body + '</div>' +
+              '</div>' +
+            '</div>';
+        }).join('') +
+      '</div>';
+  }
+
   function investmentHtml(v, country) {
     var rows = [];
     if (v.fdMonthlySub > 0) rows.push({ k: 'Flipdish monthly subscription', v: fmtMoney(v.fdMonthlySub, country) + '/mo' });
-    if (v.hardwareOneOff > 0) rows.push({ k: 'Hardware (one-off, net of any subsidy)', v: fmtMoney(v.hardwareOneOff, country) });
+    if (v.hardwareOneOff > 0) rows.push({ k: 'Hardware (one-off)', v: fmtMoney(v.hardwareOneOff, country) });
     if (!rows.length) return '';
     return '<div class="invest">' +
       rows.map(function (r) {
@@ -849,8 +1066,10 @@
     // first-year investment. Neutral, not a price-replacement pitch.
     var heroClass = 'hero';
     var heroMonthly = (v.fdMonthlySub || 0);
-    if (v.detail && v.detail.oo)  heroMonthly += (v.detail.oo.fdTotal  || 0);
-    if (v.detail && v.detail.pos) heroMonthly += (v.detail.pos.newTotal || 0);
+    if (v.detail && v.detail.oo)    heroMonthly += (v.detail.oo.fdTotal     || 0);
+    if (v.detail && v.detail.pos)   heroMonthly += (v.detail.pos.newTotal   || 0);
+    if (v.detail && v.detail.kiosk) heroMonthly += (v.detail.kiosk.fdTotal  || 0);
+    if (v.detail && v.detail.qrop)  heroMonthly += (v.detail.qrop.fdTotal   || 0);
     var heroHardware = v.hardwareOneOff || 0;
     var heroFirstYear = (heroMonthly * 12) + heroHardware;
     var heroHtml = '' +
@@ -891,6 +1110,18 @@
       var posTile = posCompareHtml(v, country);
       if (posTile) savingsTiles.push(posTile);
     }
+    // v8.17: Kiosk + QROP tiles only render if the prospect has an
+    // incumbent vendor (Mealzo/Foodics for kiosk, Pepper/Supersonic
+    // for QROP). Otherwise these are incremental and live in the hero
+    // monthly figure rather than the side-by-side compare.
+    if (prospect.includeKiosk) {
+      var kioskTile = kioskCompareHtml(v, country);
+      if (kioskTile) savingsTiles.push(kioskTile);
+    }
+    if (prospect.includeQROP) {
+      var qropTile = qropCompareHtml(v, country);
+      if (qropTile) savingsTiles.push(qropTile);
+    }
     if (savingsTiles.length) {
       savingsHtml = '<h2 class="section-title"><span class="dot"></span>Side by side with your current setup</h2>' +
         '<div class="compare-grid">' + savingsTiles.join('') + '</div>';
@@ -899,7 +1130,7 @@
     // What\'s in your Flipdish package
     var investHtml = investmentHtml(v, country);
     var investSectionHtml = investHtml
-      ? '<h2 class="section-title"><span class="dot"></span>Your Flipdish package</h2>' + investHtml
+      ? '<h2 class="section-title"><span class="dot"></span>Your Flipdish package</h2>' + investHtml + valueRailHtml(prospect)
       : '';
 
     // Bottom line + payback. Neutral framing of the monthly difference -
@@ -936,8 +1167,21 @@
         '</button>' +
       '</div>';
 
+    // v8.17: clarity banner so the rep / customer don't mistake this
+    // page for the contract. The signed order form from Salesforce is
+    // the source of truth for terms and payment schedule.
+    var bannerHtml = '' +
+      '<div class="doc-banner">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<circle cx="12" cy="12" r="10"/>' +
+          '<line x1="12" y1="16" x2="12" y2="12"/>' +
+          '<line x1="12" y1="8" x2="12.01" y2="8"/>' +
+        '</svg>' +
+        '<span>This is a discussion summary, not a contract. Final terms, contract length and payment schedule come from the signed order form in Salesforce.</span>' +
+      '</div>';
+
     document.getElementById('mainContent').innerHTML =
-      headerHtml + heroHtml + stackSection + savingsHtml + investSectionHtml + bottomLineHtml + finePrint + actionsHtml;
+      headerHtml + bannerHtml + heroHtml + stackSection + savingsHtml + investSectionHtml + bottomLineHtml + finePrint + actionsHtml;
 
     var printBtn = document.getElementById('printBtn');
     if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
@@ -948,6 +1192,12 @@
   } else {
     render();
   }
+
+  // v8.17: Live refresh when detail.html saves changes in another tab.
+  // Fires when localStorage's flipdishProspects key changes from outside this page.
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'flipdishProspects') render();
+  });
 </script>
 </body>
 </html>

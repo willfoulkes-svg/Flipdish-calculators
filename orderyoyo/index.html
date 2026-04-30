@@ -677,12 +677,12 @@
   <details class="tier-ref">
     <summary>OrderYoyo commission tiers (reference)</summary>
     <div class="tier-ref-body">
-      <p class="tier-ref-note">OrderYoyo uses a stepped tier model. Whichever band the restaurant's monthly GMV falls into is the rate applied to the whole month — not blended across bands.</p>
+      <p class="tier-ref-note"><strong>OrderYoyo bands are weekly, not monthly.</strong> The rate is set by the restaurant's typical weekly GMV. The whole period's GMV is then charged at that single rate (stepped, not blended). The calculator above accepts monthly GMV and divides by 4.33 to find the weekly equivalent before picking the tier.</p>
       <div class="tier-ref-grid">
         <div class="tier-ref-col">
           <div class="tier-ref-head">United Kingdom</div>
           <table class="tier-table">
-            <tr><th>Monthly GMV</th><th>Rate</th></tr>
+            <tr><th>Weekly GMV</th><th>Rate</th></tr>
             <tr><td>£0 - £700</td><td>9.5%</td></tr>
             <tr><td>£701 - £1,200</td><td>8.5%</td></tr>
             <tr><td>£1,201 - £2,200</td><td>7.0%</td></tr>
@@ -692,7 +692,7 @@
         <div class="tier-ref-col">
           <div class="tier-ref-head">Ireland</div>
           <table class="tier-table">
-            <tr><th>Monthly GMV</th><th>Rate</th></tr>
+            <tr><th>Weekly GMV</th><th>Rate</th></tr>
             <tr><td>€0 - €1,000</td><td>9.5%</td></tr>
             <tr><td>€1,001 - €2,500</td><td>8.5%</td></tr>
             <tr><td>€2,501 - €4,500</td><td>6.0%</td></tr>
@@ -711,8 +711,11 @@
 
 <script>
   // ---------- OrderYoyo tiered commission (stepped, whole-amount) ----------
-  // Whichever band the monthly GMV falls into is applied to the WHOLE month.
-  // No blending across bands.
+  // IMPORTANT: OrderYoyo bands are based on WEEKLY GMV, not monthly.
+  // Reps enter monthly GMV (more natural for restaurant conversations),
+  // we convert to weekly internally to look up the tier.
+  // Tiers are stepped (whole-amount), NOT marginal.
+  const WEEKS_PER_MONTH = 52 / 12; // ≈ 4.333
   const OYO_TIERS = {
     UK: [
       { upTo: 700,      rate: 9.5 },
@@ -728,10 +731,16 @@
     ]
   };
 
-  function pickOyoRate(gmv, country) {
+  function monthlyToWeekly(monthlyGmv) {
+    return monthlyGmv / WEEKS_PER_MONTH;
+  }
+
+  // gmv passed in is MONTHLY; convert to weekly for tier lookup.
+  function pickOyoRate(monthlyGmv, country) {
     const tiers = OYO_TIERS[country] || OYO_TIERS.UK;
+    const weeklyGmv = monthlyToWeekly(monthlyGmv);
     for (const t of tiers) {
-      if (gmv <= t.upTo) return t.rate;
+      if (weeklyGmv <= t.upTo) return t.rate;
     }
     return tiers[tiers.length - 1].rate;
   }
@@ -840,9 +849,11 @@
 
     // ---- Auto-tier hint ----
     if (gmv > 0) {
-      $('autoTierHint').textContent = `OrderYoyo tier at ${cur()}${gmv.toLocaleString()} GMV = ${fmtPct(pickOyoRate(gmv, activeCountry))}. Edit to override.`;
+      const weekly = monthlyToWeekly(gmv);
+      const weeklyFmt = cur() + Math.round(weekly).toLocaleString();
+      $('autoTierHint').textContent = `OrderYoyo bands are by weekly GMV. ${cur()}${gmv.toLocaleString()}/mo ≈ ${weeklyFmt}/wk → tier ${fmtPct(pickOyoRate(gmv, activeCountry))}. Edit to override.`;
     } else {
-      $('autoTierHint').textContent = 'Type a GMV to auto-pick OrderYoyo tier rate.';
+      $('autoTierHint').textContent = 'OrderYoyo bands are by weekly GMV. Type a monthly GMV to auto-pick the tier rate.';
     }
 
     // ---- VAT info line ----

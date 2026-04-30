@@ -183,6 +183,64 @@
   .deal-snapshot .snap-pill.warn  { background: #FFF1D6; color: #8A5A00; }
   .deal-snapshot .snap-pill.bad   { background: #FBE0E0; color: #9B1C1C; }
 
+  /* v8.17: Approval panel - appears when a guardrail breaches.
+     Wraps the rep's manager-approval workflow into a one-click flow. */
+  .approval-panel {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px;
+    margin: 12px 0 14px;
+    background: #FBE9E9;
+    border: 1px solid #ECC2C2;
+    border-left: 4px solid #B83838;
+    border-radius: 10px;
+  }
+  .approval-icon {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: #B83838;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .approval-icon svg { width: 22px; height: 22px; }
+  .approval-body { flex: 1; min-width: 0; }
+  .approval-title {
+    font-size: 14px; font-weight: 700; color: #7A1F1F;
+    margin-bottom: 4px;
+  }
+  .approval-reasons {
+    font-size: 12.5px; line-height: 1.55;
+    color: #5A2828;
+  }
+  .approval-reasons ul { margin: 4px 0 0; padding-left: 18px; }
+  .approval-reasons li { margin: 2px 0; }
+  .btn.btn-approval {
+    background: #B83838; color: white;
+    border: 1px solid #9B1C1C;
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .btn.btn-approval:hover { background: #9B1C1C; }
+  .btn.btn-approval svg { width: 14px; height: 14px; margin-right: 6px; }
+  .btn.btn-approval.copied { background: #1F6F3A; border-color: #155A2C; }
+
+  /* v8.17: inline sanity-check warnings under suspect inputs.
+     Shows when a field value is implausible (huge order count for the
+     AOV given, marketplace commission > 25%, processing rate > 10%). */
+  .field-warn {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #8A5A00;
+    background: #FFF1D6;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+  .field-warn:empty { display: none; }
+  .field-warn::before {
+    content: "⚠ ";
+    font-weight: 700;
+  }
+
   /* ---------- Steps (v8.7: icons + warm/cool variants) ---------- */
   .step {
     display: flex; align-items: center; gap: 12px;
@@ -223,6 +281,26 @@
     font-size: 13px; font-weight: 400; color: var(--muted);
     margin-left: 10px;
     letter-spacing: 0;
+  }
+  /* v8.17: roll-up of "today's total spend" sits at the right of the
+     Step 2 header. Auto-computes from POS + OO + Marketplaces + Kiosk
+     incumbent + QROP incumbent. Helps the rep see the total pain before
+     they start configuring the proposal. */
+  .step-summary {
+    margin-left: auto;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12.5px; font-weight: 600;
+    color: var(--peach-dark);
+    background: var(--peach-soft);
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: 0;
+    align-self: center;
+  }
+  .step-summary:empty { display: none; }
+  .step-summary strong {
+    color: var(--peach-dark);
+    font-weight: 700;
   }
 
   /* ---------- Cards (v8.5: softer borders, cleaner h3s) ----------
@@ -415,6 +493,20 @@
   .lever-verdict-pill.warn  { background: #FFF1D6; color: #8A5A00; }
   .lever-verdict-pill.bad   { background: #FBE0E0; color: #9B1C1C; }
   .lever-verdict-pill.idle  { background: #EAEEF6; color: #5C6478; }
+  /* v8.17: actionable suggestion when SNR is below the floor.
+     Tells the rep exactly which lever to lift and by how much. */
+  .lever-verdict-action {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #FFF8E5;
+    border: 1px solid #F5DA8C;
+    border-left: 3px solid #C99300;
+    border-radius: 6px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #5C4400;
+  }
+  .lever-verdict-action strong { color: #6B4400; }
 
   /* v8.14: SFDC pull placeholder - sits at the top of Step 3, looks
      like a clickable card but is disabled until the API is wired. */
@@ -581,6 +673,96 @@
     line-height: 1.5;
     color: var(--muted);
     font-style: italic;
+  }
+
+  /* v8.17: Marketplaces lifted to a dedicated top-level card with a
+     peach accent so the rep eye lands here first. Reps were missing
+     the input when it lived as a sub-strip inside the OO card. */
+  .card-marketplaces {
+    border-left: 4px solid var(--peach-dark, #C4541E);
+    background: linear-gradient(180deg, #FFF7F0 0%, #FFFFFF 30%);
+    margin-bottom: 14px;
+  }
+  .card-marketplaces h3 {
+    color: var(--peach-dark, #C4541E);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-marketplaces .market-flag {
+    display: inline-flex;
+    width: 22px; height: 22px;
+    color: var(--peach-dark, #C4541E);
+  }
+  .card-marketplaces .market-flag svg {
+    width: 100%; height: 100%;
+  }
+  .market-card-lede {
+    margin: 4px 0 14px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .market-card-cost {
+    margin: 12px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--peach-dark, #C4541E);
+    line-height: 1.5;
+  }
+  .market-card-cost.empty { display: none; }
+
+  /* v8.17: Kiosk + QROP "has incumbent" toggle and current-spend block.
+     Lets the rep capture current setup if any, so the calc can displace
+     the spend rather than ignore it. Block is hidden until the toggle is
+     ticked - keeps the card uncluttered for the typical (no incumbent) case. */
+  .incumbent-toggle {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px;
+    background: var(--soft-blue);
+    border: 1px solid var(--blue-line);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+    line-height: 1.45;
+    margin: 0 0 12px;
+  }
+  .incumbent-toggle input[type="checkbox"] {
+    margin: 2px 0 0 0;
+    width: 16px; height: 16px;
+    accent-color: var(--science-blue);
+    cursor: pointer;
+  }
+  .incumbent-toggle .hint {
+    display: inline;
+    margin-left: 4px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .current-block {
+    margin: 0 0 14px;
+    padding: 12px 14px;
+    background: #FAFCFE;
+    border: 1px dashed var(--input-border);
+    border-radius: 8px;
+  }
+  .sub-heading {
+    margin: 14px 0 4px;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--muted);
+  }
+  .proj-tip {
+    margin: 0 0 10px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .proj-tip strong {
+    font-style: normal;
+    color: var(--science-blue);
+    font-weight: 600;
   }
   .field { display: flex; flex-direction: column; }
   .field.full { grid-column: 1 / -1; }
@@ -1301,6 +1483,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
     </span>
     <span class="text">Current commercials <span class="sub">What the customer processes and pays today</span></span>
+    <span class="step-summary" id="step2Summary"></span>
   </div>
 
   <!-- v8.16: Provider-statement extraction (prototype).
@@ -1379,6 +1562,33 @@
     </label>
   </div>
 
+  <!-- v8.17: Marketplaces lifted to its own top-level card. Heavy
+       marketplace exposure is the single biggest commercial pain for
+       most prospects, and the strongest pitch lever for Flipdish. Used
+       to live as a sub-strip inside the OO card - reps were missing it.
+       Visibility tied to OO scope (since direct ordering is what
+       displaces marketplace volume). -->
+  <div class="card card-marketplaces" id="card-currentMarketplaces" style="display:none;">
+    <h3>
+      <span class="market-flag" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </span>
+      Marketplaces today <span class="hint" style="font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px;">(Deliveroo / Uber Eats / Just Eat)</span>
+    </h3>
+    <p class="market-card-lede">Where most of the customer's revenue is going today - and where the strongest case for Flipdish lives. Direct ordering, kiosk and POS bring this revenue back in-house, reclaiming margin and ownership of the customer.</p>
+    <div class="grid2">
+      <div class="field">
+        <label>Monthly marketplace revenue <span class="hint">(combined)</span></label>
+        <input id="curMarketGmv" type="number" min="0" step="100" placeholder="e.g. 10000">
+      </div>
+      <div class="field">
+        <label>Average commission % <span class="hint">(typical 12-14%)</span></label>
+        <input id="curMarketCommission" type="number" min="0" step="0.5" placeholder="e.g. 13">
+      </div>
+    </div>
+    <p class="market-card-cost" id="marketCardCost"></p>
+  </div>
+
   <!-- v8.8: side-by-side current - In-store left, Direct ordering right.
        Will: very long list with too much blank space; pair them up. -->
   <div class="current-grid">
@@ -1442,31 +1652,42 @@
           <input id="curOOTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.05">
         </div>
       </div>
-      <!-- v8.9: marketplace context lives here, not in its own card.
-           Heavy marketplace volume = stronger case for direct ordering,
-           kiosk and hardware investment. Not part of the cost-replacement
-           maths (per architecture rule), just deal context. -->
-      <div class="market-strip">
-        <div class="market-strip-title">+ Marketplaces (Deliveroo / Uber Eats / JustEat)</div>
-        <div class="grid2">
-          <div class="field">
-            <label>Monthly marketplace revenue <span class="hint">(combined)</span></label>
-            <input id="curMarketGmv" type="number" min="0" step="100" placeholder="e.g. 10000">
-          </div>
-          <div class="field">
-            <label>Average commission % <span class="hint">(typical 12-14%)</span></label>
-            <input id="curMarketCommission" type="number" min="0" step="0.5" placeholder="e.g. 13">
-          </div>
-        </div>
-        <p class="market-strip-note">Marketplaces charge heavy commission and own the customer relationship. Flipdish brings that revenue back in-house through direct ordering, kiosk and POS - reclaiming margin and the customer.</p>
-      </div>
+      <!-- v8.17: marketplace inputs lifted out of this card to a
+           dedicated top-level marketplaces card above. -->
     </div>
 
-    <!-- v8.16: Kiosk projected volume - kiosk has no incumbent to
-         displace, but the SNR math still needs GMV/AOV inputs to
-         compute kiosk processing revenue. -->
+    <!-- v8.17: Kiosk - capture current setup if any, plus projected
+         volume with Flipdish. Most prospects don't have kiosks today
+         so the current block is collapsed unless the rep ticks the
+         "already has kiosk" toggle. -->
     <div class="card" id="card-currentKiosk" style="display:none;">
-      <h3>Kiosk - projected volume <span class="hint" style="font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px;">(incremental, no incumbent to displace)</span></h3>
+      <h3>Kiosk - today &amp; projected</h3>
+      <label class="incumbent-toggle">
+        <input id="curKioskHasIncumbent" type="checkbox">
+        <span>Customer already has a kiosk setup <span class="hint">tick to capture current spend to displace</span></span>
+      </label>
+      <div class="current-block" id="curKioskBlock" style="display:none;">
+        <div class="grid2">
+          <div class="field">
+            <label>Current kiosk provider</label>
+            <input id="curKioskProvider" type="text" placeholder="e.g. Mealzo, Foodics">
+          </div>
+          <div class="field">
+            <label>Current monthly subscription</label>
+            <input id="curKioskSub" type="number" min="0" step="1" placeholder="e.g. 150">
+          </div>
+          <div class="field">
+            <label>Monthly GMV through kiosk today</label>
+            <input id="curKioskCurrentGmv" type="number" min="0" step="100" placeholder="e.g. 5000">
+          </div>
+          <div class="field">
+            <label>Average kiosk order value today</label>
+            <input id="curKioskCurrentAov" type="number" min="0" step="0.5" placeholder="e.g. 18">
+          </div>
+        </div>
+      </div>
+      <h4 class="sub-heading">Projected with Flipdish</h4>
+      <p class="proj-tip" id="kioskProjTip">Typical: 20-40% of in-store orders move to kiosk in QSR / casual dining.</p>
       <div class="grid2">
         <div class="field">
           <label>Projected monthly kiosk GMV</label>
@@ -1479,10 +1700,36 @@
       </div>
     </div>
 
-    <!-- v8.16: QROP projected volume - same shape as kiosk, no
-         incumbent to displace, just a forecast feeding the SNR math. -->
+    <!-- v8.17: QROP - same shape as Kiosk. Current setup block is
+         optional, projected volume is required for SNR math. -->
     <div class="card" id="card-currentQROP" style="display:none;">
-      <h3>QROP - projected volume <span class="hint" style="font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px;">(incremental, no incumbent to displace)</span></h3>
+      <h3>QROP - today &amp; projected</h3>
+      <label class="incumbent-toggle">
+        <input id="curQROPHasIncumbent" type="checkbox">
+        <span>Customer already has a QR ordering setup <span class="hint">tick to capture current spend to displace</span></span>
+      </label>
+      <div class="current-block" id="curQROPBlock" style="display:none;">
+        <div class="grid2">
+          <div class="field">
+            <label>Current QR provider</label>
+            <input id="curQROPProvider" type="text" placeholder="e.g. Pepper, Supersonic">
+          </div>
+          <div class="field">
+            <label>Current monthly subscription</label>
+            <input id="curQROPSub" type="number" min="0" step="1" placeholder="e.g. 80">
+          </div>
+          <div class="field">
+            <label>Monthly GMV through QR today</label>
+            <input id="curQROPCurrentGmv" type="number" min="0" step="100" placeholder="e.g. 4000">
+          </div>
+          <div class="field">
+            <label>Average QR order value today</label>
+            <input id="curQROPCurrentAov" type="number" min="0" step="0.5" placeholder="e.g. 22">
+          </div>
+        </div>
+      </div>
+      <h4 class="sub-heading">Projected with Flipdish</h4>
+      <p class="proj-tip" id="qropProjTip">Typical: 15-30% of dine-in orders use QR-pay when offered.</p>
       <div class="grid2">
         <div class="field">
           <label>Projected monthly QROP GMV</label>
@@ -1604,8 +1851,8 @@
           <div class="field" id="fdMonthlySubField" style="display:none;">
             <label>Bundled sub <span class="hint">(all-in monthly across all products - includes Phone AI, FMM and any bundled extras from the SFDC quote)</span></label>
             <div class="lever-control">
-              <input id="fdMonthlySub" type="number" min="0" step="1" value="129">
-              <input type="range" class="lever-slider" data-target="fdMonthlySub" min="119" max="139" step="1" value="129">
+              <input id="fdMonthlySub" type="number" min="0" step="1" placeholder="auto: list">
+              <input type="range" class="lever-slider" data-target="fdMonthlySub" min="0" max="326" step="1" value="326">
               <div class="lever-meta"><span class="lever-floor">£119</span><span class="lever-list">£139</span></div>
             </div>
           </div>
@@ -1613,14 +1860,15 @@
       </div>
       <aside class="lever-verdict" id="verdictFees" aria-live="polite">
         <div class="lever-verdict-title">Recurring impact</div>
-        <div class="lever-verdict-row" id="vFeesCurrentRow" style="display:none;"><span class="vlabel">Their current spend</span><span class="vval" id="vFeesCurrent">-</span></div>
-        <div class="lever-verdict-row"><span class="vlabel">At list (no discount)</span><span class="vval" id="vFeesList">-</span></div>
-        <div class="lever-verdict-row headline"><span class="vlabel">At your proposal</span><span class="vval" id="vFeesProposal">-</span></div>
-        <div class="lever-verdict-row delta" id="vFeesVsCurrentRow" style="display:none;"><span class="vlabel">Vs current spend</span><span class="vval" id="vFeesVsCurrent">-</span></div>
-        <div class="lever-verdict-row delta"><span class="vlabel">Off list</span><span class="vval" id="vFeesDelta">-</span></div>
+        <div class="lever-verdict-row" id="vFeesCurrentRow" style="display:none;"><span class="vlabel">What they pay today</span><span class="vval" id="vFeesCurrent">-</span></div>
+        <div class="lever-verdict-row"><span class="vlabel">Flipdish list price</span><span class="vval" id="vFeesList">-</span></div>
+        <div class="lever-verdict-row headline"><span class="vlabel">Your proposal</span><span class="vval" id="vFeesProposal">-</span></div>
+        <div class="lever-verdict-row delta" id="vFeesVsCurrentRow" style="display:none;"><span class="vlabel" id="vFeesVsCurrentLabel">Cheaper than today</span><span class="vval" id="vFeesVsCurrent">-</span></div>
+        <div class="lever-verdict-row delta"><span class="vlabel">Discount given</span><span class="vval" id="vFeesDelta">-</span></div>
         <hr class="lever-verdict-rule">
         <div class="lever-verdict-row"><span class="vlabel">Op margin / mo</span><span class="vval" id="vFeesOpMargin">-</span></div>
         <span class="lever-verdict-pill idle" id="vFeesPill">Awaiting input</span>
+        <div class="lever-verdict-action" id="vFeesAction" style="display:none;"></div>
         <div class="lever-verdict-note">Op margin is the monthly profit Flipdish keeps after card-processing costs. Discount fees harder and you also shrink the room available to discount hardware in Section B.</div>
       </aside>
     </div>
@@ -1688,8 +1936,8 @@
         <div class="lever-verdict-row"><span class="vlabel">Your proposal</span><span class="vval" id="vHwProposal">-</span></div>
         <div class="lever-verdict-row delta"><span class="vlabel">Discount given</span><span class="vval" id="vHwDiscount">-</span></div>
         <hr class="lever-verdict-rule">
-        <div class="lever-verdict-row"><span class="vlabel">Headroom left</span><span class="vval" id="vHwHeadroom">-</span></div>
-        <div class="lever-verdict-row"><span class="vlabel">Payback at proposal</span><span class="vval" id="vHwPayback">-</span></div>
+        <div class="lever-verdict-row"><span class="vlabel">Discount room left</span><span class="vval" id="vHwHeadroom">-</span></div>
+        <div class="lever-verdict-row"><span class="vlabel">Hardware paid back in</span><span class="vval" id="vHwPayback">-</span></div>
         <span class="lever-verdict-pill idle" id="vHwPill">Awaiting input</span>
         <div class="lever-verdict-note" id="vHwNote">Envelope is set by Section A's op margin. Tighten fees → envelope shrinks.</div>
       </aside>
@@ -1710,6 +1958,24 @@
        in-progress deal. Sits just above the action bar so reps see
        it last as they finish building the deal. -->
   <div class="deal-snapshot" id="dealSnapshot" aria-live="polite"></div>
+
+  <!-- v8.17: Approval panel - appears when the proposal breaches a guardrail
+       (SNR below floor, hardware payback over the cap, or sub == 0).
+       Gives the rep a one-click way to package the deal for manager
+       review by copying a structured summary to the clipboard. -->
+  <div class="approval-panel" id="approvalPanel" style="display:none;">
+    <div class="approval-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+    </div>
+    <div class="approval-body">
+      <div class="approval-title" id="approvalTitle">This deal needs manager approval</div>
+      <div class="approval-reasons" id="approvalReasons"></div>
+    </div>
+    <button class="btn btn-approval" type="button" id="copyApprovalBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <span id="copyApprovalLabel">Copy summary for approval</span>
+    </button>
+  </div>
 
   <!-- ===================== ACTIONS (v8.9: cleaner action bar) ===================== -->
   <div class="action-bar">
@@ -2048,6 +2314,53 @@
       html += ' <span class="vol-tier-pct">flag for CRO review</span>';
     }
     pill.innerHTML = html;
+  }
+
+  // v8.17: Section 2 rollup - "Today's total spend" pill at the right
+  // of the section header. Sums everything the rep has typed for the
+  // customer's CURRENT setup: POS (sub + processing) + OO (sub +
+  // processing) + Marketplaces (commission) + Kiosk current sub +
+  // QROP current sub. Hides itself when nothing has been typed yet.
+  function updateStep2Summary() {
+    var el = $('step2Summary');
+    if (!el) return;
+    var ccy = CCY[prospect.country] || '£';
+    var N = function (v) { var x = parseFloat(v); return isNaN(x) ? 0 : x; };
+    var fmt = function (n) { return ccy + Math.round(n).toLocaleString('en-US'); };
+    var total = 0;
+    // POS
+    if ($('includePOS') && $('includePOS').checked) {
+      var posGmv = N(($('curPosGmv') || {}).value);
+      var posRate = N(($('curPosRate') || {}).value) / 100;
+      var posTxnFee = N(($('curPosTransFee') || {}).value);
+      var aov = N(($('curAov') || {}).value);
+      var posOrders = aov > 0 ? posGmv / aov : 0;
+      total += (posGmv * posRate) + (posOrders * posTxnFee) + N(($('curPosSub') || {}).value);
+    }
+    // OO
+    if ($('includeOO') && $('includeOO').checked) {
+      var ooGmv = N(($('curOOGmv') || {}).value);
+      var ooRate = N(($('curOOProcessingRate') || {}).value) / 100;
+      var ooTxnFee = N(($('curOOTransFee') || {}).value);
+      var ooAov = N(($('curOOAov') || {}).value) || N(($('curAov') || {}).value);
+      var ooOrders = ooAov > 0 ? ooGmv / ooAov : 0;
+      total += (ooGmv * ooRate) + (ooOrders * ooTxnFee) + N(($('curOOSub') || {}).value);
+      // Marketplaces (commission only, no sub)
+      total += N(($('curMarketGmv') || {}).value) * (N(($('curMarketCommission') || {}).value) / 100);
+    }
+    // Kiosk incumbent (sub only - we don't capture their processing rate)
+    if ($('includeKiosk') && $('includeKiosk').checked && $('curKioskHasIncumbent') && $('curKioskHasIncumbent').checked) {
+      total += N(($('curKioskSub') || {}).value);
+    }
+    // QROP incumbent
+    if ($('includeQROP') && $('includeQROP').checked && $('curQROPHasIncumbent') && $('curQROPHasIncumbent').checked) {
+      total += N(($('curQROPSub') || {}).value);
+    }
+    if (total > 0) {
+      el.innerHTML = "Today's spend: <strong>" + fmt(total) + '/mo</strong>';
+    } else {
+      el.innerHTML = '';
+    }
   }
 
   // ============================================================
@@ -2422,6 +2735,19 @@
     hyd('curKioskAov',          c.kioskAov);
     hyd('curQROPGmv',           c.qropGmv);
     hyd('curQROPAov',           c.qropAov);
+    // v8.17: hydrate optional current-spend fields
+    if ($('curKioskHasIncumbent')) $('curKioskHasIncumbent').checked = !!c.kioskHasIncumbent;
+    hyd('curKioskProvider',     c.kioskCurrentProvider);
+    hyd('curKioskSub',          c.kioskCurrentSub);
+    hyd('curKioskCurrentGmv',   c.kioskCurrentGmv);
+    hyd('curKioskCurrentAov',   c.kioskCurrentAov);
+    if ($('curQROPHasIncumbent')) $('curQROPHasIncumbent').checked = !!c.qropHasIncumbent;
+    hyd('curQROPProvider',      c.qropCurrentProvider);
+    hyd('curQROPSub',           c.qropCurrentSub);
+    hyd('curQROPCurrentGmv',    c.qropCurrentGmv);
+    hyd('curQROPCurrentAov',    c.qropCurrentAov);
+    if ($('curKioskBlock')) $('curKioskBlock').style.display = c.kioskHasIncumbent ? '' : 'none';
+    if ($('curQROPBlock'))  $('curQROPBlock').style.display  = c.qropHasIncumbent  ? '' : 'none';
     // Marketplace context (Deliveroo / Uber Eats / JustEat)
     hyd('curMarketGmv',         c.marketGmv);
     hyd('curMarketCommission',  c.marketCommission);
@@ -2487,6 +2813,18 @@
       kioskAov:         val('curKioskAov'),
       qropGmv:          val('curQROPGmv'),
       qropAov:          val('curQROPAov'),
+      // v8.17: optional current-spend block for kiosk + QROP, for cases
+      // where the prospect already has an incumbent we can displace.
+      kioskHasIncumbent: !!($('curKioskHasIncumbent') && $('curKioskHasIncumbent').checked),
+      kioskCurrentProvider: val('curKioskProvider').trim(),
+      kioskCurrentSub:      val('curKioskSub'),
+      kioskCurrentGmv:      val('curKioskCurrentGmv'),
+      kioskCurrentAov:      val('curKioskCurrentAov'),
+      qropHasIncumbent:  !!($('curQROPHasIncumbent') && $('curQROPHasIncumbent').checked),
+      qropCurrentProvider:  val('curQROPProvider').trim(),
+      qropCurrentSub:       val('curQROPSub'),
+      qropCurrentGmv:       val('curQROPCurrentGmv'),
+      qropCurrentAov:       val('curQROPCurrentAov'),
       // v8.8: Marketplace context - not used in cost-replacement maths,
       // but informs the value pitch.
       marketGmv:        val('curMarketGmv'),
@@ -2529,6 +2867,9 @@
     $('card-currentPOS').style.display   = posOn  ? '' : 'none';
     if ($('card-currentKiosk')) $('card-currentKiosk').style.display = kioskOn ? '' : 'none';
     if ($('card-currentQROP'))  $('card-currentQROP').style.display  = qropOn  ? '' : 'none';
+    // v8.17: marketplaces card visible whenever OO is in scope (since
+    // direct ordering is the displacement lever).
+    if ($('card-currentMarketplaces')) $('card-currentMarketplaces').style.display = ooOn ? '' : 'none';
 
     // v8.16: Step 3 is now split into Section A (fees & subs) and
     // Section B (hardware). Each FIELD container toggles independently
@@ -2568,6 +2909,9 @@
     // anything). This way the rep starts from a defensible no-discount
     // baseline and discounts down - instead of starting from blank.
     prefillProposalFromList();
+    // v8.17: refresh slider bounds (esp. fdMonthlySub max = list sum)
+    // since the in-scope products just changed.
+    updateLeverSliderBounds();
 
     // Pill highlight
     document.querySelectorAll('.scope-tile').forEach(function (el) {
@@ -2606,9 +2950,11 @@
       fillIfBlank('fdQROPRate', rates.qrop.processing * 100);
       fillIfBlank('fdQROPTransFee', rates.qrop.txnFee);
     }
-    // v8.16: Bundled sub defaults to £129 (Flipdish's typical bundle
-    // figure across deals). Rep overwrites with the actual SFDC quote
-    // figure - the slider gives ±10 fine-tuning around the typed value.
+    // v8.17: Bundled sub defaults to LIST (sum of per-product list subs
+    // for whatever products are in scope). The rep starts at a defensible
+    // no-discount position and drags down. If the rep types a value, it
+    // sticks (auto flag is cleared). Country / scope changes re-fill while
+    // the auto flag is still set.
     var anyScope = $('includeOO').checked || $('includePOS').checked || $('includeKiosk').checked || ($('includeQROP') && $('includeQROP').checked);
     if (anyScope) {
       var subEl = $('fdMonthlySub');
@@ -2616,8 +2962,15 @@
         var isBlank = subEl.value === '' || subEl.value == null;
         var isAuto = subEl.dataset.auto === '1';
         if (isBlank || isAuto) {
-          subEl.value = '129';
-          subEl.dataset.auto = '1';
+          var listSub = 0;
+          if ($('includeOO').checked    && rates.oo)    listSub += rates.oo.sub;
+          if ($('includePOS').checked   && rates.pos)   listSub += rates.pos.sub * locations;
+          if ($('includeKiosk').checked && rates.kiosk) listSub += rates.kiosk.sub;
+          if ($('includeQROP') && $('includeQROP').checked && rates.qrop) listSub += rates.qrop.sub;
+          if (listSub > 0) {
+            subEl.value = String(Math.round(listSub));
+            subEl.dataset.auto = '1';
+          }
         }
       }
     }
@@ -2694,13 +3047,19 @@
       setSliderBounds('fdQROPRate', 0.5, 2, '0.50%', '2.00%');
       setSliderBounds('fdQROPTransFee', 0, 0.30, ccy + '0.00', ccy + '0.30');
     }
-    // v8.16: bundled sub can be anything (£3, €74, $150, £500+).
-    // Min always 0 in the active currency. Max = max(typed x 2, 300)
-    // so a £20 sub still has slide room and a £500 sub still fits.
+    // v8.17: bundled sub slider runs 0 -> LIST (sum of per-product subs
+    // for whatever products are in scope). Right-side label says "List £X"
+    // so the rep knows the anchor. If the rep typed a value above list
+    // (rare), the slider auto-expands to fit.
+    var listSubMax = 0;
+    if ($('includeOO').checked    && rates.oo)    listSubMax += rates.oo.sub;
+    if ($('includePOS').checked   && rates.pos)   listSubMax += rates.pos.sub * locations;
+    if ($('includeKiosk').checked && rates.kiosk) listSubMax += rates.kiosk.sub;
+    if ($('includeQROP') && $('includeQROP').checked && rates.qrop) listSubMax += rates.qrop.sub;
     var subTyped = parseFloat((($('fdMonthlySub') || {}).value)) || 0;
-    var subMax = Math.max(subTyped * 2, 300);
+    var subMax = Math.max(subTyped, listSubMax, 100);
     setSliderBounds('fdMonthlySub', 0, subMax,
-      ccy + '0', ccy + Math.round(subMax));
+      ccy + '0', 'List ' + ccy + Math.round(subMax));
   }
   function setSliderBounds(targetId, minVal, maxVal, floorLabel, listLabel) {
     var slider = document.querySelector('.lever-slider[data-target="' + targetId + '"]');
@@ -3176,16 +3535,20 @@
       if ($('vFeesCurrent')) $('vFeesCurrent').textContent = fmt(customerCurrent) + '/mo';
       var vsCurrent = proposalSnr - customerCurrent;
       var vsEl = $('vFeesVsCurrent');
+      var vsLabelEl = $('vFeesVsCurrentLabel');
       if (vsEl) {
         if (Math.abs(vsCurrent) < 0.5) {
+          if (vsLabelEl) vsLabelEl.textContent = 'Same as today';
           vsEl.textContent = 'Level'; vsEl.className = 'vval';
         } else if (vsCurrent > 0) {
-          // Proposal is ABOVE customer's current spend - red (the gap to defend)
-          vsEl.textContent = '+' + fmt(vsCurrent) + '/mo (above)';
+          // Proposal is ABOVE customer's current spend - rep needs to defend the uplift
+          if (vsLabelEl) vsLabelEl.textContent = 'More than today';
+          vsEl.textContent = '+' + fmt(vsCurrent) + '/mo';
           vsEl.className = 'vval down';
         } else {
-          // Proposal is BELOW customer's current spend - green
-          vsEl.textContent = '−' + fmt(-vsCurrent) + '/mo (below)';
+          // Proposal is BELOW customer's current spend - clear win
+          if (vsLabelEl) vsLabelEl.textContent = 'Cheaper than today';
+          vsEl.textContent = fmt(-vsCurrent) + '/mo less';
           vsEl.className = 'vval up';
         }
       }
@@ -3197,21 +3560,47 @@
     if ($('vFeesOpMargin')) $('vFeesOpMargin').textContent = fmt(v.opMarginMonthly || 0) + '/mo';
 
     var pillA = $('vFeesPill');
+    var actionA = $('vFeesAction');
     if (pillA) {
       var snrPerSite = v.snrPerSite || 0;
       var floor = GUARDRAILS.snrFloorMonthly;
       if (proposalSnr === 0) {
         pillA.className = 'lever-verdict-pill idle';
         pillA.textContent = 'Awaiting input';
+        if (actionA) actionA.style.display = 'none';
       } else if (snrPerSite >= floor) {
         pillA.className = 'lever-verdict-pill ok';
         pillA.textContent = 'Healthy SNR';
-      } else if (snrPerSite >= floor * 0.7) {
-        pillA.className = 'lever-verdict-pill warn';
-        pillA.textContent = 'Below SNR floor';
+        if (actionA) actionA.style.display = 'none';
       } else {
-        pillA.className = 'lever-verdict-pill bad';
-        pillA.textContent = 'SNR critical';
+        // Below floor (warn or critical) - compute the gap and recommend
+        // the simplest single-lever fix (lift the bundled sub by £X).
+        if (snrPerSite >= floor * 0.7) {
+          pillA.className = 'lever-verdict-pill warn';
+          pillA.textContent = 'Below SNR floor';
+        } else {
+          pillA.className = 'lever-verdict-pill bad';
+          pillA.textContent = 'SNR critical';
+        }
+        if (actionA) {
+          var gapPerSite = floor - snrPerSite;
+          var gapTotal = gapPerSite * locations;
+          // Sub lift = gap * locations because every £ of sub adds 1 unit
+          // of total SNR (and 1/locations to per-site SNR).
+          var subLift = Math.ceil(gapTotal);
+          // Also offer an OO-rate lift alternative (each pp adds £OOgmv/100)
+          var ooGmvDeal = parseFloat(($('curOOGmv') || {}).value) || 0;
+          var ooRateLift = ooGmvDeal > 0
+            ? (gapTotal / (ooGmvDeal / 100)).toFixed(2) + 'pp'
+            : null;
+          var actionMsg = '<strong>To clear the floor:</strong> raise the bundled sub by ~' + fmt(subLift) + '/mo';
+          if (ooRateLift && ooGmvDeal >= 500) {
+            actionMsg += ', or lift OO rate by ' + ooRateLift + ' (on ' + fmt(ooGmvDeal) + '/mo of online revenue)';
+          }
+          actionMsg += '.';
+          actionA.innerHTML = actionMsg;
+          actionA.style.display = '';
+        }
       }
     }
 
@@ -3285,6 +3674,8 @@
     updatePageTitle();
     // v8.16: volume tier pill follows the locations count.
     updateVolumeTierPill();
+    // v8.17: total current spend rollup at the top of Section 2.
+    updateStep2Summary();
     // v8.16: gate the bundled-sub field + Section A wrapper on whether
     // any proposal rate/hardware has been entered. (Don't re-run full
     // applyScopeVisibility here - it triggers prefill which writes the
@@ -3314,12 +3705,186 @@
     // v8.16: one-line deal snapshot under the page title.
     updateDealSnapshot(prospect, v);
 
+    // v8.17: approval panel + per-input sanity checks
+    updateApprovalPanel(prospect, v);
+    updateSanityChecks();
+
     // v8.16: Step 4 (Defensible discount stack) markup removed. The
     // rep now does the optimisation themselves via Section A and B
     // sliders + their live verdicts. The compute / render functions
     // for the offer panel + recommended deal remain in code below as
     // dead callees - safe to delete later if not revived.
   }
+
+  // v8.17: Decide whether the current proposal needs manager approval.
+  // Triggers: SNR per site below floor, hardware payback envelope
+  // exceeded, or bundled sub == 0 with any product in scope.
+  function updateApprovalPanel(p, v) {
+    var panel = $('approvalPanel');
+    if (!panel) return;
+    var reasons = [];
+    var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
+    var floor = GUARDRAILS.snrFloorMonthly;
+    var snrPerSite = (v && v.snrPerSite) || 0;
+    var anyScope = p.includeOO || p.includePOS || p.includeKiosk || p.includeQROP;
+    var hasProposalRates = anyScope && (
+      parseFloat(($('fdOOProcessingRate') || {}).value) > 0 ||
+      parseFloat(($('fdPosRate') || {}).value) > 0 ||
+      parseFloat(($('fdKioskRate') || {}).value) > 0 ||
+      parseFloat(($('fdQROPRate') || {}).value) > 0
+    );
+    if (anyScope && hasProposalRates && snrPerSite > 0 && snrPerSite < floor) {
+      var gap = (floor - snrPerSite) * locations;
+      reasons.push('Recurring SNR is <strong>' + Math.round(floor - snrPerSite) + '/mo per site</strong> below the £' + floor + ' floor (' + (locations === 1 ? '£' : 'across ' + locations + ' sites: £') + Math.round(gap) + '/mo total).');
+    }
+    // Hardware payback over cap
+    var envelope = (v && v.paybackEnvelope) || 0;
+    var hwList   = (v && v.hardwareListTotal) || 0;
+    var hwPos    = parseFloat(($('fdPosHardware') || {}).value) || 0;
+    var hwKiosk  = parseFloat(($('fdKioskHardware') || {}).value) || 0;
+    var hwProp   = (p.includePOS ? hwPos : 0) + (p.includeKiosk ? hwKiosk : 0);
+    var hwDisc   = Math.max(0, hwList - hwProp);
+    if (hwList > 0 && envelope > 0 && hwDisc > envelope) {
+      reasons.push('Hardware discount of <strong>£' + Math.round(hwDisc) + '</strong> exceeds the £' + Math.round(envelope) + ' payback envelope set by op margin.');
+    }
+    // Sub at zero
+    var subVal = parseFloat(($('fdMonthlySub') || {}).value);
+    if (anyScope && hasProposalRates && (subVal === 0)) {
+      reasons.push('Bundled subscription set to <strong>£0/mo</strong>.');
+    }
+    if (reasons.length > 0) {
+      var html = '<ul>' + reasons.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul>';
+      $('approvalReasons').innerHTML = html;
+      panel.style.display = '';
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+
+  // v8.17: per-input sanity warnings. Lightweight checks that catch
+  // common typos (huge order count from a tiny AOV, rate typed in the
+  // wrong unit, marketplace commission far above market norms).
+  function updateSanityChecks() {
+    function ensureWarn(inputId, warnId) {
+      var input = $(inputId);
+      if (!input) return null;
+      var existing = $(warnId);
+      if (existing) return existing;
+      var warn = document.createElement('div');
+      warn.id = warnId; warn.className = 'field-warn';
+      input.parentElement.appendChild(warn);
+      return warn;
+    }
+    function setWarn(inputId, warnId, text) {
+      var w = ensureWarn(inputId, warnId);
+      if (!w) return;
+      w.textContent = text || '';
+    }
+
+    // POS GMV / AOV — flag implausible order counts
+    var posGmv = parseFloat(($('curPosGmv') || {}).value) || 0;
+    var posAov = parseFloat(($('curAov') || {}).value) || 0;
+    var posOrders = posAov > 0 ? posGmv / posAov : 0;
+    if (posGmv > 0 && posAov > 0 && posOrders > 30000) {
+      setWarn('curAov', 'curAovWarn', 'AOV ' + posAov + ' with GMV ' + Math.round(posGmv) + ' implies ' + Math.round(posOrders).toLocaleString() + ' orders/month - check AOV is right.');
+    } else if (posGmv > 0 && posAov > 0 && posOrders < 5 && posGmv >= 1000) {
+      setWarn('curAov', 'curAovWarn', 'AOV ' + posAov + ' with GMV ' + Math.round(posGmv) + ' implies only ' + posOrders.toFixed(1) + ' orders/month - check AOV is right.');
+    } else {
+      setWarn('curAov', 'curAovWarn', '');
+    }
+
+    // OO GMV / AOV — same check, separate field
+    var ooGmv = parseFloat(($('curOOGmv') || {}).value) || 0;
+    var ooAov = parseFloat(($('curOOAov') || {}).value) || 0;
+    var ooOrders = ooAov > 0 ? ooGmv / ooAov : 0;
+    if (ooGmv > 0 && ooAov > 0 && ooOrders > 30000) {
+      setWarn('curOOAov', 'curOOAovWarn', 'AOV ' + ooAov + ' with GMV ' + Math.round(ooGmv) + ' implies ' + Math.round(ooOrders).toLocaleString() + ' orders/month - check AOV is right.');
+    } else {
+      setWarn('curOOAov', 'curOOAovWarn', '');
+    }
+
+    // Marketplace commission - typical 12-14%, > 25% looks like a typo
+    var mpc = parseFloat(($('curMarketCommission') || {}).value) || 0;
+    if (mpc > 25) {
+      setWarn('curMarketCommission', 'curMarketCommissionWarn', 'Typical marketplace commission is 12-14%. ' + mpc + '% looks high - check the figure.');
+    } else if (mpc > 0 && mpc < 5) {
+      setWarn('curMarketCommission', 'curMarketCommissionWarn', 'Typical marketplace commission is 12-14%. ' + mpc + '% looks low - did you mean to type a percentage?');
+    } else {
+      setWarn('curMarketCommission', 'curMarketCommissionWarn', '');
+    }
+
+    // POS merchant rate - > 10% is almost certainly a unit error
+    var posRate = parseFloat(($('curPosRate') || {}).value) || 0;
+    if (posRate > 10) {
+      setWarn('curPosRate', 'curPosRateWarn', posRate + '% is unusually high - typical card rate is 0.5-2%. Did you mean to type a different number?');
+    } else {
+      setWarn('curPosRate', 'curPosRateWarn', '');
+    }
+
+    // OO processing rate - > 15% is suspect
+    var ooProcRate = parseFloat(($('curOOProcessingRate') || {}).value) || 0;
+    if (ooProcRate > 20) {
+      setWarn('curOOProcessingRate', 'curOOProcessingRateWarn', ooProcRate + '% is unusually high - direct ordering rates are typically 3-7%. Check this matches the customer\'s contract.');
+    } else {
+      setWarn('curOOProcessingRate', 'curOOProcessingRateWarn', '');
+    }
+  }
+
+  // v8.17: copy a structured deal summary to the clipboard for the rep
+  // to paste into Slack / email when submitting for approval.
+  function buildApprovalSummary(p, v) {
+    var locations = Math.max(1, Math.round(parseFloat(p.locations)) || 1);
+    var ccy = CCY[p.country] || '£';
+    var fmt = function (n) { return ccy + Math.round(n || 0).toLocaleString('en-US'); };
+    var f = p.flipdish || {};
+    var c = p.current || {};
+    var lines = [];
+    lines.push('Deal approval request: ' + (p.name || '(no name)'));
+    lines.push('Owner: ' + (p.ownerName || '(unset)'));
+    lines.push('Country: ' + (p.country || 'UK') + '  ·  Locations: ' + locations);
+    lines.push('');
+    lines.push('Products in scope:');
+    if (p.includeOO)    lines.push('  - Online Ordering');
+    if (p.includePOS)   lines.push('  - POS');
+    if (p.includeKiosk) lines.push('  - Kiosk');
+    if (p.includeQROP)  lines.push('  - QROP');
+    lines.push('');
+    lines.push('Proposed rates:');
+    if (p.includeOO)    lines.push('  - OO processing: ' + (f.ooProcessingRate || '-') + '%');
+    if (p.includePOS) {
+      lines.push('  - POS processing: ' + (f.posRate || '-') + '% + ' + ccy + (f.posTransFee || '0') + '/txn');
+      lines.push('  - POS hardware: ' + fmt(parseFloat(f.posHardware) || 0) + ' (list ' + fmt(parseFloat(f.posHardwareList) || 0) + ')');
+    }
+    if (p.includeKiosk) {
+      lines.push('  - Kiosk processing: ' + (f.kioskRate || '-') + '% + ' + ccy + (f.kioskTransFee || '0') + '/txn');
+      lines.push('  - Kiosk hardware: ' + fmt(parseFloat(f.kioskHardware) || 0) + ' (list ' + fmt(parseFloat(f.kioskHardwareList) || 0) + ')');
+    }
+    if (p.includeQROP)  lines.push('  - QROP processing: ' + (f.qropRate || '-') + '% + ' + ccy + (f.qropTransFee || '0') + '/order');
+    lines.push('  - Bundled monthly sub: ' + fmt(parseFloat(f.monthlySub) || 0));
+    lines.push('');
+    lines.push('Guardrail breaches (the reason this needs sign-off):');
+    var reasons = ($('approvalReasons') || {}).innerText || '';
+    reasons.split('\n').forEach(function (r) {
+      var clean = r.trim();
+      if (clean) lines.push('  - ' + clean);
+    });
+    lines.push('');
+    var snrPerSite = (v && v.snrPerSite) || 0;
+    var opMargin = (v && v.opMarginMonthly) || 0;
+    lines.push('Headline numbers:');
+    lines.push('  - SNR per site: ' + fmt(snrPerSite) + '/mo (floor ' + fmt(GUARDRAILS.snrFloorMonthly) + '/mo)');
+    lines.push('  - Op margin total: ' + fmt(opMargin) + '/mo');
+    lines.push('');
+    lines.push('Customer current (Step 2):');
+    if (p.includeOO && c.ooGmv) lines.push('  - OO: ' + fmt(parseFloat(c.ooGmv)) + '/mo via ' + (c.ooProvider || 'unknown'));
+    if (p.includePOS && c.posGmv) lines.push('  - POS: ' + fmt(parseFloat(c.posGmv)) + '/mo via ' + (c.posProvider || 'unknown'));
+    if (c.marketGmv) lines.push('  - Marketplaces: ' + fmt(parseFloat(c.marketGmv)) + '/mo at ' + (c.marketCommission || '?') + '%');
+    return lines.join('\n');
+  }
+  // v8.17: expose for smoke tests / manual debugging
+  window.__buildApprovalSummary = buildApprovalSummary;
+  window.__getProspect = function () { return prospect; };
+  window.__computeValueStory = function () { return computeValueStory(prospect); };
 
   // ---------- Recommended Deal engine (v8.4) ----------
   // Will: "I want a 'recommended deal section' like show me what we
@@ -4139,13 +4704,87 @@
       });
     });
 
+    // v8.17: Toggle handlers for "Customer already has a kiosk/QR setup".
+    // Reveals the current-spend block when ticked.
+    function wireIncumbentToggle(toggleId, blockId) {
+      var t = $(toggleId);
+      var b = $(blockId);
+      if (!t || !b) return;
+      t.addEventListener('change', function () {
+        b.style.display = t.checked ? '' : 'none';
+        scheduleSave();
+        recompute();
+      });
+    }
+    wireIncumbentToggle('curKioskHasIncumbent', 'curKioskBlock');
+    wireIncumbentToggle('curQROPHasIncumbent',  'curQROPBlock');
+
+    // v8.17: Update the kiosk/QROP projection tips dynamically when POS
+    // GMV changes. Gives the rep a usable starting range.
+    function updateProjTips() {
+      var posGmv = parseFloat(($('curPosGmv') || {}).value) || 0;
+      var ccy = CCY[prospect.country] || '£';
+      var kioskTip = $('kioskProjTip');
+      var qropTip = $('qropProjTip');
+      if (kioskTip) {
+        if (posGmv > 0) {
+          var lo = Math.round(posGmv * 0.20 / 100) * 100;
+          var hi = Math.round(posGmv * 0.40 / 100) * 100;
+          kioskTip.innerHTML = 'Typical: 20-40% of in-store orders move to kiosk in QSR / casual dining. ' +
+            'Your POS GMV is ' + ccy + posGmv.toLocaleString() + ' - try <strong>' + ccy + lo.toLocaleString() + ' - ' + ccy + hi.toLocaleString() + '/mo</strong>.';
+        } else {
+          kioskTip.textContent = 'Typical: 20-40% of in-store orders move to kiosk in QSR / casual dining. Type a POS GMV in the in-store card to get a tailored range.';
+        }
+      }
+      if (qropTip) {
+        if (posGmv > 0) {
+          var qlo = Math.round(posGmv * 0.15 / 100) * 100;
+          var qhi = Math.round(posGmv * 0.30 / 100) * 100;
+          qropTip.innerHTML = 'Typical: 15-30% of dine-in orders use QR-pay when offered. ' +
+            'Your POS GMV is ' + ccy + posGmv.toLocaleString() + ' - try <strong>' + ccy + qlo.toLocaleString() + ' - ' + ccy + qhi.toLocaleString() + '/mo</strong>.';
+        } else {
+          qropTip.textContent = 'Typical: 15-30% of dine-in orders use QR-pay when offered. Type a POS GMV in the in-store card to get a tailored range.';
+        }
+      }
+    }
+    var posGmvInput = $('curPosGmv');
+    if (posGmvInput) posGmvInput.addEventListener('input', updateProjTips);
+    updateProjTips();  // run once at boot
+
+    // v8.17: marketplaces - render live "what they pay today" line under
+    // the GMV + commission inputs. Gives the rep an instant pain-point
+    // anchor for the conversation.
+    function updateMarketCardCost() {
+      var costEl = $('marketCardCost');
+      if (!costEl) return;
+      var gmv = parseFloat(($('curMarketGmv') || {}).value) || 0;
+      var pct = parseFloat(($('curMarketCommission') || {}).value) || 0;
+      var ccy = CCY[prospect.country] || '£';
+      if (gmv > 0 && pct > 0) {
+        var monthly = gmv * (pct / 100);
+        var annual = monthly * 12;
+        costEl.classList.remove('empty');
+        costEl.innerHTML = 'At ' + pct + '% commission on ' + ccy + Math.round(gmv).toLocaleString() + '/mo, the customer is giving up <strong>' + ccy + Math.round(monthly).toLocaleString() + '/mo</strong> (' + ccy + Math.round(annual).toLocaleString() + '/yr) to the marketplaces today.';
+      } else {
+        costEl.classList.add('empty');
+        costEl.textContent = '';
+      }
+    }
+    var marketGmvIn = $('curMarketGmv');
+    var marketPctIn = $('curMarketCommission');
+    if (marketGmvIn) marketGmvIn.addEventListener('input', updateMarketCardCost);
+    if (marketPctIn) marketPctIn.addEventListener('input', updateMarketCardCost);
+    updateMarketCardCost();
+
     // Any input in the form: debounced save + recompute
     var allInputIds = [
       'prospectName','locations','contactName','ownerName',
       'curOOProvider','curOOGmv','curOOAov','curOOSub','curOOProcessingRate','curOOTransFee',
       'curPosProvider','curPosGmv','curAov','curPosRate','curPosTransFee','curPosSub',
       'curKioskGmv','curKioskAov',
+      'curKioskProvider','curKioskSub','curKioskCurrentGmv','curKioskCurrentAov',
       'curQROPGmv','curQROPAov',
+      'curQROPProvider','curQROPSub','curQROPCurrentGmv','curQROPCurrentAov',
       'curMarketGmv','curMarketCommission',
       'fdOOProcessingRate',
       'fdPosRate','fdPosTransFee','fdPosHardware','fdPosHardwareList',
@@ -4218,6 +4857,38 @@
     });
 
     $('openCustomerBtn').addEventListener('click', openCustomerPage);
+
+    // v8.17: copy approval summary to clipboard
+    var approvalBtn = $('copyApprovalBtn');
+    if (approvalBtn) {
+      approvalBtn.addEventListener('click', function () {
+        var v = computeValueStory(prospect);
+        var text = buildApprovalSummary(prospect, v);
+        var done = function () {
+          var label = $('copyApprovalLabel');
+          approvalBtn.classList.add('copied');
+          if (label) label.textContent = 'Copied to clipboard';
+          setTimeout(function () {
+            approvalBtn.classList.remove('copied');
+            if (label) label.textContent = 'Copy summary for approval';
+          }, 2500);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function () {
+            // Fallback: use a temp textarea
+            var ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta);
+            ta.select(); document.execCommand('copy');
+            document.body.removeChild(ta); done();
+          });
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta);
+          ta.select(); document.execCommand('copy');
+          document.body.removeChild(ta); done();
+        }
+      });
+    }
     $('printBtn').addEventListener('click', printInternal);
     $('copyLinkBtn').addEventListener('click', copyLink);
     $('deleteBtn').addEventListener('click', deleteDeal);
