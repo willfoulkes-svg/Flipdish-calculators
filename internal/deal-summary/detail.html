@@ -690,77 +690,65 @@
     font-style: italic;
   }
 
-  /* v8.17.1: Marketplaces compact strip. Marketplaces is context-only
-     (doesn't feed any commercial verdict), so the input lives as a
-     single horizontal strip - icon, label, two small inputs, live
-     cost line - all on one row at typical desktop widths. Wraps onto
-     a second line on mobile. */
-  .market-strip-card {
-    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-    border: 1px solid var(--peach-line, #F1D5BC);
-    border-left: 3px solid var(--peach-dark, #C4541E);
-    background: #FFF7F0;
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin: 0 0 12px;
-    font-size: 12.5px;
+  /* v8.17.2: Sub-sections inside the Online orders card. Splits Step 2's
+     online-revenue card into two clearly-labelled sub-sections (Direct
+     ordering + Marketplace orders) so reps can see at a glance how
+     today's online revenue is split. */
+  .card-subsection {
+    margin: 14px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
   }
-  .market-strip-icon {
-    width: 18px; height: 18px;
-    display: inline-flex; align-items: center; justify-content: center;
+  .card-subsection:first-of-type {
+    margin-top: 4px;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .card-subsection-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
     color: var(--peach-dark, #C4541E);
-    flex-shrink: 0;
+    margin: 0 0 10px;
   }
-  .market-strip-icon svg { width: 100%; height: 100%; }
-  .market-strip-label {
-    display: flex; flex-direction: column; gap: 1px;
-    color: var(--peach-dark, #C4541E);
-    line-height: 1.25;
-  }
-  .market-strip-label strong { font-size: 13px; font-weight: 600; }
-  .market-strip-sub {
+  .card-subsection-hint {
     font-size: 10.5px;
-    color: var(--muted);
     font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--muted);
+    margin-left: 6px;
+    font-style: italic;
   }
-  .market-strip-input {
-    display: flex; align-items: center; gap: 6px;
+  /* The marketplace sub-section gets a peach left tint to keep the
+     visual cue from the old standalone strip - reminds the rep this
+     is the "where the money is leaking today" lever. */
+  .card-subsection-market {
+    background: #FFF7F0;
+    border-left: 3px solid var(--peach-dark, #C4541E);
+    margin: 14px -12px 0;
+    padding: 12px 14px 12px 12px;
+    border-top: none;
+    border-radius: 0 6px 6px 0;
   }
-  .market-strip-input label {
-    font-size: 10.5px; font-weight: 600; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.05em;
-    margin: 0;
+  .card-subsection-market .card-subsection-label {
+    color: var(--peach-dark, #C4541E);
+    margin-top: 0;
   }
-  .market-strip-input input {
-    width: 80px;
-    padding: 5px 8px;
-    border: 1px solid var(--input-border);
-    background: var(--input-bg);
-    border-radius: 5px;
-    font-size: 13px;
-    font-family: inherit;
-    color: var(--ink);
-  }
-  .market-strip-input input:focus {
-    outline: 2px solid var(--peach-dark, #C4541E);
-    outline-offset: -1px;
-  }
-  .market-strip-cost {
-    margin-left: auto;
-    font-size: 12px;
+  .card-subsection-cost {
+    margin: 10px 0 0;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--peach-dark, #C4541E);
-    line-height: 1.4;
-    text-align: right;
+    line-height: 1.5;
   }
-  .market-strip-cost:empty { display: none; }
-  .market-strip-cost.empty { display: none; }
-  .market-strip-cost strong {
-    font-weight: 700;
-  }
-  @media (max-width: 740px) {
-    .market-strip-card { gap: 8px; padding: 8px 10px; }
-    .market-strip-cost { width: 100%; text-align: left; margin-left: 0; }
+  .card-subsection-cost:empty { display: none; }
+  .card-subsection-cost.empty { display: none; }
+  .card-subsection-cost strong { font-weight: 700; }
+  /* The non-marketplace (direct ordering) sub-section keeps the muted-
+     grey label by default. Override here so it doesn't pick up the
+     peach colour from the generic .card-subsection-label rule above. */
+  .card-subsection:not(.card-subsection-market) .card-subsection-label {
+    color: var(--muted);
   }
 
   /* v8.17: Kiosk + QROP "has incumbent" toggle and current-spend block.
@@ -1615,30 +1603,6 @@
     </label>
   </div>
 
-  <!-- v8.17.1: Marketplaces is context, not maths. Shrunk to a single
-       compact strip - inline GMV + commission + live cost line. Tells
-       the rep the marketplace pain in one glance without eating the
-       page. Visibility tied to OO scope (since direct ordering is what
-       reclaims marketplace volume). -->
-  <div class="market-strip-card" id="card-currentMarketplaces" style="display:none;">
-    <span class="market-strip-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-    </span>
-    <span class="market-strip-label">
-      <strong>Marketplaces today</strong>
-      <span class="market-strip-sub">Deliveroo / Uber Eats / Just Eat - context for the pitch</span>
-    </span>
-    <span class="market-strip-input">
-      <label>Monthly GMV</label>
-      <input id="curMarketGmv" type="number" min="0" step="100" placeholder="e.g. 10000">
-    </span>
-    <span class="market-strip-input">
-      <label>Commission %</label>
-      <input id="curMarketCommission" type="number" min="0" step="0.5" placeholder="e.g. 13">
-    </span>
-    <span class="market-strip-cost" id="marketCardCost"></span>
-  </div>
-
   <!-- v8.8: side-by-side current - In-store left, Direct ordering right.
        Will: very long list with too much blank space; pair them up. -->
   <div class="current-grid">
@@ -1673,37 +1637,62 @@
       </div>
     </div>
 
-    <!-- Direct ordering current - provider comparison -->
+    <!-- v8.17.2: "Online orders" card - one card with two clearly
+         labelled sub-sections (Direct orders + Marketplace orders).
+         Mental model: total online revenue is split between direct
+         channels (FeedMe / Mealzo / Foodhub etc.) and marketplaces
+         (Deliveroo / Uber Eats / Just Eat). Both belong on the same
+         page section because they're both online revenue today. -->
     <div class="card" id="card-currentOO" style="display:none;">
-      <h3>Direct ordering - today <span class="hint" style="font-weight:400;font-size:12.5px;color:var(--muted);margin-left:6px;">(not marketplace channels)</span></h3>
-      <div class="grid2">
-        <div class="field">
-          <label>Current provider</label>
-          <input id="curOOProvider" type="text" placeholder="e.g. Foodhub, Mealzo">
-        </div>
-        <div class="field">
-          <label>Monthly online revenue <span class="hint">(direct)</span></label>
-          <input id="curOOGmv" type="number" min="0" step="100" placeholder="e.g. 2000">
-        </div>
-        <div class="field">
-          <label>Average online order value</label>
-          <input id="curOOAov" type="number" min="0" step="0.5" placeholder="e.g. 25">
-        </div>
-        <div class="field">
-          <label>Software subscription <span class="hint">(£/mo)</span></label>
-          <input id="curOOSub" type="number" min="0" step="1" placeholder="e.g. 79">
-        </div>
-        <div class="field">
-          <label>Processing fee % <span class="hint">(or commission %)</span></label>
-          <input id="curOOProcessingRate" type="number" min="0" step="0.01" placeholder="e.g. 3.4">
-        </div>
-        <div class="field">
-          <label>Per-transaction fee</label>
-          <input id="curOOTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.05">
+      <h3>Online orders - today</h3>
+
+      <!-- Sub-section: Direct ordering provider -->
+      <div class="card-subsection">
+        <div class="card-subsection-label">Direct ordering <span class="card-subsection-hint">(direct provider e.g. FeedMe, Foodhub)</span></div>
+        <div class="grid2">
+          <div class="field">
+            <label>Current provider</label>
+            <input id="curOOProvider" type="text" placeholder="e.g. Foodhub, Mealzo">
+          </div>
+          <div class="field">
+            <label>Monthly online revenue <span class="hint">(direct)</span></label>
+            <input id="curOOGmv" type="number" min="0" step="100" placeholder="e.g. 2000">
+          </div>
+          <div class="field">
+            <label>Average online order value</label>
+            <input id="curOOAov" type="number" min="0" step="0.5" placeholder="e.g. 25">
+          </div>
+          <div class="field">
+            <label>Software subscription <span class="hint">(£/mo)</span></label>
+            <input id="curOOSub" type="number" min="0" step="1" placeholder="e.g. 79">
+          </div>
+          <div class="field">
+            <label>Processing fee % <span class="hint">(or commission %)</span></label>
+            <input id="curOOProcessingRate" type="number" min="0" step="0.01" placeholder="e.g. 3.4">
+          </div>
+          <div class="field">
+            <label>Per-transaction fee</label>
+            <input id="curOOTransFee" type="number" min="0" step="0.01" placeholder="e.g. 0.05">
+          </div>
         </div>
       </div>
-      <!-- v8.17: marketplace inputs lifted out of this card to a
-           dedicated top-level marketplaces card above. -->
+
+      <!-- Sub-section: Marketplace orders. Context for the pitch
+           rather than cost-replacement maths. -->
+      <div class="card-subsection card-subsection-market" id="card-currentMarketplaces">
+        <div class="card-subsection-label">Marketplace orders <span class="card-subsection-hint">(Deliveroo / Uber Eats / Just Eat)</span></div>
+        <div class="grid2">
+          <div class="field">
+            <label>Monthly marketplace GMV <span class="hint">(combined)</span></label>
+            <input id="curMarketGmv" type="number" min="0" step="100" placeholder="e.g. 10000">
+          </div>
+          <div class="field">
+            <label>Average commission % <span class="hint">(typical 12-14%)</span></label>
+            <input id="curMarketCommission" type="number" min="0" step="0.5" placeholder="e.g. 13">
+          </div>
+        </div>
+        <p class="card-subsection-cost" id="marketCardCost"></p>
+      </div>
     </div>
 
     <!-- v8.17: Kiosk - capture current setup if any, plus projected
@@ -2931,9 +2920,8 @@
     $('card-currentPOS').style.display   = posOn  ? '' : 'none';
     if ($('card-currentKiosk')) $('card-currentKiosk').style.display = kioskOn ? '' : 'none';
     if ($('card-currentQROP'))  $('card-currentQROP').style.display  = qropOn  ? '' : 'none';
-    // v8.17: marketplaces card visible whenever OO is in scope (since
-    // direct ordering is the displacement lever).
-    if ($('card-currentMarketplaces')) $('card-currentMarketplaces').style.display = ooOn ? '' : 'none';
+    // v8.17.2: marketplace sub-section is now nested INSIDE the OO card,
+    // so it inherits visibility from the parent. No separate toggle.
 
     // v8.16: Step 3 is now split into Section A (fees & subs) and
     // Section B (hardware). Each FIELD container toggles independently
