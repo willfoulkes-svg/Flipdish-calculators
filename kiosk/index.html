@@ -274,7 +274,7 @@
 <body>
 <div class="wrap">
 
-  <a href="../" class="back">
+  <a href="../index.html" class="back">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     All calculators
   </a>
@@ -303,7 +303,7 @@
     <div class="meta">Kiosk · Rates verified April 2026 · v1.0</div>
   </header>
 
-  <h1 id="pageTitle">How much could a Flipdish Kiosk save you?</h1>
+  <h1 id="pageTitle">Self-service kiosk value</h1>
   <p class="lede" id="pageLede">Enter your restaurant's numbers on the left. The annual saving updates live. Nothing is saved - this is a live illustration.</p>
 
   <!-- COUNTRY SELECTOR -->
@@ -495,11 +495,11 @@
       view = btn.dataset.view;
       $('revenueInputs').style.display = (view === "revenue") ? "block" : "none";
       document.body.classList.toggle('revenue-view', view === "revenue");
+      // Page title stays static ("Self-service kiosk value") - the lede
+      // still swaps with view so the user knows what they're looking at.
       if (view === "labour") {
-        $('pageTitle').textContent = "How much could a Flipdish Kiosk save you?";
         $('pageLede').textContent = "Enter your restaurant's numbers on the left. The annual saving updates live. Nothing is saved - this is a live illustration.";
       } else {
-        $('pageTitle').textContent = "How much extra revenue could a Flipdish Kiosk bring in?";
         $('pageLede').textContent = "Enter your restaurant's numbers on the left. The extra annual revenue updates live. Nothing is saved - this is a live illustration.";
       }
       calc();

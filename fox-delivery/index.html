@@ -366,7 +366,7 @@
 <body>
 <div class="wrap">
 
-  <a href="../" class="back">
+  <a href="../index.html" class="back">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     All calculators
   </a>
@@ -395,7 +395,7 @@
     <div class="meta">Fox Delivery · Ireland · Marketplace delivery comparison · v1.0</div>
   </header>
 
-  <h1 id="pageTitle">Stop paying 33% to marketplaces for delivery</h1>
+  <h1 id="pageTitle">Flipdish + Fox Delivery vs marketplaces</h1>
   <p class="lede">Compare a restaurant's take-home on marketplace delivery (Just Eat, Deliveroo) vs ordering via Flipdish with Fox Delivery handling delivery in Ireland. The Fox Delivery rate is fixed by distance band - adjust what the customer pays per band to find a healthy take rate. All figures are ex-VAT: Fox charges VAT separately and it's reclaimable on both sides.</p>
 
   <!-- COUNTRY (Ireland only - Fox Delivery is IE-exclusive) -->
@@ -655,8 +655,8 @@
     const monthlySavings    = avgSavingPerOrder * deliveries;
     const annualSavings     = monthlySavings * 12;
 
-    // Page title reflects the marketplace rate
-    $('pageTitle').textContent = `Stop paying ${Math.round(mpRate)}% to marketplaces for delivery`;
+    // Page title is now static ("Flipdish + Fox Delivery vs marketplaces")
+    // so the rep always knows which calculator they're on.
 
     // If AOV is 0 or less, take rates become infinite/nonsense - show em-dash fallbacks
     const validAov = aov > 0;
