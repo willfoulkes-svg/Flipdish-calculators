@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Flipdish Phone AI - Value Calculator</title>
+<title>Flipdish Phone AI Value Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -178,42 +178,67 @@
 
   /* ---------- Hero result ---------- */
   .hero {
-    background: linear-gradient(135deg, #E6F1FB 0%, #C6DEF3 100%);
-    border: 1px solid var(--flipdish-blue-line);
+    background: linear-gradient(135deg, #E7F5EC 0%, #BFE3CC 100%);
+    border: 1px solid #9CCDB1;
     border-radius: 12px;
     padding: 26px 28px;
     margin: 12px 0 14px;
     display: flex; justify-content: space-between; align-items: center;
     gap: 24px; flex-wrap: wrap;
+    transition: background .25s ease, border-color .25s ease;
+  }
+  .hero.negative {
+    background: linear-gradient(135deg, #FDECEA 0%, #F8C7C2 100%);
+    border-color: #E89A92;
   }
   .hero .label {
-    font-size: 12px; color: var(--flipdish-blue-dark); font-weight: 700;
+    font-size: 12px; color: #1F5C36; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.1em;
   }
+  .hero.negative .label { color: #8A2E26; }
   .hero .big {
-    font-size: 48px; font-weight: 700; color: var(--flipdish-blue-dark);
+    font-size: 48px; font-weight: 700; color: #1F5C36;
     line-height: 1.1; margin: 4px 0 6px; letter-spacing: -0.02em;
   }
-  .hero .sub { font-size: 13px; color: var(--flipdish-blue-dark); opacity: 0.85; }
+  .hero.negative .big { color: #8A2E26; }
+  .hero .sub { font-size: 13px; color: #1F5C36; opacity: 0.85; font-style: italic; }
+  .hero.negative .sub { color: #8A2E26; }
   .hero .secondary { text-align: right; }
   .hero .secondary .big-sec {
     font-family: 'Domine', Georgia, serif;
-    font-size: 30px; font-weight: 700; color: var(--flipdish-blue-dark);
+    font-size: 30px; font-weight: 700; color: #1F5C36;
     line-height: 1.1;
   }
+  .hero.negative .secondary .big-sec { color: #8A2E26; }
   .hero .secondary .label-sec {
-    font-size: 11px; color: var(--flipdish-blue-dark); font-weight: 600;
+    font-size: 11px; color: #1F5C36; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85;
   }
+  .hero.negative .secondary .label-sec { color: #8A2E26; }
+
+  /* ---------- Breakeven warning banner ---------- */
+  .breakeven {
+    background: #FFF7E6;
+    border: 1px solid #F0C674;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #7A4F00;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .breakeven strong { color: #5C3A00; }
+
 
   /* ---------- Value breakdown ---------- */
   .breakdown {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin-bottom: 22px;
   }
-  @media (max-width: 760px) { .breakdown { grid-template-columns: 1fr; } }
+  @media (max-width: 880px) { .breakdown { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .breakdown { grid-template-columns: 1fr; } }
   .stream {
     background: white; border: 1px solid var(--border); border-radius: 12px;
     padding: 20px 22px;
@@ -258,59 +283,10 @@
   }
   .stream-value.flash,
   .hero .big.flash,
-  .hero .big-sec.flash,
-  .net-value.flash {
+  .hero .big-sec.flash {
     animation: valueFlash 0.6s ease-out;
     border-radius: 4px;
   }
-
-  /* ---------- ROI section (cost input + net card together) ---------- */
-  .roi {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-bottom: 14px;
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) 2fr;
-    gap: 20px;
-    align-items: center;
-  }
-  @media (max-width: 640px) {
-    .roi { grid-template-columns: 1fr; }
-  }
-  .roi .net-readout { text-align: right; }
-  .roi .net-readout.left { text-align: left; }
-  .roi .net-label {
-    font-size: 12px; color: var(--muted); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-  }
-  .roi .net-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .roi .net-value {
-    font-family: 'Domine', Georgia, serif;
-    font-size: 28px; font-weight: 700;
-    color: var(--green-strong);
-    line-height: 1.1; margin-top: 2px;
-  }
-  .roi .net-value.negative { color: var(--red-strong); }
-
-  /* ---------- Tips ---------- */
-  .tips {
-    background: #F5FAFE;
-    border: 1px solid var(--flipdish-blue-line);
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin-top: 14px;
-  }
-  .tips h2 {
-    font-family: 'Domine', Georgia, serif;
-    font-size: 16px; margin: 0 0 12px;
-    color: var(--flipdish-blue-dark); font-weight: 700;
-  }
-  .tips ol { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.55; color: #334155; }
-  .tips ol li { margin-bottom: 8px; }
-  .tips ol li:last-child { margin-bottom: 0; }
-  .tips strong { color: var(--flipdish-dark); }
 
   footer {
     margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center;
@@ -326,7 +302,6 @@
     .hero .big { font-size: 34px; }
     .hero .secondary .big-sec { font-size: 22px; }
     .stream .stream-value { font-size: 22px; }
-    .roi .net-value { font-size: 22px; }
     header { gap: 8px; }
     .brand svg { height: 28px; }
     .brand .tag { display: none; }
@@ -338,7 +313,7 @@
 <body>
 <div class="wrap">
 
-  <a href="../" class="back">
+  <a href="../index.html" class="back">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     All calculators
   </a>
@@ -364,11 +339,11 @@
       </svg>
       <span class="tag">Business Value Assessment</span>
     </div>
-    <div class="meta">Flipdish Phone AI · Missed orders + staff time returned · v1.4</div>
+    <div class="meta">Flipdish Phone AI · Captured orders + returned hours + upsell uplift · v2.0</div>
   </header>
 
-  <h1 id="pageTitle">Take the phone off your team's hands</h1>
-  <p class="lede">Phone AI picks up every call, every time. Missed orders that used to walk away now stick - and your team gets back the hours they used to spend on the phone. Edit any yellow input to model a specific case.</p>
+  <h1 id="pageTitle">Phone AI - Value Calculator</h1>
+  <p class="lede">Phone AI picks up every call, takes every order, and offers an upsell every time. See the captured orders, returned hours, and ticket uplift it adds to your restaurant each month. Edit any yellow input to model a specific case.</p>
 
   <!-- COUNTRY SELECTOR -->
   <div class="country-bar">
@@ -396,7 +371,7 @@
     </div>
     <div class="input-cell">
       <label>% of calls missed today</label>
-      <input id="pctMissed" type="number" value="5" step="0.5" min="0" max="100">
+      <input id="pctMissed" type="number" value="15" step="0.5" min="0" max="100">
     </div>
     <div class="input-cell">
       <label>Avg call length (minutes)</label>
@@ -408,22 +383,46 @@
     </div>
   </div>
 
-  <!-- STEP 2: VALUE -->
+  <!-- STEP 2: FLIPDISH PROPOSAL -->
   <div class="step">
     <span class="num">2</span>
+    <span class="text">Flipdish Proposal</span>
+  </div>
+  <div class="inputs-grid">
+    <div class="input-cell">
+      <label>Phone AI monthly cost</label>
+      <input id="phoneAiCost" type="number" value="99" step="1" min="0">
+    </div>
+    <div class="input-cell">
+      <label>Flipdish commission %</label>
+      <input id="commissionPct" type="number" value="5" step="0.5" min="0" max="100">
+    </div>
+    <div class="input-cell">
+      <label>AOV uplift from upsell %</label>
+      <input id="upsellPct" type="number" value="12" step="0.5" min="0" max="100">
+    </div>
+  </div>
+
+  <!-- STEP 3: VALUE -->
+  <div class="step">
+    <span class="num">3</span>
     <span class="text">See the value to the restaurant</span>
   </div>
 
-  <div class="hero">
+  <div class="hero" id="hero">
     <div>
-      <div class="label">Annual value</div>
+      <div class="label" id="heroLabel">Net monthly value after Flipdish fees</div>
       <div class="big" id="heroBig">-</div>
-      <div class="sub" id="heroSub">Missed orders captured + staff time returned</div>
+      <div class="sub" id="heroSub">-</div>
     </div>
     <div class="secondary">
-      <div class="label-sec">Monthly</div>
-      <div class="big-sec" id="heroMonthly">-</div>
+      <div class="label-sec">Annual</div>
+      <div class="big-sec" id="heroAnnual">-</div>
     </div>
+  </div>
+
+  <div class="breakeven" id="breakevenWarning" hidden>
+    <strong>Heads up:</strong> at these inputs Phone AI would cost more than it returns each month. It may not be the right fit for this restaurant at this scale yet — let's revisit the numbers together.
   </div>
 
   <div class="breakdown">
@@ -446,32 +445,16 @@
       <div class="stream-value" id="streamLabour">-</div>
       <div class="formula" id="streamLabourFormula">-</div>
     </div>
-  </div>
 
-  <!-- STEP 3: COMPARE TO QUOTE -->
-  <div class="step">
-    <span class="num">3</span>
-    <span class="text">Apply your Phone AI cost</span>
-  </div>
-  <div class="roi">
-    <div class="input-cell">
-      <label>Phone AI monthly cost</label>
-      <input id="phoneAiCost" type="number" value="0" step="5" min="0" placeholder="0">
+    <div class="stream">
+      <div class="icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <h3>Bigger tickets from upselling</h3>
+      <p class="stream-sub">Phone AI offers a relevant add-on on every single call — lifting your average order value across phone orders.</p>
+      <div class="stream-value" id="streamUpsell">-</div>
+      <div class="formula" id="streamUpsellFormula">-</div>
     </div>
-    <div class="net-readout" id="netReadout">
-      <div class="net-placeholder">Enter a monthly quote to see the net value &rarr;</div>
-    </div>
-  </div>
-
-  <!-- TIPS -->
-  <div class="tips">
-    <h2>How to use this in a commercial conversation</h2>
-    <ol>
-      <li><strong>Get the missed-call rate.</strong> Most operators underestimate this. 5% is conservative - many phone-heavy restaurants lose 10-20% of calls during the Friday/Saturday dinner rush. A simple "how many calls does your POS show vs how many got answered?" almost always uncovers a bigger number.</li>
-      <li><strong>Pin down the call length honestly.</strong> 3-5 minutes is typical for a phone order with menu questions and payment. The labour line scales linearly with this number, so don't overstate it - a credible 4 minutes beats an aggressive 8.</li>
-      <li><strong>Enter the Phone AI monthly cost.</strong> The <em>Net monthly value</em> on the right shows what the restaurant actually pockets each month after subtracting the subscription <em>and</em> Flipdish's 5% commission on every order Phone AI handles.</li>
-      <li><strong>5% commission is already baked in.</strong> You don't need to add it anywhere - the net figure already deducts 5% of (monthly phone orders × AOV). Mention this explicitly to the client so there are no surprises on invoice 1.</li>
-    </ol>
   </div>
 
   <footer>
@@ -518,7 +501,14 @@
 
   // ---------- Calculation ----------
   const DAYS_PER_MONTH = 30;
-  const COMMISSION_RATE = 0.05; // Flipdish takes a 5% commission on every order handled by Phone AI
+  // Upsell uplift: Phone AI offers an add-on on every call, lifting AOV by a
+  // typical % across all phone orders. The input lives in the "Flipdish Proposal"
+  // section and defaults to 12%; reps can dial it up or down per deal.
+  // Phone AI subscription defaults to £/€/$99 per location per month — the
+  // rep edits the field directly to reflect any discount they've offered.
+  // List subscription price per location per month (Phone AI commercial guide).
+  // Sales can promotionally discount this to £/€0 until end of 2026.
+  const LIST_SUB_PRICES = { UK: 99, IE: 99, US: 99 };
 
   function calc() {
     const ordersPerDay = num('ordersPerDay');
@@ -526,30 +516,39 @@
     const pctMissed    = num('pctMissed');
     const callLength   = num('callLength');
     const hourlyWage   = num('hourlyWage');
+    const upsellPct    = num('upsellPct');
+    const commissionPct = num('commissionPct');
     const phoneAiCost  = num('phoneAiCost');
 
-    // Clamp the missed-% - guards against silly inputs like 120%
+    // Clamp the various percentages so silly inputs (e.g. 120%) don't break things
     const clampedMissed = Math.min(Math.max(pctMissed, 0), 100);
+    const clampedUpsellPct = Math.min(Math.max(upsellPct, 0), 100);
+    const clampedCommission = Math.min(Math.max(commissionPct, 0), 100);
 
     const monthlyOrders = ordersPerDay * DAYS_PER_MONTH;
 
-    // Stream 1: missed orders captured (gross, pre-commission)
+    // Card 1: missed orders captured (gross, pre-commission)
     const missed = monthlyOrders * (clampedMissed / 100) * aov;
 
-    // Stream 2: staff time returned
+    // Card 2: staff time returned
     const labour = monthlyOrders * (callLength / 60) * hourlyWage;
 
-    // Commission cost - 5% of every phone order now runs through Flipdish Phone AI
-    const commissionMonthly = monthlyOrders * aov * COMMISSION_RATE;
+    // Card 3: AOV uplift from upsell, applied across every phone order
+    //   = monthly orders × AOV × upsell uplift %
+    const upsell = monthlyOrders * aov * (clampedUpsellPct / 100);
 
-    const grossMonthly = missed + labour;
-    const grossAnnual  = grossMonthly * 12;
-    // Net = gross value − Phone AI subscription − 5% commission on all handled orders
+    // Commission cost - charged on every phone order now running through Phone AI
+    const commissionMonthly = monthlyOrders * aov * (clampedCommission / 100);
+
+    const grossMonthly = missed + labour + upsell;
+    // Net = gross value − Phone AI subscription − commission on all handled orders
     const netMonthly   = grossMonthly - phoneAiCost - commissionMonthly;
+    const netAnnual    = netMonthly * 12;
 
     // Render stream cards
     setText($('streamMissed'), fmtMoney2(missed), 'flash');
     setText($('streamLabour'), fmtMoney2(labour), 'flash');
+    setText($('streamUpsell'), fmtMoney2(upsell), 'flash');
 
     // Live formulas - show actual numbers, not abstract variables
     const orderWord = monthlyOrders === 1 ? 'order' : 'orders';
@@ -557,34 +556,26 @@
       `${monthlyOrders.toLocaleString()} ${orderWord}/mo × ${clampedMissed}% missed × ${fmtMoney2(aov)} AOV`;
     $('streamLabourFormula').textContent =
       `${monthlyOrders.toLocaleString()} ${orderWord}/mo × ${callLength} min ÷ 60 × ${fmtMoney2(hourlyWage)}/hr`;
+    $('streamUpsellFormula').textContent =
+      `${monthlyOrders.toLocaleString()} ${orderWord}/mo × ${fmtMoney2(aov)} AOV × ${clampedUpsellPct}% upsell uplift`;
 
-    // Render hero
-    setText($('heroBig'),     fmtMoney(grossAnnual)  + '/yr', 'flash');
-    setText($('heroMonthly'), fmtMoney(grossMonthly) + '/mo', 'flash');
-    $('heroSub').textContent =
-      `Missed orders captured + staff time returned · ${labels[activeCountry]} · before 5% commission`;
+    // Render hero — net value with a small maths bridge underneath
+    const hero = $('hero');
+    const negative = netMonthly < 0;
+    hero.classList.toggle('negative', negative);
 
-    // ROI readout - always show net; include 5% commission alongside the subscription
-    const netReadout = $('netReadout');
-    const negative   = netMonthly < 0;
-    const totalCost  = phoneAiCost + commissionMonthly;
-    let subText;
-    if (phoneAiCost === 0) {
-      subText = `No subscription entered · 5% commission (${fmtMoney2(commissionMonthly)}/mo) already subtracted`;
-    } else if (negative) {
-      subText = `Total cost ${fmtMoney2(totalCost)}/mo (sub ${fmtMoney2(phoneAiCost)} + 5% commission ${fmtMoney2(commissionMonthly)}) exceeds gross value`;
-    } else {
-      subText = `Gross ${fmtMoney2(grossMonthly)}/mo − sub ${fmtMoney2(phoneAiCost)}/mo − 5% commission ${fmtMoney2(commissionMonthly)}/mo`;
-    }
-    netReadout.innerHTML = `
-      <div class="net-label">Net monthly value</div>
-      <div class="net-value ${negative ? 'negative' : ''}">${fmtMoney2(netMonthly)}/mo</div>
-      <div class="net-sub">${subText}</div>
-    `;
+    setText($('heroLabel'),
+      negative ? 'Net monthly cost at these inputs' : 'Net monthly value after Flipdish fees');
+    setText($('heroBig'),    fmtMoney2(netMonthly) + '/mo', 'flash');
+    setText($('heroAnnual'), fmtMoney(netAnnual)   + '/yr', 'flash');
+    $('heroSub').textContent = '';
+
+    // Toggle the breakeven warning banner
+    $('breakevenWarning').hidden = !negative;
   }
 
   // ---------- Wire up ----------
-  ['ordersPerDay','aov','pctMissed','callLength','hourlyWage','phoneAiCost']
+  ['ordersPerDay','aov','pctMissed','callLength','hourlyWage','upsellPct','commissionPct','phoneAiCost']
     .forEach(id => $(id).addEventListener('input', calc));
 
   // ---------- Country selector ----------
